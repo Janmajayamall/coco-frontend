@@ -1,0 +1,274 @@
+[
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_factory",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "inputs": [],
+    "name": "MARKET_INIT_CODE_HASH",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "amountOutToken0",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amountOutToken1",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amountInCMax",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "market",
+        "type": "address"
+      }
+    ],
+    "name": "buyExactTokensForMaxCTokens",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "amountOutToken0Min",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amountOutToken1Min",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amountInC",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "fixedTokenIndex",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "market",
+        "type": "address"
+      }
+    ],
+    "name": "buyMinTokensForExactCTokens",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_creator",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_oracle",
+        "type": "address"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "_identifier",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_fundingAmount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_amountIn",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_for",
+        "type": "uint256"
+      }
+    ],
+    "name": "createAndPlaceBetOnMarket",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "factory",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "creator",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "oracle",
+        "type": "address"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "identifier",
+        "type": "bytes32"
+      }
+    ],
+    "name": "getMarketAddress",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "marketAddress",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_for",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amountInToken",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "market",
+        "type": "address"
+      }
+    ],
+    "name": "redeemWinning",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "amountInToken0",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amountInToken1",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amountOutTokenCMin",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "market",
+        "type": "address"
+      }
+    ],
+    "name": "sellExactTokensForMinCTokens",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "amountInToken0Max",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amountInToken1Max",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amountOutTokenC",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "fixedTokenIndex",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "market",
+        "type": "address"
+      }
+    ],
+    "name": "sellMaxTokensForExactCTokens",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_for",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amountIn",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "market",
+        "type": "address"
+      }
+    ],
+    "name": "stakeForOutcome",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]
