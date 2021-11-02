@@ -1,21 +1,68 @@
 import { Button, Box, Text, Flex } from "@chakra-ui/react";
 import { formatEther } from "@ethersproject/units";
 import { utils } from "ethers";
-import { createHotAccount } from "./../utils";
+import {
+	createHotAccount,
+	getAccountNonce,
+	loginUser,
+	toCheckSumAddress,
+	getUser,
+} from "./../utils";
+import { useEthers } from "@usedapp/core/packages/core";
+import { useEffect, useState } from "react";
 
 function LoginButton() {
 	const { account } = useEthers();
+	const [userProfile, setUserProfile] = useState();
+
+	useEffect(async () => {
+		const res = await getUser();
+		setUserProfile(res);
+	}, []);
+
+	async function loginUserHelper() {
+		const accounts = await window.ethereum.enable();
+		if (accounts.length == 0) {
+			return;
+		}
+
+		// account Nonce
+		var res = await getAccountNonce(toCheckSumAddress(accounts[0]));
+		if (!res) {
+			// show error & return
+			return;
+		}
+		const accountNonce = Math.ceil(Number(res.accountNonce) + 1);
+
+		const { privateKey, address } = createHotAccount();
+		const signature = await window.ethereum.request({
+			method: "personal_sign",
+			params: [
+				accounts[0],
+				JSON.stringify({
+					hotAddress: address,
+					accountNonce,
+				}),
+			],
+		});
+
+		res = await loginUser(signature, address, accountNonce);
+		if (!res) {
+			// error
+			return;
+		}
+
+		localStorage.setItem("hotPvKey", privateKey);
+		localStorage.setItem("keySignature", signature);
+	}
 
 	return account ? (
 		<Button
-			onClick={() => {
-				const { privateKey, address } = createHotAccount();
-
-				// sign address & nonce with cold wallet (i.e. using Metamask)
-
-				// send login request {address, nonce, signature}
-
-				// store signature, hot private key in local storage
+			onClick={async () => {
+				if (userProfile) {
+				} else {
+					await loginUserHelper();
+				}
 			}}
 			bg="blue.800"
 			color="blue.300"
@@ -32,7 +79,7 @@ function LoginButton() {
 				borderColor: "blue.700",
 			}}
 		>
-			Login
+			{userProfile == undefined ? "Login" : "Logout"}
 		</Button>
 	) : (
 		<Button
@@ -51,9 +98,9 @@ function LoginButton() {
 				borderColor: "blue.700",
 			}}
 		>
-			Connect
+			Connect Wallet
 		</Button>
 	);
 }
 
-export default ConnectButton;
+export default LoginButton;

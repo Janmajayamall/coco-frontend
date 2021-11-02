@@ -1,5 +1,6 @@
 import axios from "axios";
-
+import { signMessage } from ".";
+import { generateRequestSignatures } from "./auth";
 const baseInstance = axios.create({
 	baseURL: "http://localhost:5000",
 	timeout: 1000,
@@ -20,17 +21,66 @@ export async function getAccountNonce(coldAddress) {
 }
 
 export async function getUser() {
-    
+	const msg = {
+		value: "profile",
+	};
+	const signatures = generateRequestSignatures(msg);
+
+	if (!signatures) {
+		return;
+	}
+
 	try {
 		const { data } = await baseInstance.request({
 			url: "/user/profile",
 			method: "POST",
 			data: {
-				signatures: {
-                    keySignature:"",
-                    
-                },
+				signatures,
+				msg,
 			},
 		});
+		return data.response;
+	} catch (e) {}
+}
+
+export async function loginUser(keySignature, hotAddress, accountNonce) {
+	try {
+		const { data } = await baseInstance.request({
+			url: "/user/login",
+			method: "POST",
+			data: {
+				hotAddress,
+				accountNonce,
+				keySignature,
+			},
+		});
+		console.log(data);
+		return data.response;
+	} catch (e) {}
+}
+
+export async function newPost(txHash, imageUrl, categoryId) {
+	const msg = {
+		txHash,
+		imageUrl,
+		categoryId,
+	};
+	const signatures = generateRequestSignatures(msg);
+
+	if (!signatures) {
+		return;
 	}
+
+	try {
+		const { data } = await baseInstance.request({
+			url: "/post/new",
+			method: "POST",
+			data: {
+				signatures,
+				msg,
+			},
+		});
+		console.log(data);
+		return data.response;
+	} catch (e) {}
 }
