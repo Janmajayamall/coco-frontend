@@ -3,7 +3,7 @@ import ReactDOM from "react-dom";
 import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
-import { DAppProvider } from "@usedapp/core";
+import { DAppProvider } from "@usedapp/core/packages/core";
 import { ChakraProvider } from "@chakra-ui/react";
 
 ReactDOM.render(
@@ -11,9 +11,9 @@ ReactDOM.render(
 		<DAppProvider
 			config={{
 				supportedChains: [421611],
-				// multicallAddresses: {
-				// 	421611: "0xed53fa304E7fcbab4E8aCB184F5FC6F69Ed54fF6",
-				// },
+				multicallAddresses: {
+					421611: "0xed53fa304E7fcbab4E8aCB184F5FC6F69Ed54fF6",
+				},
 			}}
 		>
 			<ChakraProvider>

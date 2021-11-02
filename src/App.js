@@ -2,11 +2,13 @@ import logo from "./logo.svg";
 import "./App.css";
 import ConnectButton from "./components/ConnectButton";
 import { Button, Box, Text, Flex } from "@chakra-ui/react";
-import { utils } from "ethers";
-import { useEthers } from "@usedapp/core";
-import { Contract } from "@ethersproject/contracts";
+// import {  } from "ethers";
+import { useEthers, useContractFunction } from "@usedapp/core/packages/core";
+import { utils, Contract } from "ethers";
+
 import MarkerRouterAbi from "./contracts/MarketRouter.json";
-import { useContractFunction } from "./utils";
+// import { useContractFunction } from "./utils";
+
 const marketRouterInterface = new utils.Interface(MarkerRouterAbi);
 const marketRouterAddress = "0x8EfE5a96eaE05D72492d9A0296794adB0EF76d78";
 const marketRouterContract = new Contract(
@@ -35,7 +37,9 @@ function App() {
 							account,
 							"0x2d102ED735c39F2060D9057056eC68e1430744de",
 							utils.keccak256(
-								utils.toUtf8Bytes(`${"121213dd"}:${"2"}`)
+								utils.toUtf8Bytes(
+									`${"12dwdadawdijijaio"}:${"2"}`
+								)
 							),
 							utils.parseEther("1"),
 							utils.parseEther("1"),

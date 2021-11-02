@@ -4,7 +4,7 @@ import {
 	useEtherBalance,
 	useTokenBalance,
 	useContractFunction,
-} from "@usedapp/core";
+} from "@usedapp/core/packages/core";
 import { formatEther } from "@ethersproject/units";
 import { utils } from "ethers";
 
