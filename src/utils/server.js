@@ -84,3 +84,29 @@ export async function newPost(txHash, imageUrl, categoryId) {
 		return data.response;
 	} catch (e) {}
 }
+
+export async function getFeed() {
+	const msg = {
+		txHash,
+		imageUrl,
+		categoryId,
+	};
+	const signatures = generateRequestSignatures(msg);
+
+	if (!signatures) {
+		return;
+	}
+
+	try {
+		const { data } = await baseInstance.request({
+			url: "/post/new",
+			method: "POST",
+			data: {
+				signatures,
+				msg,
+			},
+		});
+		console.log(data);
+		return data.response;
+	} catch (e) {}
+}
