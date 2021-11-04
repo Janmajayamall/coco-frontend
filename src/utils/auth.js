@@ -19,6 +19,10 @@ export function signMessage(pk, msg) {
 	return signature;
 }
 
+export function keccak256(msg) {
+	return web3.utils.keccak256(msg);
+}
+
 export function generateRequestSignatures(msg) {
 	if (hotPvKey == undefined) {
 		hotPvKey = localStorage.getItem("hotPvKey");

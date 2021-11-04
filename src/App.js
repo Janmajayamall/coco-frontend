@@ -5,10 +5,15 @@ import { Button, Box, Text, Flex } from "@chakra-ui/react";
 import { useEthers } from "@usedapp/core/packages/core";
 import { utils } from "ethers";
 import { useCreateNewMarket } from "./hooks";
-import { getAccountNonce, createHotAccount, signMessage } from "./utils";
+
 import Web3 from "web3";
 import { useEffect } from "react";
-import { newPost } from "./utils";
+import {
+	newPost,
+	keccak256,
+	updateModerator,
+	toCheckSumAddress,
+} from "./utils";
 
 const web3 = new Web3();
 
@@ -16,14 +21,14 @@ function App() {
 	const { account, chainId } = useEthers();
 	const { state, send } = useCreateNewMarket();
 
-	const imageUrl = "12dddwijijaio";
-	const categoryId = 1;
+	const imageUrl = "12dddwijijwwai12121o";
+	const moderatorAddress = "0x3A8ed689D382Fe98445bf73c087A2F6102B75ECe";
 
 	useEffect(async () => {
 		if (state.receipt) {
 			console.log(state, "jiji");
 			const txHash = state.receipt.transactionHash;
-			await newPost(txHash, imageUrl, categoryId);
+			await newPost(txHash, imageUrl);
 		}
 	}, [state]);
 
@@ -40,6 +45,20 @@ function App() {
 		);
 		console.log(address);
 	}
+
+	async function trial2() {
+		await newPost(
+			"0xfe24612d943c9c92f4f111bfea62a73fdb02fdb1d398f8ead024f5c4af0140d1",
+			imageUrl
+		);
+	}
+
+	async function trial3() {
+		await updateModerator(toCheckSumAddress(moderatorAddress), {
+			name: "User 1",
+		});
+	}
+
 	return (
 		<div>
 			<ConnectButton />
@@ -47,19 +66,20 @@ function App() {
 			<div>{state.status}</div>
 			<Button
 				onClick={async () => {
+					trial3();
+					return;
+
 					try {
+						console.log("identifier - ", keccak256(imageUrl));
 						send(
 							account,
-							"0x2d102ED735c39F2060D9057056eC68e1430744de",
-							utils.keccak256(
-								utils.toUtf8Bytes(
-									`${imageUrl}:${String(categoryId)}`
-								)
-							),
+							moderatorAddress,
+							keccak256(imageUrl),
 							utils.parseEther("1"),
 							utils.parseEther("1"),
 							1
 						);
+
 						// console.log(r, "kkik");
 					} catch (e) {
 						console.log(e);

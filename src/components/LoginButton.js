@@ -17,6 +17,7 @@ function LoginButton() {
 
 	useEffect(async () => {
 		const res = await getUser();
+		console.log(res);
 		setUserProfile(res);
 	}, []);
 
@@ -32,6 +33,7 @@ function LoginButton() {
 			// show error & return
 			return;
 		}
+		console.log(res);
 		const accountNonce = Math.ceil(Number(res.accountNonce) + 1);
 
 		const { privateKey, address } = createHotAccount();

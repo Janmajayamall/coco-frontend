@@ -59,11 +59,10 @@ export async function loginUser(keySignature, hotAddress, accountNonce) {
 	} catch (e) {}
 }
 
-export async function newPost(txHash, imageUrl, categoryId) {
+export async function newPost(txHash, imageUrl) {
 	const msg = {
 		txHash,
 		imageUrl,
-		categoryId,
 	};
 	const signatures = generateRequestSignatures(msg);
 
@@ -85,21 +84,19 @@ export async function newPost(txHash, imageUrl, categoryId) {
 	} catch (e) {}
 }
 
-export async function getFeed() {
+export async function updateModerator(address, details) {
 	const msg = {
-		txHash,
-		imageUrl,
-		categoryId,
+		address,
+		details,
 	};
 	const signatures = generateRequestSignatures(msg);
-
 	if (!signatures) {
 		return;
 	}
 
 	try {
 		const { data } = await baseInstance.request({
-			url: "/post/new",
+			url: "/moderator/update",
 			method: "POST",
 			data: {
 				signatures,
@@ -110,3 +107,29 @@ export async function getFeed() {
 		return data.response;
 	} catch (e) {}
 }
+
+// export async function getFeed() {
+// 	const msg = {
+// 		txHash,
+// 		imageUrl,
+// 		categoryId,
+// 	};
+// 	const signatures = generateRequestSignatures(msg);
+
+// 	if (!signatures) {
+// 		return;
+// 	}
+
+// 	try {
+// 		const { data } = await baseInstance.request({
+// 			url: "/post/new",
+// 			method: "POST",
+// 			data: {
+// 				signatures,
+// 				msg,
+// 			},
+// 		});
+// 		console.log(data);
+// 		return data.response;
+// 	} catch (e) {}
+// }
