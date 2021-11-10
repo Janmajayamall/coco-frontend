@@ -5,21 +5,28 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { DAppProvider } from "@usedapp/core/packages/core";
 import { ChakraProvider } from "@chakra-ui/react";
+import { Provider } from "react-redux";
+import { store } from "./redux/store";
+import { BrowserRouter as Router } from "react-router-dom";
 
 ReactDOM.render(
 	<React.StrictMode>
-		<DAppProvider
-			config={{
-				supportedChains: [421611],
-				multicallAddresses: {
-					421611: "0xed53fa304E7fcbab4E8aCB184F5FC6F69Ed54fF6",
-				},
-			}}
-		>
-			<ChakraProvider>
-				<App />
-			</ChakraProvider>
-		</DAppProvider>
+		<Provider store={store}>
+			<DAppProvider
+				config={{
+					supportedChains: [421611],
+					multicallAddresses: {
+						421611: "0xed53fa304E7fcbab4E8aCB184F5FC6F69Ed54fF6",
+					},
+				}}
+			>
+				<ChakraProvider>
+					<Router>
+						<App />
+					</Router>
+				</ChakraProvider>
+			</DAppProvider>
+		</Provider>
 	</React.StrictMode>,
 	document.getElementById("root")
 );

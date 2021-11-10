@@ -108,6 +108,9 @@ export async function updateModerator(address, details) {
 	} catch (e) {}
 }
 
+export async function uploadImage() {
+	return "ada";
+}
 // export async function getFeed() {
 // 	const msg = {
 // 		txHash,

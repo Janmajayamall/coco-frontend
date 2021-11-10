@@ -1,10 +1,12 @@
 import "./App.css";
 import ConnectButton from "./components/ConnectButton";
 import LoginButton from "./components/LoginButton";
-import { Button, Box, Text, Flex } from "@chakra-ui/react";
+import NewPost from "./pages/NewPost";
+import { Button, Box, Text, Flex, Spacer, Switch } from "@chakra-ui/react";
 import { useEthers } from "@usedapp/core/packages/core";
 import { utils } from "ethers";
 import { useCreateNewMarket } from "./hooks";
+import HeaderWarning from "./components/HeaderWarning";
 
 import Web3 from "web3";
 import { useEffect } from "react";
@@ -13,16 +15,29 @@ import {
 	keccak256,
 	updateModerator,
 	toCheckSumAddress,
+	getUser,
 } from "./utils";
+import { sUpdateProfile } from "./redux/reducers";
+import { useDispatch } from "react-redux";
+import { Route, Routes, useNavigate } from "react-router";
 
 const web3 = new Web3();
 
 function App() {
 	const { account, chainId } = useEthers();
 	const { state, send } = useCreateNewMarket();
+	const dispatch = useDispatch();
+	const navigate = useNavigate();
 
 	const imageUrl = "12dddwijijwwai12121o";
 	const moderatorAddress = "0x3A8ed689D382Fe98445bf73c087A2F6102B75ECe";
+
+	useEffect(async () => {
+		const res = await getUser();
+		if (res != undefined) {
+			dispatch(sUpdateProfile(res.user));
+		}
+	}, []);
 
 	useEffect(async () => {
 		if (state.receipt) {
@@ -61,49 +76,87 @@ function App() {
 
 	return (
 		<div>
-			<ConnectButton />
-			<LoginButton />
-			<div>{state.status}</div>
-			<Button
-				onClick={async () => {
-					trial3();
-					return;
+			<HeaderWarning />
+			<Flex>
+				<Spacer />
 
-					try {
-						console.log("identifier - ", keccak256(imageUrl));
-						send(
-							account,
-							moderatorAddress,
-							keccak256(imageUrl),
-							utils.parseEther("1"),
-							utils.parseEther("1"),
-							1
-						);
+				<ConnectButton />
+				<LoginButton />
+			</Flex>
+			<Routes>
+				<Route path="/add" element={<NewPost />} />
+				<Route
+					path="/"
+					element={
+						<div>
+							<div>{state.status}</div>
+							<Button
+								onClick={async () => {
+									trial3();
+									return;
 
-						// console.log(r, "kkik");
-					} catch (e) {
-						console.log(e);
+									try {
+										console.log(
+											"identifier - ",
+											keccak256(imageUrl)
+										);
+										send(
+											account,
+											moderatorAddress,
+											keccak256(imageUrl),
+											utils.parseEther("1"),
+											utils.parseEther("1"),
+											1
+										);
+
+										// console.log(r, "kkik");
+									} catch (e) {
+										console.log(e);
+									}
+								}}
+								bg="gray.800"
+								border="1px solid transparent"
+								_hover={{
+									border: "1px",
+									borderStyle: "solid",
+									borderColor: "blue.400",
+									backgroundColor: "gray.700",
+								}}
+								borderRadius="xl"
+								m="1px"
+								px={3}
+								height="38px"
+							>
+								<Text
+									color="white"
+									fontSize="md"
+									fontWeight="medium"
+									mr="2"
+								>
+									Send
+								</Text>
+							</Button>
+							<Button
+								onClick={() => {
+									navigate("/add");
+								}}
+							>
+								Add
+							</Button>
+						</div>
 					}
-				}}
-				bg="gray.800"
-				border="1px solid transparent"
-				_hover={{
-					border: "1px",
-					borderStyle: "solid",
-					borderColor: "blue.400",
-					backgroundColor: "gray.700",
-				}}
-				borderRadius="xl"
-				m="1px"
-				px={3}
-				height="38px"
-			>
-				<Text color="white" fontSize="md" fontWeight="medium" mr="2">
-					Send
-				</Text>
-			</Button>
+				/>
+			</Routes>
 		</div>
 	);
 }
 
 export default App;
+
+/* 
+1. Finish login setup 
+2. Finish adding a new post setup
+3. Finish setting up as a moderator
+4. Finish requesting and following moderators
+5. Finish display home feed, and moderator specific feed
+6.  */

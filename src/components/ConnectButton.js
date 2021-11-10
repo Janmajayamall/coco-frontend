@@ -21,7 +21,7 @@ function ConnectButton() {
 	// const etherBalance = useEtherBalance(account);
 	// const fakeUSDBalance = useTokenBalance(fakeUSDContractAddress, account);
 	return account ? (
-		<Flex>
+		<Flex m={2}>
 			<Box
 				display="flex"
 				alignItems="center"
@@ -73,6 +73,7 @@ function ConnectButton() {
 		</Flex>
 	) : (
 		<Button
+			m={2}
 			onClick={() => {
 				activateBrowserWallet();
 			}}
@@ -91,7 +92,7 @@ function ConnectButton() {
 				borderColor: "blue.700",
 			}}
 		>
-			Connect to a wallet
+			Connect your wallet
 		</Button>
 	);
 }
