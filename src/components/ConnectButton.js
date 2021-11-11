@@ -13,7 +13,7 @@ import { utils } from "ethers";
 
 function ConnectButton() {
 	const { activateBrowserWallet, account, chainId } = useEthers();
-	console.log(chainId);
+
 	// const { state, send } = useContractFunction(fakeUSDContract, "mint", {
 	// 	transactionName: "Wrap",
 	// });

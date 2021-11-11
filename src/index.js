@@ -8,25 +8,33 @@ import { ChakraProvider } from "@chakra-ui/react";
 import { Provider } from "react-redux";
 import { store } from "./redux/store";
 import { BrowserRouter as Router } from "react-router-dom";
+import { createClient, Provider as URQLProvider } from "urql";
+
+const client = createClient({
+	url:
+		"https://api.thegraph.com/subgraphs/name/janmajayamall/meme-curator-subgraphs",
+});
 
 ReactDOM.render(
 	<React.StrictMode>
-		<Provider store={store}>
-			<DAppProvider
-				config={{
-					supportedChains: [421611],
-					multicallAddresses: {
-						421611: "0xed53fa304E7fcbab4E8aCB184F5FC6F69Ed54fF6",
-					},
-				}}
-			>
-				<ChakraProvider>
-					<Router>
-						<App />
-					</Router>
-				</ChakraProvider>
-			</DAppProvider>
-		</Provider>
+		<URQLProvider value={client}>
+			<Provider store={store}>
+				<DAppProvider
+					config={{
+						supportedChains: [421611],
+						multicallAddresses: {
+							421611: "0xed53fa304E7fcbab4E8aCB184F5FC6F69Ed54fF6",
+						},
+					}}
+				>
+					<ChakraProvider>
+						<Router>
+							<App />
+						</Router>
+					</ChakraProvider>
+				</DAppProvider>
+			</Provider>
+		</URQLProvider>
 	</React.StrictMode>,
 	document.getElementById("root")
 );

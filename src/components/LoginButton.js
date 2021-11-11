@@ -65,7 +65,7 @@ function LoginButton() {
 		localStorage.removeItem("keySignature");
 		dispatch(sUpdateProfile(undefined));
 	}
-	console.log(userProfile, " userProfile");
+
 
 	if (!account) {
 		return <div />;

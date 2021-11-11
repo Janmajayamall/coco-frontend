@@ -2,6 +2,8 @@ import "./App.css";
 import ConnectButton from "./components/ConnectButton";
 import LoginButton from "./components/LoginButton";
 import NewPost from "./pages/NewPost";
+import NewModerator from "./pages/NewModerator";
+import OracleConfig from "./pages/OracleConfig";
 import { Button, Box, Text, Flex, Spacer, Switch } from "@chakra-ui/react";
 import { useEthers } from "@usedapp/core/packages/core";
 import { utils } from "ethers";
@@ -41,7 +43,6 @@ function App() {
 
 	useEffect(async () => {
 		if (state.receipt) {
-			console.log(state, "jiji");
 			const txHash = state.receipt.transactionHash;
 			await newPost(txHash, imageUrl);
 		}
@@ -85,6 +86,8 @@ function App() {
 			</Flex>
 			<Routes>
 				<Route path="/add" element={<NewPost />} />
+				<Route path="/addModerator" element={<NewModerator />} />
+				<Route path="/oracle/:address" element={<OracleConfig />} />
 				<Route
 					path="/"
 					element={

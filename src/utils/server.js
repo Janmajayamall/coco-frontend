@@ -103,14 +103,31 @@ export async function updateModerator(address, details) {
 				msg,
 			},
 		});
-		console.log(data);
+
 		return data.response;
-	} catch (e) {}
+	} catch (e) {
+		// console.log(e, ",aldmakom");
+	}
 }
 
 export async function uploadImage() {
 	return "ada";
 }
+
+export async function findModerator(address) {
+	try {
+		const { data } = await baseInstance.request({
+			url: "/moderator/find",
+			method: "POST",
+			data: {
+				address,
+			},
+		});
+		console.log(data);
+		return data.response;
+	} catch (e) {}
+}
+
 // export async function getFeed() {
 // 	const msg = {
 // 		txHash,
