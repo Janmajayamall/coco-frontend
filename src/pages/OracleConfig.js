@@ -17,7 +17,7 @@ import {
 	toCheckSumAddress,
 	getOracleDetails,
 	updateModerator,
-	findModerator,
+	findModerators,
 } from "./../utils";
 
 function Page() {
@@ -41,11 +41,12 @@ function Page() {
 			}
 			setOracleDetails(oracleDetails);
 
-			const oracleMetaData = await findModerator(
-				toCheckSumAddress(oracleAddress)
-			);
-			console.log("oracleMetaData", oracleMetaData);
-			setOracleMetaData(oracleMetaData);
+			const res = await findModerators({
+				address: toCheckSumAddress(oracleAddress),
+			});
+			if (res.moderators.length > 0) {
+				setOracleMetaData(res.moderators[0]);
+			}
 		}
 	}, [oracleAddress]);
 

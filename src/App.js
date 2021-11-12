@@ -162,4 +162,4 @@ export default App;
 3. Finish setting up as a moderator
 4. Finish requesting and following moderators
 5. Finish display home feed, and moderator specific feed
-6.  */
+6. */

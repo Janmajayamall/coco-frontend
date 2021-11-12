@@ -25,6 +25,19 @@ const QueryOracleById = `
   }
 `;
 
+const QueryFeedByModeratorList = `
+  query ($moderators: [Bytes!]!){
+    markets(where:{creator_in:$moderators}) {
+        id
+        factory {
+        id
+        }
+        creator
+        oracle
+      }
+    }
+`;
+
 export function useQueryAllOracles() {
 	const [result, reexecuteQuery] = useQuery({
 		query: QueryAllOracles,
@@ -51,6 +64,17 @@ export function useQueryOracleById(id, pause = false) {
 		query: QueryOracleById,
 		variables: { id },
 		pause,
+	});
+	return {
+		result,
+		reexecuteQuery,
+	};
+}
+
+export function useQueryFeedByModeratorList(moderators) {
+	const [result, reexecuteQuery] = useQuery({
+		query: QueryFeedByModeratorList,
+		variables: { moderators },
 	});
 	return {
 		result,

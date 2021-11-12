@@ -114,18 +114,68 @@ export async function uploadImage() {
 	return "ada";
 }
 
-export async function findModerator(address) {
+export async function findModerators(filter) {
 	try {
 		const { data } = await baseInstance.request({
 			url: "/moderator/find",
 			method: "POST",
 			data: {
-				address,
+				filter,
 			},
 		});
-		console.log(data);
+
 		return data.response;
 	} catch (e) {}
+}
+
+export async function followModerator(moderatorAddress) {
+	const msg = {
+		moderatorAddress,
+	};
+	const signatures = generateRequestSignatures(msg);
+	if (!signatures) {
+		return;
+	}
+
+	try {
+		const { data } = await baseInstance.request({
+			url: "/follow/add",
+			method: "POST",
+			data: {
+				signatures,
+				msg,
+			},
+		});
+
+		return data.response;
+	} catch (e) {
+		// console.log(e, ",aldmakom");
+	}
+}
+
+export async function unfollowModerator(moderatorAddress) {
+	const msg = {
+		moderatorAddress,
+	};
+	const signatures = generateRequestSignatures(msg);
+	if (!signatures) {
+		return;
+	}
+
+	try {
+		const { data } = await baseInstance.request({
+			url: "/follow/remove",
+			method: "POST",
+			data: {
+				signatures,
+				msg,
+			},
+		});
+
+		return data.response;
+	} catch (e) {
+		// console.log(e, ",aldmakom");
+	}
 }
 
 // export async function getFeed() {
