@@ -1,7 +1,6 @@
 import addresses from "./../contracts/addresses.json";
 import MarkerRouterAbi from "../contracts/abis/MarketRouter.json";
 import OracleFactoryAbi from "../contracts/abis/OracleFactory.json";
-import OracleAbi from "../contracts/abis/Oracle.json";
 
 import {
 	useEthers,
@@ -22,35 +21,33 @@ export const oracleFactoryContract = new Contract(
 	oracleFactoryInterface
 );
 
-export const oracleInterface = new utils.Interface(OracleAbi);
-
 export function useCreateNewMarket() {
 	const { state, send } = useContractFunction(
 		marketRouterContract,
-		"createAndPlaceBetOnMarket"
+		"createFundBetOnMarket"
 	);
 	return { state, send };
 }
 
-export function useCreateNewModerator() {
+export function useCreateNewOracle() {
 	const { state, send } = useContractFunction(
 		oracleFactoryContract,
-		"setupSingleOracle"
+		"createOracle"
 	);
 	return { state, send };
 }
 
-export function useCallOracleParams(oracleAddress) {
-	console.log(oracleAddress, "this is here");
-	const d = useContractCall({
-		abi: oracleInterface,
-		address: oracleAddress,
-		method: "getMarketParams",
-		args: [],
-	});
-	console.log(d, ",l,l,");
-	return d;
-}
+// export function useCallOracleParams(oracleAddress) {
+// 	console.log(oracleAddress, "this is here");
+// 	const d = useContractCall({
+// 		abi: oracleInterface,
+// 		address: oracleAddress,
+// 		method: "getMarketParams",
+// 		args: [],
+// 	});
+// 	console.log(d, ",l,l,");
+// 	return d;
+// }
 
 // const d = useContractCalls([
 // 	{

@@ -59,10 +59,10 @@ export async function loginUser(keySignature, hotAddress, accountNonce) {
 	} catch (e) {}
 }
 
-export async function newPost(txHash, imageUrl) {
+export async function newPost(oracleAddress, eventIdentifierStr) {
 	const msg = {
-		txHash,
-		imageUrl,
+		oracleAddress,
+		eventIdentifierStr,
 	};
 	const signatures = generateRequestSignatures(msg);
 
@@ -84,9 +84,9 @@ export async function newPost(txHash, imageUrl) {
 	} catch (e) {}
 }
 
-export async function updateModerator(address, details) {
+export async function updateModerator(oracleAddress, details) {
 	const msg = {
-		address,
+		oracleAddress,
 		details,
 	};
 	const signatures = generateRequestSignatures(msg);
@@ -111,7 +111,7 @@ export async function updateModerator(address, details) {
 }
 
 export async function uploadImage() {
-	return "ada";
+	return "adwadiuahwoaidjaoidjaojodadfsada";
 }
 
 export async function findModerators(filter) {

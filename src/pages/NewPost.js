@@ -8,7 +8,7 @@ import {
 } from "@chakra-ui/react";
 import { FiFile } from "react-icons/fi";
 import FileUpload from "./../components/FileUpload";
-import { uploadImage, keccak256 } from "./../utils";
+import { uploadImage, keccak256, newPost } from "./../utils";
 import { useCreateNewMarket } from "./../hooks";
 import { useEthers } from "@usedapp/core/packages/core";
 import { utils } from "ethers";
@@ -18,16 +18,19 @@ function Page() {
 	const [selectModerator, setSelectModerator] = useState(null);
 	const [fundingAmount, setFundingAmount] = useState(0);
 	const [betAmount, setBetAmount] = useState(0);
+	const [imageUrl, setImageUrl] = useState("");
 
 	const { account } = useEthers();
 
 	const { state, send } = useCreateNewMarket();
 
-	useEffect(() => {
+	useEffect(async () => {
 		if (state.receipt) {
 			console.log(state, "jiji");
-			const txHash = state.receipt.transactionHash;
-			console.log(txHash, " Post added");
+			// const txHash = state.receipt.transactionHash;
+			const res = await newPost(selectModerator, imageUrl);
+			console.log(res, " ml");
+			// console.log(txHash, " Post added");
 		}
 	}, [state]);
 
@@ -41,18 +44,25 @@ function Page() {
 		return true;
 	}
 
-	async function newPostHelper() {
+	async function uploadImageHelper() {
+		const _imageUrl = await uploadImage();
+		setImageUrl(_imageUrl);
+		newPostTxHelper();
+	}
+
+	async function newPostTxHelper() {
 		console.log(selectModerator, fundingAmount, betAmount);
 
 		// upload image
-		const imageUrl = await uploadImage();
+		// await uploadImageHelper();
 
 		// validation checks
+		// check image url is not empty
+		// check rest of the values are fine as well
 
 		send(
-			account,
-			selectModerator,
 			keccak256(imageUrl),
+			selectModerator,
 			utils.parseEther(String(fundingAmount)),
 			utils.parseEther(String(betAmount)),
 			1
@@ -80,10 +90,10 @@ function Page() {
 				}}
 				placeholder="Select Page"
 			>
-				<option value="0x3A8ed689D382Fe98445bf73c087A2F6102B75ECe">
+				<option value="0xc227040739b85272e4d8231664dcfd7cb15f35f7">
 					Top 10 Dank
 				</option>
-				<option value="0x3A8ed689D382Fe98445bf73c087A2F6102B75ECe">
+				<option value="0xc227040739b85272e4d8231664dcfd7cb15f35f7">
 					Top 50 KI
 				</option>
 			</Select>
@@ -100,7 +110,7 @@ function Page() {
 
 			<NumberInput
 				onChange={(val) => {
-					setFundingAmount(val);
+					setBetAmount(val);
 				}}
 				defaultValue={0}
 				precision={2}
@@ -108,7 +118,7 @@ function Page() {
 				<NumberInputField />
 			</NumberInput>
 
-			<Button onClick={newPostHelper}>Submit</Button>
+			<Button onClick={uploadImageHelper}>Submit</Button>
 		</>
 	);
 }

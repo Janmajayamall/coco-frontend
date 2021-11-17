@@ -6,8 +6,13 @@ import {
 	NumberInput,
 	NumberInputField,
 } from "@chakra-ui/react";
-import { convertDaysToBlocks, retrieveOracleAddressFormLogs } from "./../utils";
-import { useCreateNewModerator } from "./../hooks";
+import {
+	convertDaysToBlocks,
+	retrieveOracleAddressFormLogs,
+	updateModerator,
+	toCheckSumAddress,
+} from "./../utils";
+import { useCreateNewOracle } from "./../hooks";
 import { useEthers } from "@usedapp/core/packages/core";
 
 import addresses from "./../contracts/addresses.json";
@@ -21,14 +26,18 @@ function Page() {
 	const [bufferHours, setBufferHours] = useState(10);
 	const [resolutionHours, setResolutionHours] = useState(10);
 
-	const { state, send } = useCreateNewModerator();
+	const { state, send } = useCreateNewOracle();
 
-	useEffect(() => {
+	useEffect(async () => {
 		if (state.receipt) {
 			const txHash = state.receipt.transactionHash;
+			console.log(state.receipt.logs, "receipt logs");
 			const oracleAddress = retrieveOracleAddressFormLogs(
 				state.receipt.logs
 			);
+			await updateModerator(oracleAddress, {
+				name: "new name",
+			});
 			console.log(txHash, " Post added");
 			console.log(oracleAddress, " Here it is");
 		}
@@ -38,9 +47,21 @@ function Page() {
 		// fee calc
 		const feeNumerator = fee * 100;
 		const feeDenominator = 100;
-
+		console.log(
+			account,
+			account,
+			addresses.MemeToken,
+			true,
+			feeNumerator,
+			feeDenominator,
+			escalationLimit,
+			convertDaysToBlocks(chainId, expireHours),
+			convertDaysToBlocks(chainId, bufferHours),
+			convertDaysToBlocks(chainId, resolutionHours)
+		);
 		// validation checks
 		send(
+			account,
 			account,
 			addresses.MemeToken,
 			true,

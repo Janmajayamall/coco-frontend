@@ -1,27 +1,8 @@
 [
   {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_factory",
-        "type": "address"
-      }
-    ],
+    "inputs": [],
     "stateMutability": "nonpayable",
     "type": "constructor"
-  },
-  {
-    "inputs": [],
-    "name": "MARKET_INIT_CODE_HASH",
-    "outputs": [
-      {
-        "internalType": "bytes32",
-        "name": "",
-        "type": "bytes32"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
   },
   {
     "inputs": [
@@ -42,8 +23,13 @@
       },
       {
         "internalType": "address",
-        "name": "market",
+        "name": "oracle",
         "type": "address"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "marketIdentifier",
+        "type": "bytes32"
       }
     ],
     "name": "buyExactTokensForMaxCTokens",
@@ -75,8 +61,13 @@
       },
       {
         "internalType": "address",
-        "name": "market",
+        "name": "oracle",
         "type": "address"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "marketIdentifier",
+        "type": "bytes32"
       }
     ],
     "name": "buyMinTokensForExactCTokens",
@@ -87,28 +78,23 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "_creator",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_oracle",
-        "type": "address"
-      },
-      {
         "internalType": "bytes32",
-        "name": "_identifier",
+        "name": "eventIdentifier",
         "type": "bytes32"
       },
       {
+        "internalType": "address",
+        "name": "oracle",
+        "type": "address"
+      },
+      {
         "internalType": "uint256",
-        "name": "_fundingAmount",
+        "name": "fundingAmount",
         "type": "uint256"
       },
       {
         "internalType": "uint256",
-        "name": "_amountIn",
+        "name": "amountIn",
         "type": "uint256"
       },
       {
@@ -117,22 +103,9 @@
         "type": "uint256"
       }
     ],
-    "name": "createAndPlaceBetOnMarket",
+    "name": "createFundBetOnMarket",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "factory",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -143,25 +116,25 @@
         "type": "address"
       },
       {
+        "internalType": "bytes32",
+        "name": "eventIdentifier",
+        "type": "bytes32"
+      },
+      {
         "internalType": "address",
         "name": "oracle",
         "type": "address"
-      },
+      }
+    ],
+    "name": "getMarketIdentifier",
+    "outputs": [
       {
         "internalType": "bytes32",
-        "name": "identifier",
+        "name": "marketIdentifier",
         "type": "bytes32"
       }
     ],
-    "name": "getMarketAddress",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "marketAddress",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
+    "stateMutability": "pure",
     "type": "function"
   },
   {
@@ -178,8 +151,13 @@
       },
       {
         "internalType": "address",
-        "name": "market",
+        "name": "oracle",
         "type": "address"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "marketIdentifier",
+        "type": "bytes32"
       }
     ],
     "name": "redeemWinning",
@@ -206,8 +184,13 @@
       },
       {
         "internalType": "address",
-        "name": "market",
+        "name": "oracle",
         "type": "address"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "marketIdentifier",
+        "type": "bytes32"
       }
     ],
     "name": "sellExactTokensForMinCTokens",
@@ -239,8 +222,13 @@
       },
       {
         "internalType": "address",
-        "name": "market",
+        "name": "oracle",
         "type": "address"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "marketIdentifier",
+        "type": "bytes32"
       }
     ],
     "name": "sellMaxTokensForExactCTokens",
@@ -262,8 +250,13 @@
       },
       {
         "internalType": "address",
-        "name": "market",
+        "name": "oracle",
         "type": "address"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "marketIdentifier",
+        "type": "bytes32"
       }
     ],
     "name": "stakeForOutcome",
