@@ -1,5 +1,37 @@
 import { useQuery } from "urql";
 
+const QueryMarketsOrderedByLatest = `
+	query {
+		markets(orderBy:id, orderDirection: desc) {
+			id
+			creator
+			eventIdentifier
+			marketIdentifier
+			outcomeReserve0
+			outcomeReserve1
+			stakingReserve0
+			stakingReserve1
+			tokenC
+			feeNumerator
+			feeDenominator
+			fee
+			expireAtBlock
+			donBufferEndsAtBlock
+			resolutionEndsAtBlock
+			donBufferBlocks
+			resolutionBufferBlocks
+			donEscalationCount
+			donEscalationLimit
+			outcome
+			stage
+			staker0
+			staker1
+			lastAmountStaked
+			lastOutcomeStaked
+		}
+	}
+`;
+
 const QueryAllOracles = `
   query {
     oracles{
@@ -37,6 +69,16 @@ const QueryFeedByModeratorList = `
       }
     }
 `;
+
+export function useQueryMarketsOrderedByLatest() {
+	const [result, reexecuteQuery] = useQuery({
+		query: QueryMarketsOrderedByLatest,
+	});
+	return {
+		result,
+		reexecuteQuery,
+	};
+}
 
 export function useQueryAllOracles() {
 	const [result, reexecuteQuery] = useQuery({

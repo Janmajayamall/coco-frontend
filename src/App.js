@@ -4,10 +4,11 @@ import LoginButton from "./components/LoginButton";
 import NewPost from "./pages/NewPost";
 import NewModerator from "./pages/NewModerator";
 import OracleConfig from "./pages/OracleConfig";
+import Explore from "./pages/Explore";
 import { Button, Box, Text, Flex, Spacer, Switch } from "@chakra-ui/react";
 import { useEthers } from "@usedapp/core/packages/core";
 import { utils } from "ethers";
-import { useCreateNewMarket } from "./hooks";
+import { useCreateNewMarket, useQueryMarketsOrderedByLatest } from "./hooks";
 import HeaderWarning from "./components/HeaderWarning";
 
 import Web3 from "web3";
@@ -18,6 +19,8 @@ import {
 	updateModerator,
 	toCheckSumAddress,
 	getUser,
+	findAllFollows,
+	getPopularModerators,
 } from "./utils";
 import { sUpdateProfile } from "./redux/reducers";
 import { useDispatch } from "react-redux";
@@ -35,10 +38,15 @@ function App() {
 	const moderatorAddress = "0x3A8ed689D382Fe98445bf73c087A2F6102B75ECe";
 
 	useEffect(async () => {
-		const res = await getUser();
+		var res = await getUser();
 		if (res != undefined) {
 			dispatch(sUpdateProfile(res.user));
 		}
+		res = await findAllFollows();
+		console.log(res, "findAllFollows");
+
+		res = await getPopularModerators();
+		console.log(res, "getPopularModerators");
 	}, []);
 
 	useEffect(async () => {
@@ -47,6 +55,9 @@ function App() {
 			await newPost(txHash, imageUrl);
 		}
 	}, [state]);
+
+	const { result, reexecuteQuery } = useQueryMarketsOrderedByLatest();
+	console.log(result, " it is here");
 
 	async function trial() {
 		const signature =
@@ -88,6 +99,7 @@ function App() {
 				<Route path="/add" element={<NewPost />} />
 				<Route path="/addModerator" element={<NewModerator />} />
 				<Route path="/oracle/:address" element={<OracleConfig />} />
+				<Route path="/explore" element={<Explore />} />
 				<Route
 					path="/"
 					element={

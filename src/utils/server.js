@@ -84,6 +84,20 @@ export async function newPost(oracleAddress, eventIdentifierStr) {
 	} catch (e) {}
 }
 
+export async function getPosts(filter) {
+	try {
+		const { data } = await baseInstance.request({
+			url: "/post/find",
+			method: "POST",
+			data: {
+				filter,
+			},
+		});
+		console.log(data);
+		return data.response;
+	} catch (e) {}
+}
+
 export async function updateModerator(oracleAddress, details) {
 	const msg = {
 		oracleAddress,
@@ -128,6 +142,17 @@ export async function findModerators(filter) {
 	} catch (e) {}
 }
 
+export async function getPopularModerators() {
+	try {
+		const { data } = await baseInstance.request({
+			url: "/moderator/popular",
+			method: "GET",
+		});
+
+		return data.response;
+	} catch (e) {}
+}
+
 export async function followModerator(moderatorAddress) {
 	const msg = {
 		moderatorAddress,
@@ -165,6 +190,31 @@ export async function unfollowModerator(moderatorAddress) {
 	try {
 		const { data } = await baseInstance.request({
 			url: "/follow/remove",
+			method: "POST",
+			data: {
+				signatures,
+				msg,
+			},
+		});
+
+		return data.response;
+	} catch (e) {
+		// console.log(e, ",aldmakom");
+	}
+}
+
+export async function findAllFollows() {
+	const msg = {
+		msg: "follows",
+	};
+	const signatures = generateRequestSignatures(msg);
+	if (!signatures) {
+		return;
+	}
+
+	try {
+		const { data } = await baseInstance.request({
+			url: "/follow/all",
 			method: "POST",
 			data: {
 				signatures,
