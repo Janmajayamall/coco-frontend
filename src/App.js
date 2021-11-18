@@ -5,7 +5,17 @@ import NewPost from "./pages/NewPost";
 import NewModerator from "./pages/NewModerator";
 import OracleConfig from "./pages/OracleConfig";
 import Explore from "./pages/Explore";
-import { Button, Box, Text, Flex, Spacer, Switch } from "@chakra-ui/react";
+import {
+	Button,
+	Box,
+	Text,
+	Flex,
+	Spacer,
+	Switch,
+	Heading,
+	Image,
+	Avatar,
+} from "@chakra-ui/react";
 import { useEthers } from "@usedapp/core/packages/core";
 import { utils } from "ethers";
 import { useCreateNewMarket, useQueryMarketsOrderedByLatest } from "./hooks";
@@ -83,14 +93,47 @@ function App() {
 		});
 	}
 
+	function Post() {
+		return (
+			<Box>
+				<Flex paddingBottom={3} paddingTop={4}>
+					<Flex alignItems="center">
+						<Avatar
+							size="sm"
+							name="Dan Abrahmov"
+							src="https://bit.ly/dan-abramov"
+						/>
+						<Heading marginLeft={2} size="xs">
+							Groupname
+						</Heading>
+					</Flex>
+					<Spacer />
+					<Text>dwa</Text>
+				</Flex>
+				<Image src={"https://bit.ly/2Z4KKcF"} />
+			</Box>
+		);
+	}
+
 	return (
 		<div>
 			<HeaderWarning />
-			<Flex>
-				<Spacer />
-
-				<ConnectButton />
-				<LoginButton />
+			<Flex borderBottom="1px" borderColor="#BDBDBD">
+				<Flex
+					style={{
+						paddingRight: 224,
+						paddingLeft: 224,
+						width: "100%",
+						justifyContent: "center",
+						alignItems: "center",
+						height: 96,
+					}}
+				>
+					<Heading>Mimi</Heading>
+					<Spacer />
+					<ConnectButton />
+					<LoginButton />
+				</Flex>
 			</Flex>
 			<Routes>
 				<Route path="/add" element={<NewPost />} />
@@ -100,61 +143,49 @@ function App() {
 				<Route
 					path="/"
 					element={
-						<div>
-							<div>{state.status}</div>
-							<Button
-								onClick={async () => {
-									trial3();
-									return;
-
-									try {
-										console.log(
-											"identifier - ",
-											keccak256(imageUrl)
-										);
-										send(
-											account,
-											moderatorAddress,
-											keccak256(imageUrl),
-											utils.parseEther("1"),
-											utils.parseEther("1"),
-											1
-										);
-
-										// console.log(r, "kkik");
-									} catch (e) {
-										console.log(e);
-									}
-								}}
-								bg="gray.800"
-								border="1px solid transparent"
-								_hover={{
-									border: "1px",
-									borderStyle: "solid",
-									borderColor: "blue.400",
-									backgroundColor: "gray.700",
-								}}
-								borderRadius="xl"
-								m="1px"
-								px={3}
-								height="38px"
-							>
-								<Text
-									color="white"
-									fontSize="md"
-									fontWeight="medium"
-									mr="2"
+						<div
+							style={{
+								paddingRight: 208,
+								paddingLeft: 208,
+							}}
+						>
+							<Flex>
+								<Flex
+									width={268}
+									height={100}
+									backgroundColor="yellow.300"
+								></Flex>
+								<Flex
+									flexDirection="column"
+									width={600}
+									paddingRight={21}
+									paddingLeft={21}
+									backgroundColor="yellow.400"
 								>
-									Send
-								</Text>
-							</Button>
-							<Button
-								onClick={() => {
-									navigate("/add");
-								}}
-							>
-								Add
-							</Button>
+									<Post />
+									<Post />
+									<Post />
+									<Post />
+								</Flex>
+								<Flex
+									width={368}
+									height={100}
+									backgroundColor="yellow.900"
+									paddingRight={6}
+									paddingLeft={6}
+									paddingTop={5}
+									flexDirection="column"
+								>
+									<Heading size="md" marginBottom={5}>
+										Explore Groups
+									</Heading>
+									<Flex>
+										<Text>daiwodja</Text>
+										<Spacer />
+										<Button size="sm">daow</Button>
+									</Flex>
+								</Flex>
+							</Flex>
 						</div>
 					}
 				/>

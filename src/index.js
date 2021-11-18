@@ -11,8 +11,7 @@ import { BrowserRouter as Router } from "react-router-dom";
 import { createClient, Provider as URQLProvider } from "urql";
 
 const client = createClient({
-	url:
-		"https://api.thegraph.com/subgraphs/name/janmajayamall/meme-curator-subgraphs",
+	url: "https://api.thegraph.com/subgraphs/",
 });
 
 ReactDOM.render(
