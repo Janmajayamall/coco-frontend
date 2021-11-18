@@ -25,7 +25,7 @@ function Page() {
 		const res = await getPosts({
 			marketIdentifier: marketIdentifiers,
 		});
-		console.log(res);
+		console.log(res, "dada");
 
 		/* 
         Now combine content identifiers with graph data

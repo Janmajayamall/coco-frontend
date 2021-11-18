@@ -125,7 +125,7 @@ export async function updateModerator(oracleAddress, details) {
 }
 
 export async function uploadImage() {
-	return "adwadiuahwoaidjaoidjaojodadfsada";
+	return "adwadiuahwo";
 }
 
 export async function findModerators(filter) {

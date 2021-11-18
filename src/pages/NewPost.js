@@ -90,11 +90,11 @@ function Page() {
 				}}
 				placeholder="Select Page"
 			>
-				<option value="0xc227040739b85272e4d8231664dcfd7cb15f35f7">
-					Top 10 Dank
+				<option value="0x56bAbDfdAC482c7ce9B6626cbABBfA700bcfea35">
+					0x56bAbDfdAC482c7ce9B6626cbABBfA700bcfea35
 				</option>
-				<option value="0xc227040739b85272e4d8231664dcfd7cb15f35f7">
-					Top 50 KI
+				<option value="0xb5307b54ec7ecd5b0de9f3397c9bd004fea98b66">
+					0xb5307b54ec7ecd5b0de9f3397c9bd004fea98b66
 				</option>
 			</Select>
 

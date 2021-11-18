@@ -36,7 +36,7 @@ function Page() {
 				state.receipt.logs
 			);
 			await updateModerator(oracleAddress, {
-				name: "new name",
+				name: "especial one 1",
 			});
 			console.log(txHash, " Post added");
 			console.log(oracleAddress, " Here it is");
@@ -47,18 +47,7 @@ function Page() {
 		// fee calc
 		const feeNumerator = fee * 100;
 		const feeDenominator = 100;
-		console.log(
-			account,
-			account,
-			addresses.MemeToken,
-			true,
-			feeNumerator,
-			feeDenominator,
-			escalationLimit,
-			convertDaysToBlocks(chainId, expireHours),
-			convertDaysToBlocks(chainId, bufferHours),
-			convertDaysToBlocks(chainId, resolutionHours)
-		);
+
 		// validation checks
 		send(
 			account,

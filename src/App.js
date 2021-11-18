@@ -44,9 +44,6 @@ function App() {
 		}
 		res = await findAllFollows();
 		console.log(res, "findAllFollows");
-
-		res = await getPopularModerators();
-		console.log(res, "getPopularModerators");
 	}, []);
 
 	useEffect(async () => {
