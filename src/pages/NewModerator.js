@@ -5,6 +5,7 @@ import {
 	Select,
 	NumberInput,
 	NumberInputField,
+	Input,
 } from "@chakra-ui/react";
 import {
 	convertDaysToBlocks,
@@ -25,21 +26,20 @@ function Page() {
 	const [expireHours, setExpireHours] = useState(10);
 	const [bufferHours, setBufferHours] = useState(10);
 	const [resolutionHours, setResolutionHours] = useState(10);
+	const [name, setName] = useState("");
 
 	const { state, send } = useCreateNewOracle();
 
 	useEffect(async () => {
 		if (state.receipt) {
 			const txHash = state.receipt.transactionHash;
-			console.log(state.receipt.logs, "receipt logs");
 			const oracleAddress = retrieveOracleAddressFormLogs(
 				state.receipt.logs
 			);
 			await updateModerator(oracleAddress, {
-				name: "especial one 1",
+				name,
 			});
-			console.log(txHash, " Post added");
-			console.log(oracleAddress, " Here it is");
+			console.log(oracleAddress, " New Oracle Added");
 		}
 	}, [state]);
 
@@ -47,15 +47,26 @@ function Page() {
 		// fee calc
 		const feeNumerator = fee * 100;
 		const feeDenominator = 100;
-
+		console.log(
+			account,
+			account,
+			addresses.MemeToken,
+			true,
+			1,
+			10,
+			escalationLimit,
+			convertDaysToBlocks(chainId, expireHours),
+			convertDaysToBlocks(chainId, bufferHours),
+			convertDaysToBlocks(chainId, resolutionHours)
+		);
 		// validation checks
 		send(
 			account,
 			account,
 			addresses.MemeToken,
 			true,
-			feeNumerator,
-			feeDenominator,
+			1,
+			10,
 			escalationLimit,
 			convertDaysToBlocks(chainId, expireHours),
 			convertDaysToBlocks(chainId, bufferHours),
@@ -65,12 +76,22 @@ function Page() {
 
 	return (
 		<>
+			<Input
+				placeholder="Name"
+				onChange={(e) => {
+					setName(e.target.value);
+				}}
+				value={name}
+			/>
 			<NumberInput
 				onChange={(val) => {
+					console.log(val);
 					setFee(val);
 				}}
 				defaultValue={0}
 				precision={3}
+				value={fee}
+				max={100}
 			>
 				<NumberInputField />
 			</NumberInput>

@@ -8,7 +8,13 @@ import {
 } from "@chakra-ui/react";
 import { FiFile } from "react-icons/fi";
 import FileUpload from "./../components/FileUpload";
-import { uploadImage, keccak256, newPost } from "./../utils";
+import {
+	uploadImage,
+	keccak256,
+	newPost,
+	newPostTrial,
+	findModerators,
+} from "./../utils";
 import { useCreateNewMarket } from "./../hooks";
 import { useEthers } from "@usedapp/core/packages/core";
 import { utils } from "ethers";
@@ -20,13 +26,19 @@ function Page() {
 	const [betAmount, setBetAmount] = useState(0);
 	const [imageUrl, setImageUrl] = useState("");
 
+	const [moderators, setModerators] = useState([]);
+
 	const { account } = useEthers();
 
 	const { state, send } = useCreateNewMarket();
 
 	useEffect(async () => {
+		let res = await findModerators({});
+		setModerators(res.moderators);
+	}, []);
+
+	useEffect(async () => {
 		if (state.receipt) {
-			console.log(state, "jiji");
 			// const txHash = state.receipt.transactionHash;
 			const res = await newPost(selectModerator, imageUrl);
 			console.log(res, " ml");
@@ -45,7 +57,14 @@ function Page() {
 	}
 
 	async function uploadImageHelper() {
-		const _imageUrl = await uploadImage();
+		// await newPostTrial(
+		// 	"0x9c446be6e0597620cbceb6c479c6c16f3ee591fc",
+		// 	"0x1d58000000000000000000000000000000000000000000000000000000000000"
+		// );
+		// return;
+		// const _imageUrl = await uploadImage();
+		const _imageUrl =
+			"https://media.9news.com/assets/KUSA/images/ec98b6a3-0e48-4151-a438-3d9b28d687a4/ec98b6a3-0e48-4151-a438-3d9b28d687a4_1920x1080.jpg";
 		setImageUrl(_imageUrl);
 		newPostTxHelper();
 	}
@@ -90,12 +109,15 @@ function Page() {
 				}}
 				placeholder="Select Page"
 			>
-				<option value="0x56bAbDfdAC482c7ce9B6626cbABBfA700bcfea35">
-					0x56bAbDfdAC482c7ce9B6626cbABBfA700bcfea35
-				</option>
-				<option value="0xb5307b54ec7ecd5b0de9f3397c9bd004fea98b66">
-					0xb5307b54ec7ecd5b0de9f3397c9bd004fea98b66
-				</option>
+				{moderators.map((obj) => {
+					return (
+						<>
+							<option value={obj.oracleAddress}>
+								{`${obj.name}`}
+							</option>
+						</>
+					);
+				})}
 			</Select>
 
 			<NumberInput

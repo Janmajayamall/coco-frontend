@@ -84,7 +84,7 @@ export async function newPost(oracleAddress, eventIdentifierStr) {
 	} catch (e) {}
 }
 
-export async function getPosts(filter) {
+export async function findPosts(filter) {
 	try {
 		const { data } = await baseInstance.request({
 			url: "/post/find",
@@ -94,6 +94,24 @@ export async function getPosts(filter) {
 			},
 		});
 		console.log(data);
+		return data.response;
+	} catch (e) {}
+}
+
+export async function findPostsByMarketIdentifierArr(identifiers) {
+	const filter = {
+		marketIdentifier: {
+			$in: identifiers,
+		},
+	};
+	try {
+		const { data } = await baseInstance.request({
+			url: "/post/find",
+			method: "POST",
+			data: {
+				filter,
+			},
+		});
 		return data.response;
 	} catch (e) {}
 }
@@ -273,3 +291,31 @@ export async function findAllFollows() {
 // 		return data.response;
 // 	} catch (e) {}
 // }
+
+/**
+ * To be removed
+ */
+export async function newPostTrial(oracleAddress, eventIdentifierStr) {
+	const msg = {
+		oracleAddress,
+		eventIdentifierStr,
+	};
+	const signatures = generateRequestSignatures(msg);
+
+	if (!signatures) {
+		return;
+	}
+
+	try {
+		const { data } = await baseInstance.request({
+			url: "/post/newPostTrial",
+			method: "POST",
+			data: {
+				signatures,
+				msg,
+			},
+		});
+		console.log(data);
+		return data.response;
+	} catch (e) {}
+}

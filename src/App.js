@@ -17,7 +17,11 @@ import {
 	Avatar,
 } from "@chakra-ui/react";
 import { useEthers } from "@usedapp/core/packages/core";
-import { useCreateNewMarket, useQueryMarketsOrderedByLatest } from "./hooks";
+import {
+	useCreateNewMarket,
+	useQueryMarketsOrderedByLatest,
+	useQueryExploreMarkets,
+} from "./hooks";
 import HeaderWarning from "./components/HeaderWarning";
 
 import Web3 from "web3";
@@ -31,8 +35,17 @@ import {
 	getPopularModerators,
 	filterOraclesFromMarketsGraph,
 	findModeratorsByIdArr,
+	filterMarketIdentifiersFromMarketsGraph,
+	findPostsByMarketIdentifierArr,
+	populateMarketWithMetadata,
 } from "./utils";
-import { sUpdateProfile, sUpdateOraclesInfoObj } from "./redux/reducers";
+import {
+	sUpdateProfile,
+	sUpdateOraclesInfoObj,
+	selectOracleInfoObj,
+	selectMarketsMetadata,
+	sUpdateMarketsMetadata,
+} from "./redux/reducers";
 import { useDispatch, useSelector } from "react-redux";
 import { Route, Routes, useNavigate } from "react-router";
 
@@ -40,17 +53,17 @@ const web3 = new Web3();
 
 function App() {
 	const navigate = useNavigate();
-
 	const dispatch = useDispatch();
+
+	const oraclesInfoObj = useSelector(selectOracleInfoObj);
+	const marketsMetadata = useSelector(selectMarketsMetadata);
 
 	const { account, chainId } = useEthers();
 	const { state, send } = useCreateNewMarket();
 
-	const { result, reexecuteQuery } = useQueryMarketsOrderedByLatest();
-	console.log(result, " it is here");
+	const { result, reexecuteQuery } = useQueryExploreMarkets();
 
-	const imageUrl = "12dddwijijwwai12121o";
-	const moderatorAddress = "0x3A8ed689D382Fe98445bf73c087A2F6102B75ECe";
+	const [markets, setMarkets] = useState([]);
 
 	useEffect(async () => {
 		var res = await getUser();
@@ -58,54 +71,27 @@ function App() {
 			dispatch(sUpdateProfile(res.user));
 		}
 		res = await findAllFollows();
-		console.log(res, "findAllFollows");
 	}, []);
-
-	useEffect(async () => {
-		if (state.receipt) {
-			const txHash = state.receipt.transactionHash;
-			await newPost(txHash, imageUrl);
-		}
-	}, [state]);
 
 	useEffect(async () => {
 		if (result.data && result.data.markets) {
 			const oracleIds = filterOraclesFromMarketsGraph(
 				result.data.markets
 			);
-			const res = await findModeratorsByIdArr(oracleIds);
+			let res = await findModeratorsByIdArr(oracleIds);
 			dispatch(sUpdateOraclesInfoObj(res.moderators));
+
+			const marketIdentifiers = filterMarketIdentifiersFromMarketsGraph(
+				result.data.markets
+			);
+			res = await findPostsByMarketIdentifierArr(marketIdentifiers);
+			dispatch(sUpdateMarketsMetadata(res.posts));
+
+			setMarkets(result.data.markets);
 		}
 	}, [result]);
 
-	async function trial() {
-		const signature =
-			"0xd63257c295c23cd9c2fa54f6f860391115ee46a60e91a23fc29e7f671f77a7b40726dc2d7903974343cc6026f98196fa112404d3463d0d98d0ae20a7d3b3468b1b";
-
-		const address = web3.eth.accounts.recover(
-			JSON.stringify({
-				hotAddress: "0xdcC73E699F5A910AE90947a76f75e0C2732aff40",
-				accountNonce: 1,
-			}),
-			signature
-		);
-		console.log(address);
-	}
-
-	async function trial2() {
-		await newPost(
-			"0xfe24612d943c9c92f4f111bfea62a73fdb02fdb1d398f8ead024f5c4af0140d1",
-			imageUrl
-		);
-	}
-
-	async function trial3() {
-		await updateModerator(toCheckSumAddress(moderatorAddress), {
-			name: "User 1",
-		});
-	}
-
-	function Post() {
+	function Post({ market }) {
 		return (
 			<Box>
 				<Flex paddingBottom={3} paddingTop={4}>
@@ -116,7 +102,7 @@ function App() {
 							src="https://bit.ly/dan-abramov"
 						/>
 						<Heading marginLeft={2} size="xs">
-							Groupname
+							{market.oracleInfo.name}
 						</Heading>
 					</Flex>
 					<Spacer />
@@ -174,10 +160,17 @@ function App() {
 									paddingLeft={21}
 									backgroundColor="yellow.400"
 								>
-									<Post />
-									<Post />
-									<Post />
-									<Post />
+									{markets.map((market) => {
+										return (
+											<Post
+												market={populateMarketWithMetadata(
+													market,
+													oraclesInfoObj,
+													marketsMetadata
+												)}
+											/>
+										);
+									})}
 								</Flex>
 								<Flex
 									width={368}

@@ -35,7 +35,6 @@ export function generateRequestSignatures(msg) {
 		return;
 	}
 
-	console.log(JSON.stringify(msg), ",l,l");
 	const { signature } = signMessage(hotPvKey, JSON.stringify(msg));
 
 	return {
