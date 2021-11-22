@@ -180,11 +180,14 @@ export async function findModeratorsByIdArr(ids) {
 	} catch (e) {}
 }
 
-export async function getPopularModerators() {
+export async function findPopularModerators(ignoreList) {
 	try {
 		const { data } = await baseInstance.request({
 			url: "/moderator/popular",
-			method: "GET",
+			method: "POST",
+			data: {
+				ignoreList,
+			},
 		});
 
 		return data.response;

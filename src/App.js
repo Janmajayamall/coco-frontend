@@ -1,6 +1,7 @@
 import "./App.css";
 import ConnectButton from "./components/ConnectButton";
 import LoginButton from "./components/LoginButton";
+import PostDisplay from "./components/PostDisplay";
 import NewPost from "./pages/NewPost";
 import NewModerator from "./pages/NewModerator";
 import OracleConfig from "./pages/OracleConfig";
@@ -16,6 +17,7 @@ import {
 	Image,
 	Avatar,
 } from "@chakra-ui/react";
+import { TriangleUpIcon, TriangleDownIcon } from "@chakra-ui/icons";
 import { useEthers } from "@usedapp/core/packages/core";
 import {
 	useCreateNewMarket,
@@ -32,12 +34,13 @@ import {
 	toCheckSumAddress,
 	getUser,
 	findAllFollows,
-	getPopularModerators,
 	filterOraclesFromMarketsGraph,
 	findModeratorsByIdArr,
 	filterMarketIdentifiersFromMarketsGraph,
 	findPostsByMarketIdentifierArr,
 	populateMarketWithMetadata,
+	findPopularModerators,
+	followModerator,
 } from "./utils";
 import {
 	sUpdateProfile,
@@ -45,6 +48,8 @@ import {
 	selectOracleInfoObj,
 	selectMarketsMetadata,
 	sUpdateMarketsMetadata,
+	sUpdateGroupsFollowed,
+	selectGroupsFollowed,
 } from "./redux/reducers";
 import { useDispatch, useSelector } from "react-redux";
 import { Route, Routes, useNavigate } from "react-router";
@@ -57,13 +62,19 @@ function App() {
 
 	const oraclesInfoObj = useSelector(selectOracleInfoObj);
 	const marketsMetadata = useSelector(selectMarketsMetadata);
-
-	const { account, chainId } = useEthers();
-	const { state, send } = useCreateNewMarket();
+	const groupsFollowed = useSelector(selectGroupsFollowed);
 
 	const { result, reexecuteQuery } = useQueryExploreMarkets();
 
 	const [markets, setMarkets] = useState([]);
+	const [popularGroups, setPopularGroups] = useState([]);
+
+	useEffect(async () => {
+		const ignoreList = Object.keys(groupsFollowed);
+		let res = await findPopularModerators(ignoreList);
+		console.log(res);
+		setPopularGroups(res.moderators);
+	}, []);
 
 	useEffect(async () => {
 		var res = await getUser();
@@ -71,10 +82,13 @@ function App() {
 			dispatch(sUpdateProfile(res.user));
 		}
 		res = await findAllFollows();
+		console.log(res);
+		dispatch(sUpdateGroupsFollowed(res.relations));
 	}, []);
 
 	useEffect(async () => {
 		if (result.data && result.data.markets) {
+			console.log(result.data.markets);
 			const oracleIds = filterOraclesFromMarketsGraph(
 				result.data.markets
 			);
@@ -90,28 +104,6 @@ function App() {
 			setMarkets(result.data.markets);
 		}
 	}, [result]);
-
-	function Post({ market }) {
-		return (
-			<Box>
-				<Flex paddingBottom={3} paddingTop={4}>
-					<Flex alignItems="center">
-						<Avatar
-							size="sm"
-							name="Dan Abrahmov"
-							src="https://bit.ly/dan-abramov"
-						/>
-						<Heading marginLeft={2} size="xs">
-							{market.oracleInfo.name}
-						</Heading>
-					</Flex>
-					<Spacer />
-					<Text>dwa</Text>
-				</Flex>
-				<Image src={"https://bit.ly/2Z4KKcF"} />
-			</Box>
-		);
-	}
 
 	return (
 		<div>
@@ -162,11 +154,12 @@ function App() {
 								>
 									{markets.map((market) => {
 										return (
-											<Post
+											<PostDisplay
 												market={populateMarketWithMetadata(
 													market,
 													oraclesInfoObj,
-													marketsMetadata
+													marketsMetadata,
+													groupsFollowed
 												)}
 											/>
 										);
@@ -184,10 +177,25 @@ function App() {
 									<Heading size="md" marginBottom={5}>
 										Explore Groups
 									</Heading>
-									<Flex>
-										<Text>daiwodja</Text>
-										<Spacer />
-										<Button size="sm">daow</Button>
+									<Flex flexDirection={"column"}>
+										{popularGroups.map((group) => {
+											return (
+												<Flex>
+													<Text>{group.name}</Text>
+													<Spacer />
+													<Button
+														onClick={async () => {
+															await followModerator(
+																group.oracleAddress
+															);
+														}}
+														size="sm"
+													>
+														daow
+													</Button>
+												</Flex>
+											);
+										})}
 									</Flex>
 								</Flex>
 							</Flex>

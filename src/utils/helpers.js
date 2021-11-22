@@ -28,11 +28,29 @@ export function filterMarketIdentifiersFromMarketsGraph(markets) {
 export function populateMarketWithMetadata(
 	market,
 	oraclesInfo,
-	marketsMetadata
+	marketsMetadata,
+	groupsFollowed
 ) {
 	return {
 		...market,
 		oracleInfo: oraclesInfo[toCheckSumAddress(market.oracle.id)],
 		imageUrl: marketsMetadata[market.marketIdentifier].eventIdentifierStr,
+		follow: groupsFollowed[toCheckSumAddress(market.oracle.id)]
+			? toCheckSumAddress(market.oracle.id)
+			: false,
 	};
+}
+
+export function roundValueTwoDP(value) {
+	let _value = value;
+	try {
+		if (typeof _value == "string") {
+			_value = Number(_value);
+		}
+	} catch (e) {
+		return 0;
+	}
+
+	// TODO finish this
+	return 0.43;
 }
