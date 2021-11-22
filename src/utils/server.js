@@ -142,6 +142,26 @@ export async function findModerators(filter) {
 	} catch (e) {}
 }
 
+export async function findModeratorsByIdArr(ids) {
+	const filter = {
+		oracleAddress: {
+			$in: ids,
+		},
+	};
+
+	try {
+		const { data } = await baseInstance.request({
+			url: "/moderator/find",
+			method: "POST",
+			data: {
+				filter,
+			},
+		});
+
+		return data.response;
+	} catch (e) {}
+}
+
 export async function getPopularModerators() {
 	try {
 		const { data } = await baseInstance.request({

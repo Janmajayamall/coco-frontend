@@ -17,32 +17,37 @@ import {
 	Avatar,
 } from "@chakra-ui/react";
 import { useEthers } from "@usedapp/core/packages/core";
-import { utils } from "ethers";
 import { useCreateNewMarket, useQueryMarketsOrderedByLatest } from "./hooks";
 import HeaderWarning from "./components/HeaderWarning";
 
 import Web3 from "web3";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
 	newPost,
-	keccak256,
 	updateModerator,
 	toCheckSumAddress,
 	getUser,
 	findAllFollows,
 	getPopularModerators,
+	filterOraclesFromMarketsGraph,
+	findModeratorsByIdArr,
 } from "./utils";
-import { sUpdateProfile } from "./redux/reducers";
-import { useDispatch } from "react-redux";
+import { sUpdateProfile, sUpdateOraclesInfoObj } from "./redux/reducers";
+import { useDispatch, useSelector } from "react-redux";
 import { Route, Routes, useNavigate } from "react-router";
 
 const web3 = new Web3();
 
 function App() {
+	const navigate = useNavigate();
+
+	const dispatch = useDispatch();
+
 	const { account, chainId } = useEthers();
 	const { state, send } = useCreateNewMarket();
-	const dispatch = useDispatch();
-	const navigate = useNavigate();
+
+	const { result, reexecuteQuery } = useQueryMarketsOrderedByLatest();
+	console.log(result, " it is here");
 
 	const imageUrl = "12dddwijijwwai12121o";
 	const moderatorAddress = "0x3A8ed689D382Fe98445bf73c087A2F6102B75ECe";
@@ -63,8 +68,15 @@ function App() {
 		}
 	}, [state]);
 
-	const { result, reexecuteQuery } = useQueryMarketsOrderedByLatest();
-	console.log(result, " it is here");
+	useEffect(async () => {
+		if (result.data && result.data.markets) {
+			const oracleIds = filterOraclesFromMarketsGraph(
+				result.data.markets
+			);
+			const res = await findModeratorsByIdArr(oracleIds);
+			dispatch(sUpdateOraclesInfoObj(res.moderators));
+		}
+	}, [result]);
 
 	async function trial() {
 		const signature =
@@ -195,11 +207,3 @@ function App() {
 }
 
 export default App;
-
-/* 
-1. Finish login setup 
-2. Finish adding a new post setup
-3. Finish setting up as a moderator
-4. Finish requesting and following moderators
-5. Finish display home feed, and moderator specific feed
-6. */

@@ -2,13 +2,15 @@ import { useQuery } from "urql";
 
 const QueryMarketsOrderedByLatest = `
 	query {
-		markets(orderBy:id, orderDirection: desc) {
+		markets(orderBy:timestamp, orderDirection: desc) {
 			id
 			creator
 			eventIdentifier
 			marketIdentifier
 			outcomeReserve0
 			outcomeReserve1
+			probability0
+			probability1
 			stakingReserve0
 			stakingReserve1
 			tokenC
@@ -28,6 +30,10 @@ const QueryMarketsOrderedByLatest = `
 			staker1
 			lastAmountStaked
 			lastOutcomeStaked
+			timestamp
+			oracle{
+     			id
+    		}
 		}
 	}
 `;
