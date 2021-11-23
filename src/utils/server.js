@@ -194,6 +194,22 @@ export async function findPopularModerators(ignoreList) {
 	} catch (e) {}
 }
 
+export async function findModeratorsDetails(moderatorIds) {
+	try {
+		const { data } = await baseInstance.request({
+			url: "/moderator/findDetails",
+			method: "POST",
+			data: {
+				moderatorIds,
+			},
+		});
+
+		return data.response;
+	} catch (e) {
+		// console.log(e, ",aldmakom");
+	}
+}
+
 export async function followModerator(moderatorAddress) {
 	const msg = {
 		moderatorAddress,

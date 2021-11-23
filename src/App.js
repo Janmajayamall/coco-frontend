@@ -132,10 +132,10 @@ function App() {
 				<Route path="/add" element={<NewPost />} />
 				<Route path="/addModerator" element={<NewModerator />} />
 				<Route path="/oracle/:address" element={<OracleConfig />} />
-				<Route path="/explore" element={<Explore />} />
+				<Route path="/explore" element={<Feed />} />
+				<Route path="/home" element={<Feed />} />
+				<Route path="/group/:groupId" element={<Feed />} />
 				<Route path="/" element={<Feed />} />
-				<Route path="/feed" element={<Feed />} />
-				<Route path="/feed/:groupId" element={<Feed />} />
 			</Routes>
 		</div>
 	);

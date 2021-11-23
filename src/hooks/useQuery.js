@@ -2,7 +2,7 @@ import { useQuery } from "urql";
 
 const QueryExploreMarkets = `
 	query ($first: Int!, $skip: Int!, $timestamp: BigInt!) {
-		markets(first: $first, skip: $skip, orderBy: totalVolume, orderDirection: desc, where:{timestamp_gt: $timestamp})
+		markets(first: $first, skip: $skip, orderBy: totalVolume, orderDirection: desc, where:{timestamp_gt: $timestamp}){
 			id
 			creator
 			eventIdentifier
@@ -38,12 +38,13 @@ const QueryExploreMarkets = `
 			oracle {
      			id
     		}
+		}
 	}
 `;
 
-const QueryMarketsOrderedByLatest = `
-	query {
-		markets(orderBy:timestamp, orderDirection: desc) {
+const QueryMarketsByOracles = `
+	query ($first: Int!, $skip: Int!, $oracles: [String!]!) {
+		markets(first: $first, skip: $skip, where:{oracle_in: $oracles}) {
 			id
 			creator
 			eventIdentifier
@@ -117,14 +118,33 @@ const QueryFeedByModeratorList = `
     }
 `;
 
-export function useQueryExploreMarkets() {
+export function useQueryExploreMarkets(first, skip, timestamp, pause) {
+	console.log(first, skip, timestamp, pause);
 	const [result, reexecuteQuery] = useQuery({
-		query: QueryMarketsOrderedByLatest,
+		query: QueryExploreMarkets,
 		variables: {
-			first: 10,
-			skip: 0,
-			timestamp: 1637584845,
+			first,
+			skip,
+			timestamp,
 		},
+		pause,
+	});
+	return {
+		result,
+		reexecuteQuery,
+	};
+}
+
+export function useQueryMarketByOracles(first, skip, oracles, pause) {
+	// console.log(first, skip, oracles, pause, "121s");
+	const [result, reexecuteQuery] = useQuery({
+		query: QueryMarketsByOracles,
+		variables: {
+			first,
+			skip,
+			oracles,
+		},
+		pause,
 	});
 	return {
 		result,
@@ -134,7 +154,7 @@ export function useQueryExploreMarkets() {
 
 export function useQueryMarketsOrderedByLatest() {
 	const [result, reexecuteQuery] = useQuery({
-		query: QueryMarketsOrderedByLatest,
+		query: QueryExploreMarkets,
 	});
 	return {
 		result,

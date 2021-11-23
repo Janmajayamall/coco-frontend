@@ -22,6 +22,7 @@ import {
 	useCreateNewMarket,
 	useQueryMarketsOrderedByLatest,
 	useQueryExploreMarkets,
+	useQueryMarketByOracles,
 } from "../hooks";
 
 import Web3 from "web3";
@@ -39,6 +40,8 @@ import {
 	populateMarketWithMetadata,
 	findPopularModerators,
 	followModerator,
+	findModeratorsDetails,
+	numStrFormatter,
 } from "../utils";
 import {
 	sUpdateProfile,
@@ -69,20 +72,115 @@ function Page() {
 	const location = useLocation();
 	const urlParams = useParams();
 	const groupId = urlParams.groupId;
+	const feedType = (() => {
+		if (location.pathname == "/explore") {
+			return 0;
+		}
+		if (location.pathname == "/home") {
+			return 1;
+		}
+		if (groupId) {
+			return 2;
+		}
+	})();
 
 	const oraclesInfoObj = useSelector(selectOracleInfoObj);
 	const marketsMetadata = useSelector(selectMarketsMetadata);
 	const groupsFollowed = useSelector(selectGroupsFollowed);
 
-	const { result, reexecuteQuery } = useQueryExploreMarkets();
-
+	const [pagination, setPagination] = useState({ first: 0, skip: 0 });
+	const [queryOracles, setQueryOracles] = useState([]);
 	const [markets, setMarkets] = useState([]);
 	const [popularGroups, setPopularGroups] = useState([]);
+	const [groupDetails, setGroupDetails] = useState({});
+
+	const { result: result0, reexecuteQuery: rQ0 } = useQueryExploreMarkets(
+		pagination.first,
+		pagination.skip,
+		0,
+		true
+	);
+
+	const { result: result1, reexecuteQuery: rQ1 } = useQueryMarketByOracles(
+		pagination.first,
+		pagination.skip,
+		queryOracles,
+		true
+	);
+
+	// initial graph protocol call
+	useEffect(() => {
+		setMarkets([]);
+		if (feedType == undefined) {
+			return;
+		}
+
+		if (feedType == 0) {
+			setPagination({ first: 10, skip: 0 });
+		} else if (feedType == 1) {
+			let idsToLowerCase = Object.keys(groupsFollowed).map((id) =>
+				id.toLowerCase()
+			);
+			setPagination({ first: 10, skip: 0 });
+			setQueryOracles(idsToLowerCase);
+		} else if (feedType == 2) {
+			setPagination({ first: 10, skip: 0 });
+			setQueryOracles([groupId.toLowerCase()]);
+		}
+	}, [groupsFollowed]);
+
+	useEffect(() => {
+		if (feedType == 0 && pagination.first > 0) {
+			rQ0();
+		}
+	}, [pagination]);
+
+	useEffect(() => {
+		if (
+			(feedType == 1 || feedType == 2) &&
+			queryOracles.length > 0 &&
+			pagination.first > 0
+		) {
+			rQ1();
+		}
+	}, [queryOracles, pagination]);
+
+	useEffect(async () => {
+		if (feedType == undefined) {
+			return;
+		}
+
+		let _result;
+		if (feedType == 0) {
+			_result = result0;
+		} else if (feedType == 1 || feedType == 2) {
+			_result = result1;
+		}
+
+		console.log(_result, " this is result");
+
+		if (_result.data && _result.data.markets) {
+			console.log(_result.data.markets);
+			const oracleIds = filterOraclesFromMarketsGraph(
+				_result.data.markets
+			);
+			let res = await findModeratorsByIdArr(oracleIds);
+			dispatch(sUpdateOraclesInfoObj(res.moderators));
+
+			const marketIdentifiers = filterMarketIdentifiersFromMarketsGraph(
+				_result.data.markets
+			);
+			res = await findPostsByMarketIdentifierArr(marketIdentifiers);
+			dispatch(sUpdateMarketsMetadata(res.posts));
+
+			setMarkets([...markets, ..._result.data.markets]);
+		}
+	}, [result0, result1]);
 
 	useEffect(async () => {
 		const ignoreList = Object.keys(groupsFollowed);
 		let res = await findPopularModerators(ignoreList);
-		console.log(res);
+
 		setPopularGroups(res.moderators);
 	}, []);
 
@@ -92,28 +190,19 @@ function Page() {
 			dispatch(sUpdateProfile(res.user));
 		}
 		res = await findAllFollows();
-		console.log(res);
+
 		dispatch(sUpdateGroupsFollowed(res.relations));
 	}, []);
 
 	useEffect(async () => {
-		if (result.data && result.data.markets) {
-			console.log(result.data.markets);
-			const oracleIds = filterOraclesFromMarketsGraph(
-				result.data.markets
-			);
-			let res = await findModeratorsByIdArr(oracleIds);
-			dispatch(sUpdateOraclesInfoObj(res.moderators));
-
-			const marketIdentifiers = filterMarketIdentifiersFromMarketsGraph(
-				result.data.markets
-			);
-			res = await findPostsByMarketIdentifierArr(marketIdentifiers);
-			dispatch(sUpdateMarketsMetadata(res.posts));
-
-			setMarkets(result.data.markets);
+		if (groupId) {
+			let res = await findModeratorsDetails([groupId]);
+			if (res && res.groupsDetails && res.groupsDetails.length > 0) {
+				let groupDetails = res.groupsDetails[0];
+				setGroupDetails(groupDetails);
+			}
 		}
-	}, [result]);
+	}, []);
 
 	return (
 		<Flex
@@ -152,7 +241,9 @@ function Page() {
 								h={5}
 								color="#0B0B0B"
 							/>
-							<Heading size="sm">Group Name</Heading>
+							<Heading size="sm">
+								{groupDetails.name ? groupDetails.name : ""}
+							</Heading>
 						</Flex>
 						<Flex marginBottom={5}>
 							<Avatar
@@ -162,27 +253,52 @@ function Page() {
 								marginRight={5}
 							/>
 							<Box marginRight={5}>
-								<Text fontSize="md">17k</Text>
+								<Text fontSize="md">
+									{numStrFormatter(
+										groupDetails.followCount
+											? groupDetails.followCount
+											: 0
+									)}
+								</Text>
 								<Text fontSize="sm">members</Text>
 							</Box>
 							<Box marginRight={5}>
-								<Text fontSize="md">120m</Text>
+								<Text fontSize="md">
+									{numStrFormatter(
+										groupDetails.postCount
+											? groupDetails.postCount
+											: 0
+									)}
+								</Text>
 								<Text fontSize="sm">contributions</Text>
 							</Box>
 						</Flex>
-						<Flex>
+						<Flex marginBottom={5}>
 							<Text fontSize="sm">
 								Group description. This group is only for good
 								posts. Please avoid posting any bad posts
 							</Text>
 						</Flex>
+						<Flex>
+							<Button
+								backgroundColor="#0B0B0B"
+								color="#FDFDFD"
+								size="sm"
+								variant="solid"
+							>
+								{groupsFollowed[toCheckSumAddress(groupId)]
+									? "Leave Group"
+									: "Join Group"}
+							</Button>
+						</Flex>
 					</Flex>
-				) : (
+				) : undefined}
+				{feedType == 0 || feedType == 1 ? (
 					<Flex justifyContent="center" margin={5}>
 						<FireIcon marginRight={5} w={10} h={10} />
 						<HomeIcon marginLeft={5} w={10} h={10} />
 					</Flex>
-				)}
+				) : undefined}
 				{markets.map((market) => {
 					return (
 						<PostDisplay

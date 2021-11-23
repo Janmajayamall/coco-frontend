@@ -1,6 +1,6 @@
 import { Icon } from "@chakra-ui/icons";
 /**
- * @ref https://orioniconlibrary.com/icon/flame-3117
+ * 
  */
 export function FireIcon(props) {
 	return (

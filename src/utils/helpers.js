@@ -52,5 +52,25 @@ export function roundValueTwoDP(value) {
 	}
 
 	// TODO finish this
-	return 0.43;
+	return _value.toFixed(2);
+}
+
+export function numStrFormatter(value, digits = 1) {
+	let _value = value;
+	try {
+		if (typeof _value == "string") {
+			_value = Number(_value);
+		}
+	} catch (e) {
+		return 0;
+	}
+
+	if (_value > 1000000) {
+		_value = (_value / 1000000).toFixed(digits) + "M";
+	} else if (_value > 1000) {
+		_value = (_value / 1000).toFixed(digits) + "K";
+	} else {
+		_value = String(_value);
+	}
+	return _value;
 }
