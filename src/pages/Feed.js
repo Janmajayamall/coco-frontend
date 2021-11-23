@@ -73,7 +73,7 @@ function Page() {
 	const urlParams = useParams();
 	const groupId = urlParams.groupId;
 	const feedType = (() => {
-		if (location.pathname == "/explore") {
+		if (location.pathname == "/explore" || location.pathname == "/") {
 			return 0;
 		}
 		if (location.pathname == "/home") {
@@ -191,7 +191,9 @@ function Page() {
 		}
 		res = await findAllFollows();
 
-		dispatch(sUpdateGroupsFollowed(res.relations));
+		if (res != undefined) {
+			dispatch(sUpdateGroupsFollowed(res.relations));
+		}
 	}, []);
 
 	useEffect(async () => {

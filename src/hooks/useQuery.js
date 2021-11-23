@@ -44,7 +44,7 @@ const QueryExploreMarkets = `
 
 const QueryMarketsByOracles = `
 	query ($first: Int!, $skip: Int!, $oracles: [String!]!) {
-		markets(first: $first, skip: $skip, where:{oracle_in: $oracles}) {
+		markets(first: $first, skip: $skip, where:{oracle_in: $oracles}, orderBy: timestamp, orderDirection: desc) {
 			id
 			creator
 			eventIdentifier

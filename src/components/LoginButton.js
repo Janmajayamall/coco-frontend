@@ -66,7 +66,6 @@ function LoginButton() {
 		dispatch(sUpdateProfile(undefined));
 	}
 
-
 	if (!account) {
 		return <div />;
 	}

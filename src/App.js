@@ -58,6 +58,7 @@ import {
 } from "./redux/reducers";
 import { useDispatch, useSelector } from "react-redux";
 import { Route, Routes, useNavigate } from "react-router";
+import LoginModal from "./components/LoginModal";
 
 const web3 = new Web3();
 
@@ -88,7 +89,9 @@ function App() {
 		}
 		res = await findAllFollows();
 		console.log(res);
-		dispatch(sUpdateGroupsFollowed(res.relations));
+		if (res != undefined) {
+			dispatch(sUpdateGroupsFollowed(res.relations));
+		}
 	}, []);
 
 	useEffect(async () => {
@@ -125,9 +128,9 @@ function App() {
 					<Heading>Mimi</Heading>
 					<Spacer />
 					<ConnectButton />
-					<LoginButton />
 				</Flex>
 			</Flex>
+			<LoginModal />
 			<Routes>
 				<Route path="/add" element={<NewPost />} />
 				<Route path="/addModerator" element={<NewModerator />} />
