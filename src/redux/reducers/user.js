@@ -2,7 +2,11 @@ import { createSlice } from "@reduxjs/toolkit";
 import { act } from "react-dom/test-utils";
 import { useSelector } from "react-redux";
 
-const initialState = { profile: undefined, groupsFollowed: new Object() };
+const initialState = {
+	profile: undefined,
+	groupsFollowed: new Object(),
+	feedDisplayConfigs: { threshold: 50 },
+};
 
 const slice = createSlice({
 	name: "user",
@@ -12,6 +16,7 @@ const slice = createSlice({
 			console.log(state, action, "mmkmkm");
 			state.profile = action.payload;
 		},
+
 		sUpdateGroupsFollowed(state, action) {
 			if (action.payload && Array.isArray(action.payload)) {
 				let groupsFollowed = new Object();
@@ -41,6 +46,18 @@ const slice = createSlice({
 				state.groupsFollowed = updatedValues;
 			}
 		},
+		sUpdateThresholdOfFeedDisplayConfigs(state, action) {
+			if (
+				action.payload &&
+				typeof action.payload == "number" &&
+				action.payload <= 100
+			) {
+				state.feedDisplayConfigs = {
+					...state.feedDisplayConfigs,
+					threshold: action.payload,
+				};
+			}
+		},
 	},
 });
 
@@ -49,8 +66,11 @@ export const {
 	sUpdateGroupsFollowed,
 	sAddGroupFollow,
 	sDeleteGroupFollow,
+	sUpdateThresholdOfFeedDisplayConfigs,
 } = slice.actions;
 
 export const selectUserProfile = (state) => state.user.profile;
 export const selectGroupsFollowed = (state) => state.user.groupsFollowed;
+export const selectFeedDisplayConfigs = (state) =>
+	state.user.feedDisplayConfigs;
 export default slice.reducer;

@@ -16,8 +16,12 @@ import {
 	Heading,
 	Image,
 	Avatar,
+	Slider,
+	SliderTrack,
+	SliderFilledTrack,
+	SliderThumb,
 } from "@chakra-ui/react";
-import { TriangleUpIcon, TriangleDownIcon } from "@chakra-ui/icons";
+
 import { useEthers } from "@usedapp/core/packages/core";
 import {
 	useCreateNewMarket,
@@ -50,9 +54,12 @@ import {
 	sUpdateMarketsMetadata,
 	sUpdateGroupsFollowed,
 	selectGroupsFollowed,
-} from "./redux/reducers";
+} from "../redux/reducers";
 import { useDispatch, useSelector } from "react-redux";
 import { Route, Routes, useNavigate } from "react-router";
+import ConfigSidebar from "./components/ConfigSiderbar";
+import { FireIcon } from "./components/FireIcon";
+import { HomeIcon } from "./components/HomeIcon";
 
 const web3 = new Web3();
 
@@ -106,13 +113,11 @@ function App() {
 	}, [result]);
 
 	return (
-		<div>
+		<div style={{ maxWidth: 1650 }}>
 			<HeaderWarning />
 			<Flex borderBottom="1px" borderColor="#BDBDBD">
 				<Flex
 					style={{
-						paddingRight: 224,
-						paddingLeft: 224,
 						width: "100%",
 						justifyContent: "center",
 						alignItems: "center",
@@ -133,73 +138,76 @@ function App() {
 				<Route
 					path="/"
 					element={
-						<div
+						<Flex
 							style={{
-								paddingRight: 208,
-								paddingLeft: 208,
+								paddingRight: 20,
+								paddingLeft: 20,
 							}}
 						>
-							<Flex>
-								<Flex
-									width={268}
-									height={100}
-									backgroundColor="yellow.300"
-								></Flex>
-								<Flex
-									flexDirection="column"
-									width={600}
-									paddingRight={21}
-									paddingLeft={21}
-									backgroundColor="yellow.400"
-								>
-									{markets.map((market) => {
+							<Spacer />
+							<Flex width={"20%"}>
+								<ConfigSidebar />
+							</Flex>
+
+							<Flex
+								flexDirection="column"
+								width={"50%"}
+								paddingRight={21}
+								paddingLeft={21}
+								borderRightWidth={1}
+								borderLeftWidth={1}
+								borderColor={"#E0E0E0"}
+							>
+								<Flex justifyContent="center" margin={5}>
+									<FireIcon marginRight={5} w={10} h={10} />
+									<HomeIcon marginLeft={5} w={10} h={10} />
+								</Flex>
+								{markets.map((market) => {
+									return (
+										<PostDisplay
+											market={populateMarketWithMetadata(
+												market,
+												oraclesInfoObj,
+												marketsMetadata,
+												groupsFollowed
+											)}
+										/>
+									);
+								})}
+							</Flex>
+							<Flex
+								width={"20%"}
+								paddingRight={6}
+								paddingLeft={6}
+								paddingTop={5}
+								flexDirection="column"
+							>
+								<Heading size="md" marginBottom={5}>
+									Explore Groups
+								</Heading>
+								<Flex flexDirection={"column"}>
+									{popularGroups.map((group) => {
 										return (
-											<PostDisplay
-												market={populateMarketWithMetadata(
-													market,
-													oraclesInfoObj,
-													marketsMetadata,
-													groupsFollowed
-												)}
-											/>
+											<Flex>
+												<Text>{group.name}</Text>
+												<Spacer />
+												<Button
+													onClick={async () => {
+														await followModerator(
+															group.oracleAddress
+														);
+													}}
+													size="sm"
+												>
+													daow
+												</Button>
+											</Flex>
 										);
 									})}
 								</Flex>
-								<Flex
-									width={368}
-									height={100}
-									backgroundColor="yellow.900"
-									paddingRight={6}
-									paddingLeft={6}
-									paddingTop={5}
-									flexDirection="column"
-								>
-									<Heading size="md" marginBottom={5}>
-										Explore Groups
-									</Heading>
-									<Flex flexDirection={"column"}>
-										{popularGroups.map((group) => {
-											return (
-												<Flex>
-													<Text>{group.name}</Text>
-													<Spacer />
-													<Button
-														onClick={async () => {
-															await followModerator(
-																group.oracleAddress
-															);
-														}}
-														size="sm"
-													>
-														daow
-													</Button>
-												</Flex>
-											);
-										})}
-									</Flex>
-								</Flex>
 							</Flex>
-						</div>
+							<Spacer />
+						</Flex>
 					}
 				/>
 			</Routes>
