@@ -6,6 +6,7 @@ import NewPost from "./pages/NewPost";
 import NewModerator from "./pages/NewModerator";
 import OracleConfig from "./pages/OracleConfig";
 import Explore from "./pages/Explore";
+import Feed from "./pages/Feed";
 import {
 	Button,
 	Box,
@@ -54,12 +55,9 @@ import {
 	sUpdateMarketsMetadata,
 	sUpdateGroupsFollowed,
 	selectGroupsFollowed,
-} from "../redux/reducers";
+} from "./redux/reducers";
 import { useDispatch, useSelector } from "react-redux";
 import { Route, Routes, useNavigate } from "react-router";
-import ConfigSidebar from "./components/ConfigSiderbar";
-import { FireIcon } from "./components/FireIcon";
-import { HomeIcon } from "./components/HomeIcon";
 
 const web3 = new Web3();
 
@@ -135,81 +133,9 @@ function App() {
 				<Route path="/addModerator" element={<NewModerator />} />
 				<Route path="/oracle/:address" element={<OracleConfig />} />
 				<Route path="/explore" element={<Explore />} />
-				<Route
-					path="/"
-					element={
-						<Flex
-							style={{
-								paddingRight: 20,
-								paddingLeft: 20,
-							}}
-						>
-							<Spacer />
-							<Flex width={"20%"}>
-								<ConfigSidebar />
-							</Flex>
-
-							<Flex
-								flexDirection="column"
-								width={"50%"}
-								paddingRight={21}
-								paddingLeft={21}
-								borderRightWidth={1}
-								borderLeftWidth={1}
-								borderColor={"#E0E0E0"}
-							>
-								<Flex justifyContent="center" margin={5}>
-									<FireIcon marginRight={5} w={10} h={10} />
-									<HomeIcon marginLeft={5} w={10} h={10} />
-								</Flex>
-								{markets.map((market) => {
-									return (
-										<PostDisplay
-											market={populateMarketWithMetadata(
-												market,
-												oraclesInfoObj,
-												marketsMetadata,
-												groupsFollowed
-											)}
-										/>
-									);
-								})}
-							</Flex>
-							<Flex
-								width={"20%"}
-								paddingRight={6}
-								paddingLeft={6}
-								paddingTop={5}
-								flexDirection="column"
-							>
-								<Heading size="md" marginBottom={5}>
-									Explore Groups
-								</Heading>
-								<Flex flexDirection={"column"}>
-									{popularGroups.map((group) => {
-										return (
-											<Flex>
-												<Text>{group.name}</Text>
-												<Spacer />
-												<Button
-													onClick={async () => {
-														await followModerator(
-															group.oracleAddress
-														);
-													}}
-													size="sm"
-												>
-													daow
-												</Button>
-											</Flex>
-										);
-									})}
-								</Flex>
-							</Flex>
-							<Spacer />
-						</Flex>
-					}
-				/>
+				<Route path="/" element={<Feed />} />
+				<Route path="/feed" element={<Feed />} />
+				<Route path="/feed/:groupId" element={<Feed />} />
 			</Routes>
 		</div>
 	);

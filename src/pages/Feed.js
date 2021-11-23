@@ -1,4 +1,3 @@
-import "./App.css";
 import ConnectButton from "../components/ConnectButton";
 import LoginButton from "../components/LoginButton";
 import PostDisplay from "../components/PostDisplay";
@@ -24,7 +23,6 @@ import {
 	useQueryMarketsOrderedByLatest,
 	useQueryExploreMarkets,
 } from "../hooks";
-import HeaderWarning from "./components/HeaderWarning";
 
 import Web3 from "web3";
 import { useEffect, useState } from "react";
@@ -50,16 +48,27 @@ import {
 	sUpdateMarketsMetadata,
 	sUpdateGroupsFollowed,
 	selectGroupsFollowed,
-} from "./redux/reducers";
+} from "../redux/reducers";
 import { useDispatch, useSelector } from "react-redux";
-import { Route, Routes, useNavigate } from "react-router";
+import {
+	Route,
+	Routes,
+	useLocation,
+	useNavigate,
+	useParams,
+} from "react-router";
 import ConfigSidebar from "../components/ConfigSiderbar";
 import { FireIcon } from "../components/FireIcon";
 import { HomeIcon } from "../components/HomeIcon";
+import { ArrowBackIcon } from "@chakra-ui/icons";
 
 function Page() {
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
+
+	const location = useLocation();
+	const urlParams = useParams();
+	const groupId = urlParams.groupId;
 
 	const oraclesInfoObj = useSelector(selectOracleInfoObj);
 	const marketsMetadata = useSelector(selectMarketsMetadata);
@@ -127,10 +136,53 @@ function Page() {
 				borderLeftWidth={1}
 				borderColor={"#E0E0E0"}
 			>
-				<Flex justifyContent="center" margin={5}>
-					<FireIcon marginRight={5} w={10} h={10} />
-					<HomeIcon marginLeft={5} w={10} h={10} />
-				</Flex>
+				{groupId ? (
+					<Flex flexDirection="column">
+						<Flex
+							marginBottom={5}
+							marginTop={5}
+							alignItems="center"
+						>
+							<ArrowBackIcon
+								onClick={() => {
+									navigate("/feed");
+								}}
+								marginRight={5}
+								w={5}
+								h={5}
+								color="#0B0B0B"
+							/>
+							<Heading size="sm">Group Name</Heading>
+						</Flex>
+						<Flex marginBottom={5}>
+							<Avatar
+								size="md"
+								name="Dan Abrahmov"
+								src="https://bit.ly/dan-abramov"
+								marginRight={5}
+							/>
+							<Box marginRight={5}>
+								<Text fontSize="md">17k</Text>
+								<Text fontSize="sm">members</Text>
+							</Box>
+							<Box marginRight={5}>
+								<Text fontSize="md">120m</Text>
+								<Text fontSize="sm">contributions</Text>
+							</Box>
+						</Flex>
+						<Flex>
+							<Text fontSize="sm">
+								Group description. This group is only for good
+								posts. Please avoid posting any bad posts
+							</Text>
+						</Flex>
+					</Flex>
+				) : (
+					<Flex justifyContent="center" margin={5}>
+						<FireIcon marginRight={5} w={10} h={10} />
+						<HomeIcon marginLeft={5} w={10} h={10} />
+					</Flex>
+				)}
 				{markets.map((market) => {
 					return (
 						<PostDisplay
