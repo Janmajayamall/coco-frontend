@@ -44,21 +44,15 @@ function Page() {
 	}, [state]);
 
 	async function createModeratorHelper() {
+		// await updateModerator("0xb9181365C266cD4e361a455567B77a16bd8044a8", {
+		// 	name: "Oracle 1",
+		// });
+		// return;
+
 		// fee calc
 		const feeNumerator = fee * 100;
 		const feeDenominator = 100;
-		console.log(
-			account,
-			account,
-			addresses.MemeToken,
-			true,
-			1,
-			10,
-			escalationLimit,
-			convertDaysToBlocks(chainId, expireHours),
-			convertDaysToBlocks(chainId, bufferHours),
-			convertDaysToBlocks(chainId, resolutionHours)
-		);
+
 		// validation checks
 		send(
 			account,

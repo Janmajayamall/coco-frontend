@@ -59,6 +59,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { Route, Routes, useNavigate } from "react-router";
 import LoginModal from "./components/LoginModal";
+import PostTradeModal from "./components/PostTradeModal";
 
 const web3 = new Web3();
 
@@ -131,6 +132,7 @@ function App() {
 				</Flex>
 			</Flex>
 			<LoginModal />
+			<PostTradeModal />
 			<Routes>
 				<Route path="/add" element={<NewPost />} />
 				<Route path="/addModerator" element={<NewModerator />} />

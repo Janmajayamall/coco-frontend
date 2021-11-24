@@ -302,16 +302,16 @@ function Page() {
 					</Flex>
 				) : undefined}
 				{markets.map((market) => {
-					return (
-						<PostDisplay
-							market={populateMarketWithMetadata(
-								market,
-								oraclesInfoObj,
-								marketsMetadata,
-								groupsFollowed
-							)}
-						/>
+					const populatedMarket = populateMarketWithMetadata(
+						market,
+						oraclesInfoObj,
+						marketsMetadata,
+						groupsFollowed
 					);
+					if (!populatedMarket.oracleInfo) {
+						return;
+					}
+					return <PostDisplay market={populatedMarket} />;
 				})}
 			</Flex>
 			<Flex

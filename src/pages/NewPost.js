@@ -58,10 +58,11 @@ function Page() {
 
 	async function uploadImageHelper() {
 		// await newPostTrial(
-		// 	"0x9c446be6e0597620cbceb6c479c6c16f3ee591fc",
-		// 	"0x1d58000000000000000000000000000000000000000000000000000000000000"
+		// 	"0xb9181365C266cD4e361a455567B77a16bd8044a8",
+		// 	"0x4838e42180000000000000000000000000000000000000000000000000000000"
 		// );
 		// return;
+		
 		// const _imageUrl = await uploadImage();
 		const _imageUrl =
 			"https://media.9news.com/assets/KUSA/images/ec98b6a3-0e48-4151-a438-3d9b28d687a4/ec98b6a3-0e48-4151-a438-3d9b28d687a4_1920x1080.jpg";

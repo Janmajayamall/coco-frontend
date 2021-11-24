@@ -11,10 +11,24 @@ import {
 } from "@chakra-ui/react";
 import { TriangleUpIcon, TriangleDownIcon } from "@chakra-ui/icons";
 import { roundValueTwoDP } from "../utils";
+import { useDispatch } from "react-redux";
+import { sUpdatePostTradeModal } from "./../redux/reducers";
 
 function PostDisplay({ market }) {
+	const dispatch = useDispatch();
+
 	return (
-		<Box>
+		<Box
+			onClick={() => {
+				console.log("Clicked");
+				dispatch(
+					sUpdatePostTradeModal({
+						isOpen: true,
+						marketIdentifier: market.marketIdentifier,
+					})
+				);
+			}}
+		>
 			<Flex paddingBottom={3} paddingTop={4}>
 				<Flex alignItems="center">
 					<Avatar

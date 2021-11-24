@@ -34,7 +34,9 @@ export function populateMarketWithMetadata(
 	return {
 		...market,
 		oracleInfo: oraclesInfo[toCheckSumAddress(market.oracle.id)],
-		imageUrl: marketsMetadata[market.marketIdentifier].eventIdentifierStr,
+		imageUrl: marketsMetadata[market.marketIdentifier]
+			? marketsMetadata[market.marketIdentifier].eventIdentifierStr
+			: undefined,
 		follow: groupsFollowed[toCheckSumAddress(market.oracle.id)]
 			? toCheckSumAddress(market.oracle.id)
 			: false,

@@ -80,6 +80,44 @@ const QueryMarketsByOracles = `
 	}
 `;
 
+const QueryMarketByMarketIdentifier = `
+	query ($marketIdentifier: Bytes!) {
+		market(id: $marketIdentifier) {
+			id
+			creator
+			eventIdentifier
+			marketIdentifier
+			outcomeReserve0
+			outcomeReserve1
+			probability0
+			probability1
+			stakingReserve0
+			stakingReserve1
+			tokenC
+			feeNumerator
+			feeDenominator
+			fee
+			expireAtBlock
+			donBufferEndsAtBlock
+			resolutionEndsAtBlock
+			donBufferBlocks
+			resolutionBufferBlocks
+			donEscalationCount
+			donEscalationLimit
+			outcome
+			stage
+			staker0
+			staker1
+			lastAmountStaked
+			lastOutcomeStaked
+			timestamp
+			oracle{
+     			id
+    		}
+		}
+	}
+`;
+
 const QueryAllOracles = `
   query {
     oracles{
@@ -155,6 +193,20 @@ export function useQueryMarketByOracles(first, skip, oracles, pause) {
 export function useQueryMarketsOrderedByLatest() {
 	const [result, reexecuteQuery] = useQuery({
 		query: QueryExploreMarkets,
+	});
+	return {
+		result,
+		reexecuteQuery,
+	};
+}
+
+export function useQueryMarketByMarketIdentifier(marketIdentifier, pause) {
+	const [result, reexecuteQuery] = useQuery({
+		query: QueryMarketByMarketIdentifier,
+		variables: {
+			marketIdentifier,
+		},
+		pause,
 	});
 	return {
 		result,
