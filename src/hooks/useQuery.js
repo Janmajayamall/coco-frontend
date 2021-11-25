@@ -118,6 +118,39 @@ const QueryMarketByMarketIdentifier = `
 	}
 `;
 
+const QueryMarketTradeAndStakeInfoByUser = `
+	query ($user: Bytes!, $marketIdentifier: Bytes!, $positionIdentifier: Bytes!){
+			tradeHistories(where:{user: $user}, orderBy: tradeIndex, orderDirection: desc){
+				id
+				amount0
+				amount1
+				amountC
+				buy
+				timestamp
+				tradeIndex
+			}
+			stakeHistories(where: {user: $user}, orderBy: stakeIndex, orderDirection: desc){
+				id
+				amountC
+				outcomeStaked
+				timestamp
+				stakeIndex
+			}
+			tradePosition(id: $positionIdentifier) {
+				id
+				amount0
+				amount1
+				timestamp
+			}
+			stakePosition(id: $positionIdentifier){
+				id
+				amountStaked0
+				amountStaked1
+				timestamp
+			}
+		}
+`;
+
 const QueryAllOracles = `
   query {
     oracles{
@@ -205,6 +238,26 @@ export function useQueryMarketByMarketIdentifier(marketIdentifier, pause) {
 		query: QueryMarketByMarketIdentifier,
 		variables: {
 			marketIdentifier,
+		},
+		pause,
+	});
+	return {
+		result,
+		reexecuteQuery,
+	};
+}
+
+export function useQueryMarketTradeAndStakeInfoByUser(
+	marketIdentifier,
+	user,
+	pause
+) {
+	const [result, reexecuteQuery] = useQuery({
+		query: QueryMarketTradeAndStakeInfoByUser,
+		variables: {
+			user,
+			marketIdentifier,
+			positionIdentifier: `${user}-${marketIdentifier}`,
 		},
 		pause,
 	});
