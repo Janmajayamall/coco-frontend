@@ -30,6 +30,7 @@ import {
 	useBuyMinTokensForExactCTokens,
 	useQueryMarketByMarketIdentifier,
 	useQueryMarketTradeAndStakeInfoByUser,
+	useSellExactTokensForMinCTokens,
 } from "../hooks";
 import {
 	convertDecimalStrToBigNumber,
@@ -71,7 +72,11 @@ function Page() {
 	const groupsFollowed = useSelector(selectGroupsFollowed);
 
 	const { state: stateBuy, send: sendBuy } = useBuyMinTokensForExactCTokens();
-
+	const {
+		state: stateSell,
+		send: sendSell,
+	} = useSellExactTokensForMinCTokens();
+	console.log(stateSell, " state sell");
 	const { result, reexecuteQuery } = useQueryMarketByMarketIdentifier(
 		postId,
 		false
@@ -103,7 +108,7 @@ function Page() {
 		mSATResult.data && mSATResult.data.stakePosition
 			? mSATResult.data.tradePosition
 			: undefined;
-
+	console.log(tradeHistories);
 	useEffect(async () => {
 		if (!result.data || !result.data.market) {
 			return;
@@ -280,9 +285,9 @@ function Page() {
 											: BigNumber.from(0);
 
 									sendBuy(
-										a0.toString(),
-										a1.toString(),
-										inputBuyAmountBn.toString(),
+										a0,
+										a1,
+										inputBuyAmountBn,
 										1 - tokenActionIndex,
 										market.oracle.id,
 										market.marketIdentifier
@@ -321,7 +326,33 @@ function Page() {
 								tokenOutAmount -
 									convertDecimalStrToInt(inputBuyAmount)
 							)}`}</Text> */}
-							<Button>
+							<Button
+								onClick={() => {
+									let a0 =
+										tokenActionIndex == 0
+											? inputSellAmountBn
+											: BigNumber.from(0);
+									let a1 =
+										tokenActionIndex == 1
+											? inputSellAmountBn
+											: BigNumber.from(0);
+									console.log(
+										a0.toString(),
+										a1.toString(),
+										amountCOutBn.toString(),
+										1 - tokenActionIndex,
+										market.oracle.id,
+										market.marketIdentifier
+									);
+									sendSell(
+										a0,
+										a1,
+										amountCOutBn,
+										market.oracle.id,
+										market.marketIdentifier
+									);
+								}}
+							>
 								<Text
 									color="white"
 									fontSize="md"

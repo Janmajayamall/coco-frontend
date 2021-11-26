@@ -146,7 +146,7 @@ export function getTokenAmountToBuyWithAmountC(r0, r1, a, tokenIndex) {
 	} else {
 		tokenAmount = r1.add(a).sub(r0.mul(r1).div(r0.add(a)));
 	}
-	tokenAmount = tokenAmount.sub(BigNumber.from(1));
+	tokenAmount = tokenAmount.sub(ONE_BN);
 	return {
 		amount: tokenAmount,
 		err: false,
@@ -178,7 +178,7 @@ export function sqrtBn(value) {
 
 export function getAmountCBySellTokenAmount(r0, r1, tA, tokenIndex) {
 	if (tokenIndex > 1 || tokenIndex < 0) {
-		return { amount: 0, err: true };
+		return { amount: ZERO_BN, err: true };
 	}
 
 	if (
@@ -199,7 +199,7 @@ export function getAmountCBySellTokenAmount(r0, r1, tA, tokenIndex) {
 	let a = b.add(root).div(TWO_BN);
 	if (isValidTradeEq(r0, r1, a0, a1, a, false)) {
 		return {
-			amount: a,
+			amount: a.sub(ONE_BN),
 			err: false,
 		};
 	}
@@ -207,7 +207,7 @@ export function getAmountCBySellTokenAmount(r0, r1, tA, tokenIndex) {
 	a = b.sub(root).div(TWO_BN);
 	if (isValidTradeEq(r0, r1, a0, a1, a, false)) {
 		return {
-			amount: a,
+			amount: a.sub(ONE_BN),
 			err: false,
 		};
 	}
