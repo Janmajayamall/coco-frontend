@@ -39,17 +39,21 @@ import {
 	filterOraclesFromMarketsGraph,
 	findModeratorsByIdArr,
 	findPostsByMarketIdentifierArr,
+	formatBNToDecimal,
 	getAmountCBySellTokenAmount,
 	getAmountCToBuyTokens,
+	getAvgPrice,
 	getAvgPriceOfOutcomeToken,
 	getTokenAmountToBuyWithAmountC,
+	parseDecimalToBN,
 	populateMarketWithMetadata,
 	roundValueTwoDP,
+	useBNInput,
 } from "../utils";
 import PostDisplay from "../components/PostDisplay";
 import { useParams } from "react-router";
-import { BigNumber } from "@ethersproject/abi/node_modules/@ethersproject/bignumber";
 
+import { BigNumber, ethers, utils } from "ethers";
 /**
  * You haven't checked errors returned on graph queries. (For example when postId is wrong)
  * Try putting in some validation check for postId (i.e. marketIdentifier)?
@@ -57,7 +61,7 @@ import { BigNumber } from "@ethersproject/abi/node_modules/@ethersproject/bignum
 function Page() {
 	const urlParams = useParams();
 	const postId = urlParams.postId;
-	console.log(postId, " postId");
+
 	const dispatch = useDispatch();
 
 	const { account } = useEthers();
@@ -67,7 +71,7 @@ function Page() {
 	const groupsFollowed = useSelector(selectGroupsFollowed);
 
 	const { state: stateBuy, send: sendBuy } = useBuyMinTokensForExactCTokens();
-	console.log(stateBuy, " stateBuy");
+
 	const { result, reexecuteQuery } = useQueryMarketByMarketIdentifier(
 		postId,
 		false
@@ -125,8 +129,6 @@ function Page() {
 		setMarket(_market);
 	}, [result]);
 
-	console.log(postId, market, "marketIdentifier is here");
-	console.log(mSATResult, " market stake and trade result");
 	const [tabIndex, setTabIndex] = useState(0);
 
 	const [tokenActionIndex, setTokenActionIndex] = useState(0);
@@ -134,30 +136,39 @@ function Page() {
 	/**
 	 * Buy side states
 	 */
-	const [inputBuyAmount, setInputBuyAmount] = useState(0);
-	const [tokenOutAmount, setTokenOutAmount] = useState(BigNumber.from(0));
+	const {
+		input: inputBuyAmount,
+		bnValue: inputBuyAmountBn,
+		setInput: setInputBuyAmount,
+		err: inputBuyAmountErr,
+	} = useBNInput();
+	const [tokenOutAmountBn, setTokenOutAmountBn] = useState(BigNumber.from(0));
 
 	/**
 	 * Sell side states
 	 */
-	const [inputSellAmount, setInputSellAmount] = useState(0);
-	const [amountCOut, setAmountCOut] = useState(0);
+	const {
+		input: inputSellAmount,
+		bnValue: inputSellAmountBn,
+		setInput: setInputSellAmount,
+		err: inputSellAmountErr,
+	} = useBNInput();
+	const [amountCOutBn, setAmountCOutBn] = useState(BigNumber.from(0));
 
 	useEffect(() => {
 		if (
 			!market ||
 			tabIndex != 0 ||
 			tokenActionIndex > 1 ||
-			tokenActionIndex < 0 ||
-			inputBuyAmount <= 0
+			tokenActionIndex < 0
 		) {
 			return;
 		}
 
 		let { amount, err } = getTokenAmountToBuyWithAmountC(
-			convertDecimalStrToBigNumber(market.outcomeReserve0),
-			convertDecimalStrToBigNumber(market.outcomeReserve1),
-			convertDecimalStrToBigNumber(inputBuyAmount),
+			parseDecimalToBN(market.outcomeReserve0),
+			parseDecimalToBN(market.outcomeReserve1),
+			inputBuyAmountBn,
 			tokenActionIndex
 		);
 
@@ -166,35 +177,33 @@ function Page() {
 			return;
 		}
 
-		setTokenOutAmount(amount);
-	}, [inputBuyAmount, tokenActionIndex]);
+		setTokenOutAmountBn(amount);
+	}, [inputBuyAmountBn, tokenActionIndex]);
 
 	useEffect(() => {
 		if (
 			!market ||
 			tabIndex != 1 ||
 			tokenActionIndex > 1 ||
-			tokenActionIndex < 0 ||
-			inputSellAmount <= 0
+			tokenActionIndex < 0
 		) {
 			return;
 		}
-
+		console.log(market.outcomeReserve0, market.outcomeReserve1);
 		let { amount, err } = getAmountCBySellTokenAmount(
-			convertDecimalStrToBigNumber(market.outcomeReserve0),
-			convertDecimalStrToBigNumber(market.outcomeReserve1),
-			convertDecimalStrToBigNumber(inputSellAmount),
+			parseDecimalToBN(market.outcomeReserve0),
+			parseDecimalToBN(market.outcomeReserve1),
+			inputSellAmountBn,
 			tokenActionIndex
 		);
-		console.log(amount, err);
 
 		if (err) {
 			// TODO set error
 			return;
 		}
 
-		setAmountCOut(amount);
-	}, [inputSellAmount, tokenActionIndex]);
+		setAmountCOutBn(amount);
+	}, [inputSellAmountBn, tokenActionIndex]);
 
 	if (!market || !postId) {
 		return <div />;
@@ -242,49 +251,38 @@ function Page() {
 									setInputBuyAmount(val);
 								}}
 								placeholder="Amount"
+								value={inputBuyAmount}
 							>
 								<NumberInputField />
 							</NumberInput>
 							<NumberInput placeholder="Slippage %">
 								<NumberInputField />
 							</NumberInput>
-							<Text>{`Amount ${convertIntToDecimalStr(
-								tokenOutAmount
+							<Text>{`Amount ${formatBNToDecimal(
+								tokenOutAmountBn
 							)}`}</Text>
-							<Text>{`Avg. Price ${getAvgPriceOfOutcomeToken(
-								tokenOutAmount,
-								convertDecimalStrToInt(inputBuyAmount)
+							<Text>{`Avg. Price ${getAvgPrice(
+								inputBuyAmountBn,
+								tokenOutAmountBn
 							)}`}</Text>
-							<Text>{`Max. potential profit ${convertIntToDecimalStr(
-								tokenOutAmount -
-									convertDecimalStrToInt(inputBuyAmount)
+							<Text>{`Max. potential profit ${formatBNToDecimal(
+								tokenOutAmountBn.sub(inputBuyAmountBn)
 							)}`}</Text>
 							<Button
 								onClick={() => {
 									let a0 =
 										tokenActionIndex == 0
-											? tokenOutAmount
-											: 0;
+											? tokenOutAmountBn
+											: BigNumber.from(0);
 									let a1 =
 										tokenActionIndex == 1
-											? tokenOutAmount
-											: 0;
-									console.log(
-										a0,
-										a1,
-										convertDecimalStrToBigNumber(
-											inputBuyAmount
-										),
-										1 - tokenActionIndex,
-										market.oracle.id,
-										market.marketIdentifier
-									);
+											? tokenOutAmountBn
+											: BigNumber.from(0);
+
 									sendBuy(
-										a0,
-										a1,
-										convertDecimalStrToBigNumber(
-											inputBuyAmount
-										),
+										a0.toString(),
+										a1.toString(),
+										inputBuyAmountBn.toString(),
 										1 - tokenActionIndex,
 										market.oracle.id,
 										market.marketIdentifier
@@ -308,17 +306,18 @@ function Page() {
 									setInputSellAmount(val);
 								}}
 								placeholder="Amount"
+								value={inputSellAmount}
 							>
 								<NumberInputField />
 							</NumberInput>
 							<NumberInput placeholder="Slippage %">
 								<NumberInputField />
 							</NumberInput>
-							<Text>{`Amount C ${convertIntToDecimalStr(
-								amountCOut
+							<Text>{`Amount C ${formatBNToDecimal(
+								amountCOutBn
 							)}`}</Text>
-							<Text>{`Avg sell price`}</Text>
-							{/* <Text>{`Max. potential profit ${convertIntToDecimalStr(
+							{/* <Text>{`Avg sell price`}</Text>
+							<Text>{`Max. potential profit ${convertIntToDecimalStr(
 								tokenOutAmount -
 									convertDecimalStrToInt(inputBuyAmount)
 							)}`}</Text> */}

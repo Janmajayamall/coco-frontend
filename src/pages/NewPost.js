@@ -62,10 +62,10 @@ function Page() {
 		// 	"0x4838e42180000000000000000000000000000000000000000000000000000000"
 		// );
 		// return;
-		
+
 		// const _imageUrl = await uploadImage();
 		const _imageUrl =
-			"https://media.9news.com/assets/KUSA/images/ec98b6a3-0e48-4151-a438-3d9b28d687a4/ec98b6a3-0e48-4151-a438-3d9b28d687a4_1920x1080.jpg";
+			"https://blog.cloudflare.com/content/images/speedy-gonzales.jpeg.scaled500.jpg";
 		setImageUrl(_imageUrl);
 		newPostTxHelper();
 	}
