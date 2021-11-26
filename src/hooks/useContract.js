@@ -52,29 +52,3 @@ export function useSellExactTokensForMinCTokens() {
 	);
 	return { state, send };
 }
-// export function useCallOracleParams(oracleAddress) {
-// 	console.log(oracleAddress, "this is here");
-// 	const d = useContractCall({
-// 		abi: oracleInterface,
-// 		address: oracleAddress,
-// 		method: "getMarketParams",
-// 		args: [],
-// 	});
-// 	console.log(d, ",l,l,");
-// 	return d;
-// }
-
-// const d = useContractCalls([
-// 	{
-// 		abi: oracleInterface,
-// 		address: oracleAddress,
-// 		method: "getMarketParams",
-// 		args: [],
-// 	},
-// 	{
-// 		abi: oracleInterface,
-// 		address: oracleAddress,
-// 		method: "getDelegate",
-// 		args: [],
-// 	},
-// ]);

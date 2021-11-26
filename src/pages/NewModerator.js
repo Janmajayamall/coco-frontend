@@ -39,7 +39,6 @@ function Page() {
 			await updateModerator(oracleAddress, {
 				name,
 			});
-			console.log(oracleAddress, " New Oracle Added");
 		}
 	}, [state]);
 
@@ -79,7 +78,6 @@ function Page() {
 			/>
 			<NumberInput
 				onChange={(val) => {
-					console.log(val);
 					setFee(val);
 				}}
 				defaultValue={0}

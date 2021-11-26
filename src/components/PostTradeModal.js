@@ -70,8 +70,7 @@ function PostTradeModal() {
 		false
 	);
 
-	console.log(marketIdentifier, result, "marketIdentifier is here");
-	console.log(mSATResult, " market stake and trade result");
+
 	const [tabIndex, setTabIndex] = useState(0);
 
 	if (!result.data || !mSATResult.data) {

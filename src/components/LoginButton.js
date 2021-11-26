@@ -31,7 +31,7 @@ function LoginButton() {
 			//TODO show error & return
 			return;
 		}
-		console.log(res);
+
 		const accountNonce = Math.ceil(Number(res.accountNonce) + 1);
 
 		const { privateKey, address } = createHotAccount();

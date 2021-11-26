@@ -8,6 +8,7 @@ import {
 	sUpdateOraclesInfoObj,
 	sUpdateMarketsMetadata,
 	selectGroupsFollowed,
+	selectRinkebyLatestBlockNumber,
 } from "../redux/reducers";
 import {
 	Button,
@@ -21,6 +22,14 @@ import {
 	Tab,
 	NumberInput,
 	NumberInputField,
+	Table,
+	TableCaption,
+	Thead,
+	Tr,
+	Th,
+	Tbody,
+	Td,
+	Tfoot,
 } from "@chakra-ui/react";
 import { useEthers } from "@usedapp/core/packages/core";
 import { CloseIcon } from "@chakra-ui/icons";
@@ -33,9 +42,11 @@ import {
 	useSellExactTokensForMinCTokens,
 } from "../hooks";
 import {
+	convertBlocksToSeconds,
 	convertDecimalStrToBigNumber,
 	convertDecimalStrToInt,
 	convertIntToDecimalStr,
+	determineMarketState,
 	filterMarketIdentifiersFromMarketsGraph,
 	filterOraclesFromMarketsGraph,
 	findModeratorsByIdArr,
@@ -45,6 +56,8 @@ import {
 	getAmountCToBuyTokens,
 	getAvgPrice,
 	getAvgPriceOfOutcomeToken,
+	getMarketStageName,
+	getMarketStateDetails,
 	getTokenAmountToBuyWithAmountC,
 	parseDecimalToBN,
 	populateMarketWithMetadata,
@@ -70,13 +83,16 @@ function Page() {
 	const oraclesInfoObj = useSelector(selectOracleInfoObj);
 	const marketsMetadata = useSelector(selectMarketsMetadata);
 	const groupsFollowed = useSelector(selectGroupsFollowed);
+	const rinkebyLatestBlockNumber = useSelector(
+		selectRinkebyLatestBlockNumber
+	);
 
 	const { state: stateBuy, send: sendBuy } = useBuyMinTokensForExactCTokens();
 	const {
 		state: stateSell,
 		send: sendSell,
 	} = useSellExactTokensForMinCTokens();
-	console.log(stateSell, " state sell");
+
 	const { result, reexecuteQuery } = useQueryMarketByMarketIdentifier(
 		postId,
 		false
@@ -91,6 +107,11 @@ function Page() {
 	);
 
 	const [market, setMarket] = useState(undefined);
+	// const [marketStage, setMarketStage] = useState(getMarketStageName(-1));
+	// const [stageTimeRemaining, setStageTimeRemaining] = useState(0);
+
+	// console.log(marketStage, " marketStage");
+	// console.log(stageTimeRemaining, "stageTimeRemaining");
 
 	const tradeHistories =
 		mSATResult.data && mSATResult.data.tradeHistories
@@ -108,7 +129,7 @@ function Page() {
 		mSATResult.data && mSATResult.data.stakePosition
 			? mSATResult.data.tradePosition
 			: undefined;
-	console.log(tradeHistories);
+
 	useEffect(async () => {
 		if (!result.data || !result.data.market) {
 			return;
@@ -130,12 +151,43 @@ function Page() {
 			return;
 		}
 		dispatch(sUpdateMarketsMetadata(res.posts));
-
-		setMarket(_market);
 	}, [result]);
 
-	const [tabIndex, setTabIndex] = useState(0);
+	useEffect(() => {
+		if (!result.data || !result.data.market) {
+			return;
+		}
+		setMarket(
+			populateMarketWithMetadata(
+				result.data.market,
+				oraclesInfoObj,
+				marketsMetadata,
+				groupsFollowed,
+				rinkebyLatestBlockNumber
+			)
+		);
+	}, [
+		result,
+		oraclesInfoObj,
+		marketsMetadata,
+		groupsFollowed,
+		rinkebyLatestBlockNumber,
+	]);
 
+	// useEffect(() => {
+	// 	if (!market) {
+	// 		return;
+	// 	}
+	// 	console.log(rinkebyLatestBlockNumber, " rinkebyLatestBlockNumber");
+	// 	let { stage, blocksLeft } = determineMarketState(
+	// 		getMarketStateDetails(market),
+	// 		rinkebyLatestBlockNumber
+	// 	);
+	// 	setMarketStage(getMarketStageName(stage));
+	// 	setStageTimeRemaining(convertBlocksToSeconds(blocksLeft));
+	// }, [market, rinkebyLatestBlockNumber]);
+
+	const [tabIndex, setTabIndex] = useState(0);
 	const [tokenActionIndex, setTokenActionIndex] = useState(0);
 
 	/**
@@ -194,7 +246,7 @@ function Page() {
 		) {
 			return;
 		}
-		console.log(market.outcomeReserve0, market.outcomeReserve1);
+
 		let { amount, err } = getAmountCBySellTokenAmount(
 			parseDecimalToBN(market.outcomeReserve0),
 			parseDecimalToBN(market.outcomeReserve1),
@@ -224,16 +276,8 @@ function Page() {
 		);
 	}
 
-	return (
-		<Flex>
-			<PostDisplay
-				market={populateMarketWithMetadata(
-					market,
-					oraclesInfoObj,
-					marketsMetadata,
-					groupsFollowed
-				)}
-			/>
+	function TradeInterface() {
+		return (
 			<Flex flexDirection={"column"}>
 				<Tabs
 					backgroundColor={"#ffffff"}
@@ -336,14 +380,7 @@ function Page() {
 										tokenActionIndex == 1
 											? inputSellAmountBn
 											: BigNumber.from(0);
-									console.log(
-										a0.toString(),
-										a1.toString(),
-										amountCOutBn.toString(),
-										1 - tokenActionIndex,
-										market.oracle.id,
-										market.marketIdentifier
-									);
+
 									sendSell(
 										a0,
 										a1,
@@ -366,6 +403,66 @@ function Page() {
 					</TabPanels>
 				</Tabs>
 			</Flex>
+		);
+	}
+
+	function StakeInterface() {
+
+	}
+
+	return (
+		<Flex>
+			<Flex flexDirection={"column"}>
+				<PostDisplay market={market} />
+				<Table size="sm" variant="simple">
+					<TableCaption>Trade History</TableCaption>
+					<Thead>
+						<Tr>
+							<Th>Direction</Th>
+							<Th>Amount 0</Th>
+							<Th>Amount 0</Th>
+							<Th>Amount 1</Th>
+						</Tr>
+					</Thead>
+					<Tbody>
+						{tradeHistories.map((row) => {
+							return (
+								<Tr>
+									<Td>{row.buy ? "BUY" : "SELL"}</Td>
+									<Td>{row.amount0}</Td>
+									<Td>{row.amount1}</Td>
+									<Td>{row.amountC}</Td>
+								</Tr>
+							);
+						})}
+					</Tbody>
+				</Table>
+				<Table size="sm" variant="simple">
+					<TableCaption>Stake History</TableCaption>
+					<Thead>
+						<Tr>
+							<Th>Outcome</Th>
+							<Th>Amount</Th>
+						</Tr>
+					</Thead>
+					<Tbody>
+						{stakeHistories.map((row) => {
+							return (
+								<Tr>
+									<Td>{row.outcomeStaked}</Td>
+									<Td>{row.amountC}</Td>
+								</Tr>
+							);
+						})}
+					</Tbody>
+				</Table>
+			</Flex>
+			{market && market.stateMetadata.stage == 1 ? (
+				<TradeInterface />
+			) : undefined}
+			{market && market.stateMetadata.stage == 2 ? (
+				<StakeInterface />
+			) : undefined}
 		</Flex>
 	);
 }

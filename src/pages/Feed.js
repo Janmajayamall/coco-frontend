@@ -157,10 +157,7 @@ function Page() {
 			_result = result1;
 		}
 
-		console.log(_result, " this is result");
-
 		if (_result.data && _result.data.markets) {
-			console.log(_result.data.markets);
 			const oracleIds = filterOraclesFromMarketsGraph(
 				_result.data.markets
 			);

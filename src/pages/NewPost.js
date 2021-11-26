@@ -39,10 +39,7 @@ function Page() {
 
 	useEffect(async () => {
 		if (state.receipt) {
-			// const txHash = state.receipt.transactionHash;
 			const res = await newPost(selectModerator, imageUrl);
-			console.log(res, " ml");
-			// console.log(txHash, " Post added");
 		}
 	}, [state]);
 
@@ -71,8 +68,6 @@ function Page() {
 	}
 
 	async function newPostTxHelper() {
-		console.log(selectModerator, fundingAmount, betAmount);
-
 		// upload image
 		// await uploadImageHelper();
 

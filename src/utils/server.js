@@ -54,7 +54,7 @@ export async function loginUser(keySignature, hotAddress, accountNonce) {
 				keySignature,
 			},
 		});
-		console.log(data);
+
 		return data.response;
 	} catch (e) {}
 }
@@ -79,7 +79,7 @@ export async function newPost(oracleAddress, eventIdentifierStr) {
 				msg,
 			},
 		});
-		console.log(data);
+
 		return data.response;
 	} catch (e) {}
 }
@@ -93,7 +93,7 @@ export async function findPosts(filter) {
 				filter,
 			},
 		});
-		console.log(data);
+
 		return data.response;
 	} catch (e) {}
 }
@@ -137,9 +137,7 @@ export async function updateModerator(oracleAddress, details) {
 		});
 
 		return data.response;
-	} catch (e) {
-		// console.log(e, ",aldmakom");
-	}
+	} catch (e) {}
 }
 
 export async function uploadImage() {
@@ -205,9 +203,7 @@ export async function findModeratorsDetails(moderatorIds) {
 		});
 
 		return data.response;
-	} catch (e) {
-		// console.log(e, ",aldmakom");
-	}
+	} catch (e) {}
 }
 
 export async function followModerator(moderatorAddress) {
@@ -230,9 +226,7 @@ export async function followModerator(moderatorAddress) {
 		});
 
 		return data.response;
-	} catch (e) {
-		// console.log(e, ",aldmakom");
-	}
+	} catch (e) {}
 }
 
 export async function unfollowModerator(moderatorAddress) {
@@ -255,9 +249,7 @@ export async function unfollowModerator(moderatorAddress) {
 		});
 
 		return data.response;
-	} catch (e) {
-		// console.log(e, ",aldmakom");
-	}
+	} catch (e) {}
 }
 
 export async function findAllFollows() {
@@ -280,9 +272,7 @@ export async function findAllFollows() {
 		});
 
 		return data.response;
-	} catch (e) {
-		// console.log(e, ",aldmakom");
-	}
+	} catch (e) {}
 }
 
 // export async function getFeed() {
@@ -334,7 +324,7 @@ export async function newPostTrial(oracleAddress, eventIdentifierStr) {
 				msg,
 			},
 		});
-		console.log(data);
+
 		return data.response;
 	} catch (e) {}
 }

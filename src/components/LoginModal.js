@@ -69,14 +69,14 @@ function LoginModal() {
 				`Sign your hot wallet with address ${address} and nonce ${accountNonce} to login Mimi`,
 			],
 		});
-		console.log(signature);
+
 
 		// login user
 		res = await loginUser(signature, address, accountNonce);
 		if (!res) {
 			return;
 		}
-		console.log(res);
+
 
 		// store creds locally
 		localStorage.setItem("hotPvKey", privateKey);

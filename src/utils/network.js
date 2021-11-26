@@ -1,6 +1,13 @@
 import Web3 from "web3";
 const web3 = new Web3("https://rinkeby.arbitrum.io/rpc");
 
+export function getRinkebyLatestBlockNumber() {
+	let web3Rinkeby = new Web3(
+		"https://eth-rinkeby.alchemyapi.io/v2/KWlaJDgZmnjXPfP8Q205zvgD8RDI7bDe"
+	);
+	return web3Rinkeby.eth.getBlockNumber();
+}
+
 export function convertDaysToBlocks(chainId, hours) {
 	if (chainId == 421611) {
 		return Math.ceil((3600 * hours) / 15);

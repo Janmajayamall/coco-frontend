@@ -38,8 +38,14 @@ export function populateMarketWithMetadata(
 	market,
 	oraclesInfo,
 	marketsMetadata,
-	groupsFollowed
+	groupsFollowed,
+	latestBlockNumber
 ) {
+	const { stage, blocksLeft } = determineMarketState(
+		getMarketStateDetails(market),
+		latestBlockNumber
+	);
+	
 	return {
 		...market,
 		oracleInfo: oraclesInfo[toCheckSumAddress(market.oracle.id)],
@@ -49,6 +55,11 @@ export function populateMarketWithMetadata(
 		follow: groupsFollowed[toCheckSumAddress(market.oracle.id)]
 			? toCheckSumAddress(market.oracle.id)
 			: false,
+		stateMetadata:{
+			stage,
+			blocksLeft,
+			
+		}
 	};
 }
 
@@ -243,6 +254,31 @@ export function getAmountCToBuyTokens(r0, r1, a0, a1) {
 	return 0, true;
 }
 
+export function getMarketStateDetails(market) {
+	console.log({
+		expireAtBlock: Number(market.expireAtBlock),
+		donBufferEndsAtBlock: Number(market.donBufferEndsAtBlock),
+		resolutionEndsAtBlock: Number(market.resolutionEndsAtBlock),
+		donBufferBlocks: Number(market.donBufferBlocks),
+		resolutionBufferBlocks: Number(market.resolutionBufferBlocks),
+		donEscalationCount: Number(market.donEscalationCount),
+		donEscalationLimit: Number(market.donEscalationLimit),
+		outcome: Number(market.outcome),
+		stage: Number(market.stage),
+	});
+	return {
+		expireAtBlock: Number(market.expireAtBlock),
+		donBufferEndsAtBlock: Number(market.donBufferEndsAtBlock),
+		resolutionEndsAtBlock: Number(market.resolutionEndsAtBlock),
+		donBufferBlocks: Number(market.donBufferBlocks),
+		resolutionBufferBlocks: Number(market.resolutionBufferBlocks),
+		donEscalationCount: Number(market.donEscalationCount),
+		donEscalationLimit: Number(market.donEscalationLimit),
+		outcome: Number(market.outcome),
+		stage: Number(market.stage),
+	};
+}
+
 export function getAvgPrice(amountIn, amountOut) {
 	if (!BigNumber.isBigNumber(amountIn) || !BigNumber.isBigNumber(amountOut)) {
 		return "0.00";
@@ -291,4 +327,97 @@ export function useBNInput() {
 		setInput,
 		err,
 	};
+}
+
+export function determineMarketState(stateDetails, blockNumber) {
+	let stage = 0;
+	let blocksLeft = 0;
+
+	// market stage = closed
+	if ((stateDetails.stage = 4)) {
+		stage = 4;
+		blocksLeft = 0;
+	}
+
+	// resolution period expired, thus market expires
+	if (
+		stateDetails.stage == 3 &&
+		blockNumber >= stateDetails.resolutionEndsAtBlock
+	) {
+		stage = 4;
+		blocksLeft = 0;
+	}
+
+	// Escalation limit reached, in market resolve
+	if (
+		stateDetails.stage == 3 &&
+		blockNumber < stateDetails.resolutionEndsAtBlock
+	) {
+		stage = 3;
+		blocksLeft = stateDetails.resolutionEndsAtBlock - blockNumber;
+	}
+
+	// buffer period expired before reaching escalation limit, thus market closes
+	if (
+		blockNumber >= stateDetails.donBufferEndsAtBlock &&
+		stateDetails.donEscalationLimit > stateDetails.donEscalationCount
+	) {
+		stage = 4;
+		blocksLeft = 0;
+	}
+
+	// in buffer period, when buffer period is > 0 and escalation limit > 0
+	if (
+		blockNumber >= stateDetails.expireAtBlock &&
+		blockNumber < stateDetails.donBufferEndsAtBlock &&
+		stateDetails.donEscalationLimit > 0 &&
+		stateDetails.donEscalationLimit > stateDetails.donEscalationCount
+	) {
+		stage = 2;
+		blocksLeft = stateDetails.donBufferEndsAtBlock - blockNumber;
+	}
+
+	// active trading period
+	if (blockNumber < stateDetails.expireAtBlock && stateDetails.stage == 1) {
+		stage = 1;
+		blocksLeft = stateDetails.expireAtBlock - blockNumber;
+	}
+
+	// market hasn't been funded
+	if (stateDetails.stage == 0) {
+		stage = 0;
+		blocksLeft = 0;
+	}
+
+	return {
+		stage,
+		blocksLeft,
+	};
+}
+
+export function getMarketStageName(stage) {
+	if (stage == 0) {
+		return "CREATED";
+	}
+	if (stage == 1) {
+		return "ACTIVE_TRADING";
+	}
+	if (stage == 2) {
+		return "IN_BUFFER";
+	}
+	if (stage == 3) {
+		return "WAITING_FOR_RESOLUTION";
+	}
+	if (stage == 4) {
+		return "RESOLVED";
+	}
+	return "LOADING";
+}
+
+export function convertBlocksToSeconds(blocks) {
+	return blocks * 15;
+}
+
+export function formatTimeInSeconds(seconds) {
+	return `${seconds} seconds`;
 }

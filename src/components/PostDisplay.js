@@ -20,7 +20,7 @@ function PostDisplay({ market }) {
 	return (
 		<Box
 			onClick={() => {
-				console.log("Clicked");
+
 				dispatch(
 					sUpdatePostTradeModal({
 						isOpen: true,

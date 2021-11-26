@@ -47,6 +47,7 @@ import {
 	populateMarketWithMetadata,
 	findPopularModerators,
 	followModerator,
+	getRinkebyLatestBlockNumber,
 } from "./utils";
 import {
 	sUpdateProfile,
@@ -56,6 +57,7 @@ import {
 	sUpdateMarketsMetadata,
 	sUpdateGroupsFollowed,
 	selectGroupsFollowed,
+	sUpdateRinkebyLatestBlockNumber,
 } from "./redux/reducers";
 import { useDispatch, useSelector } from "react-redux";
 import { Route, Routes, useNavigate } from "react-router";
@@ -78,9 +80,15 @@ function App() {
 	const [popularGroups, setPopularGroups] = useState([]);
 
 	useEffect(async () => {
+		const blockNumber = await getRinkebyLatestBlockNumber();
+		console.log(blockNumber, " this is here");
+		dispatch(sUpdateRinkebyLatestBlockNumber(blockNumber));
+	}, []);
+
+	useEffect(async () => {
 		const ignoreList = Object.keys(groupsFollowed);
 		let res = await findPopularModerators(ignoreList);
-		console.log(res);
+
 		setPopularGroups(res.moderators);
 	}, []);
 
@@ -90,7 +98,7 @@ function App() {
 			dispatch(sUpdateProfile(res.user));
 		}
 		res = await findAllFollows();
-		console.log(res);
+
 		if (res != undefined) {
 			dispatch(sUpdateGroupsFollowed(res.relations));
 		}
@@ -98,7 +106,6 @@ function App() {
 
 	useEffect(async () => {
 		if (result.data && result.data.markets) {
-			console.log(result.data.markets);
 			const oracleIds = filterOraclesFromMarketsGraph(
 				result.data.markets
 			);

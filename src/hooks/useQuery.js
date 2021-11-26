@@ -120,7 +120,7 @@ const QueryMarketByMarketIdentifier = `
 
 const QueryMarketTradeAndStakeInfoByUser = `
 	query ($user: Bytes!, $marketIdentifier: Bytes!, $positionIdentifier: Bytes!){
-			tradeHistories(where:{user: $user}, orderBy: tradeIndex, orderDirection: desc){
+			tradeHistories(where:{user: $user, market: $marketIdentifier}, orderBy: tradeIndex, orderDirection: desc){
 				id
 				amount0
 				amount1
@@ -129,7 +129,7 @@ const QueryMarketTradeAndStakeInfoByUser = `
 				timestamp
 				tradeIndex
 			}
-			stakeHistories(where: {user: $user}, orderBy: stakeIndex, orderDirection: desc){
+			stakeHistories(where: {user: $user, market: $marketIdentifier}, orderBy: stakeIndex, orderDirection: desc){
 				id
 				amountC
 				outcomeStaked
@@ -190,7 +190,6 @@ const QueryFeedByModeratorList = `
 `;
 
 export function useQueryExploreMarkets(first, skip, timestamp, pause) {
-	console.log(first, skip, timestamp, pause);
 	const [result, reexecuteQuery] = useQuery({
 		query: QueryExploreMarkets,
 		variables: {
@@ -207,7 +206,6 @@ export function useQueryExploreMarkets(first, skip, timestamp, pause) {
 }
 
 export function useQueryMarketByOracles(first, skip, oracles, pause) {
-	// console.log(first, skip, oracles, pause, "121s");
 	const [result, reexecuteQuery] = useQuery({
 		query: QueryMarketsByOracles,
 		variables: {

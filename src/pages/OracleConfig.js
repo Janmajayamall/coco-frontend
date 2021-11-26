@@ -36,7 +36,6 @@ function Page() {
 			const oracleDetails = await getOracleDetails(oracleAddress);
 			if (oracleDetails == undefined) {
 				// TODO: throw error since oracle details aren't present
-				console.log("Invalid Oracle");
 				return;
 			}
 			setOracleDetails(oracleDetails);
@@ -58,7 +57,7 @@ function Page() {
 		const res = await updateModerator(toCheckSumAddress(oracleAddress), {
 			name,
 		});
-		console.log("updatedMetadata", res);
+
 		if (res == undefined) {
 			// TODO: throw error
 			return;

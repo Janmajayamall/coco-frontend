@@ -13,7 +13,6 @@ const slice = createSlice({
 	initialState,
 	reducers: {
 		sUpdateProfile(state, action) {
-			console.log(state, action, "mmkmkm");
 			state.profile = action.payload;
 		},
 
