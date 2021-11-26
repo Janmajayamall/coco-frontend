@@ -28,15 +28,28 @@ import {
 	ModalCloseButton,
 	ModalFooter,
 	Lorem,
+	Tabs,
+	TabList,
+	TabPanel,
+	TabPanels,
+	Tab,
+	NumberInput,
+	NumberInputField,
 } from "@chakra-ui/react";
 import { useEthers } from "@usedapp/core/packages/core";
 import { CloseIcon } from "@chakra-ui/icons";
 import { useEffect } from "react";
 import { useState } from "react";
-import { useQueryMarketByMarketIdentifier } from "../hooks";
+import {
+	useQueryMarketByMarketIdentifier,
+	useQueryMarketTradeAndStakeInfoByUser,
+} from "../hooks";
+import { roundValueTwoDP } from "../utils";
 
 function PostTradeModal() {
 	const dispatch = useDispatch();
+
+	const { account } = useEthers();
 
 	const oraclesInfoObj = useSelector(selectOracleInfoObj);
 	const marketsMetadata = useSelector(selectMarketsMetadata);
@@ -44,9 +57,27 @@ function PostTradeModal() {
 	const marketIdentifier = postTradeModalState.marketIdentifier;
 
 	const { result, reexecuteQuery } = useQueryMarketByMarketIdentifier(
-		marketIdentifier
+		marketIdentifier,
+		false
 	);
+
+	const {
+		result: mSATResult,
+		reexecuteQuery: mSATRexecuteQuery,
+	} = useQueryMarketTradeAndStakeInfoByUser(
+		marketIdentifier,
+		account ? account.toLowerCase() : "",
+		false
+	);
+
 	console.log(marketIdentifier, result, "marketIdentifier is here");
+	console.log(mSATResult, " market stake and trade result");
+	const [tabIndex, setTabIndex] = useState(0);
+
+	if (!result.data || !mSATResult.data) {
+		return <div />;
+	}
+
 	return (
 		<Modal
 			isOpen={
@@ -63,18 +94,57 @@ function PostTradeModal() {
 			}}
 		>
 			<ModalOverlay />
-			<ModalContent paddingLeft={5} paddingRight={5} paddingTop={3}>
-				<Flex
-					paddingLeft={2}
-					paddingRight={2}
-					paddingTop={2}
-					alignItems="center"
-					borderBottomWidth={1}
-					borderColor="#E0E0E0"
-				>
-					<Heading size="xl">Sign In</Heading>
-					<Spacer />
-					<CloseIcon marginRight={2} w={3} h={3} color="#0B0B0B" />
+			<ModalContent>
+				<Flex backgroundColor="#ffffff">
+					<Image src={"https://bit.ly/2Z4KKcF"} />
+					<Flex flexDirection="column">
+						<Tabs
+							backgroundColor={"#ffffff"}
+							defaultIndex={0}
+							isFitted
+							variant="enclosed"
+							onChange={(index) => {
+								setTabIndex(index);
+							}}
+						>
+							<TabList mb="1em">
+								<Tab>Buy</Tab>
+								<Tab>Sell</Tab>
+							</TabList>
+							<TabPanels>
+								<TabPanel>
+									<p>{`YES ${roundValueTwoDP(
+										result.data.market.probability1
+									)}`}</p>
+									<p>{`NO ${roundValueTwoDP(
+										result.data.market.probability0
+									)}`}</p>
+								</TabPanel>
+								<TabPanel>
+									<p>YES</p>
+									<p>NO</p>
+								</TabPanel>
+							</TabPanels>
+						</Tabs>
+						<NumberInput placeholder="Amount">
+							<NumberInputField />
+						</NumberInput>
+						<NumberInput placeholder="Slippage %">
+							<NumberInputField />
+						</NumberInput>
+						<Text>Amount</Text>
+						<Text>Max. potential profit</Text>
+						<Button>
+							<Text
+								color="white"
+								fontSize="md"
+								fontWeight="medium"
+								mr="2"
+							>
+								Buy
+							</Text>
+						</Button>
+					</Flex>
 				</Flex>
 			</ModalContent>
 		</Modal>

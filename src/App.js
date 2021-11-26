@@ -7,6 +7,7 @@ import NewModerator from "./pages/NewModerator";
 import OracleConfig from "./pages/OracleConfig";
 import Explore from "./pages/Explore";
 import Feed from "./pages/Feed";
+import Post from "./pages/Post";
 import {
 	Button,
 	Box,
@@ -141,6 +142,7 @@ function App() {
 				<Route path="/home" element={<Feed />} />
 				<Route path="/group/:groupId" element={<Feed />} />
 				<Route path="/" element={<Feed />} />
+				<Route path="/post/:postId" element={<Post />} />
 			</Routes>
 		</div>
 	);

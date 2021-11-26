@@ -37,6 +37,14 @@ export function useCreateNewOracle() {
 	return { state, send };
 }
 
+export function useBuyMinTokensForExactCTokens() {
+	const { state, send } = useContractFunction(
+		marketRouterContract,
+		"buyMinTokensForExactCTokens"
+	);
+	return { state, send };
+}
+
 // export function useCallOracleParams(oracleAddress) {
 // 	console.log(oracleAddress, "this is here");
 // 	const d = useContractCall({
