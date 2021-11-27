@@ -8,7 +8,7 @@ export function getRinkebyLatestBlockNumber() {
 	return web3Rinkeby.eth.getBlockNumber();
 }
 
-export function convertDaysToBlocks(chainId, hours) {
+export function convertHoursToBlocks(chainId, hours) {
 	if (chainId == 421611) {
 		return Math.ceil((3600 * hours) / 15);
 	}

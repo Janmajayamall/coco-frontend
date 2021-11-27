@@ -45,6 +45,7 @@ import {
 	useQueryMarketByMarketIdentifier,
 	useQueryMarketTradeAndStakeInfoByUser,
 	useSellExactTokensForMinCTokens,
+	useStakeForOutcome,
 } from "../hooks";
 import {
 	convertBlocksToSeconds,
@@ -94,7 +95,11 @@ function StakingInterface({
 	stakePosition,
 	stakeHistories,
 }) {
+	const { state, send } = useStakeForOutcome();
+
 	const { input, bnValue, setInput, err } = useBNInput();
+	const [tempOutcome, setTempOutcome] = useState(0);
+	const [favoredOutcome, setFavoredOutcome] = useState();
 
 	function setInputToMinStakeReq() {
 		setInput(
@@ -112,21 +117,17 @@ function StakingInterface({
 			return;
 		}
 		setInputToMinStakeReq();
+
+		let _tempOutcome = getTempOutcomeInChallengePeriod(market);
+		setTempOutcome(_tempOutcome);
+		setFavoredOutcome(_tempOutcome == 2 ? 2 : 1 - _tempOutcome);
 	}, [market]);
 
 	return (
 		<Flex flexDirection="column">
-			<TradePriceBoxes
-				market={market}
-				tradePosition={tradePosition}
-				outcomeChosen={3}
-			/>
-
 			<TwoColTitleInfo
 				title={"Temp outcome"}
-				info={`${outcomeDisplayName(
-					getTempOutcomeInChallengePeriod(market)
-				)}`}
+				info={`${outcomeDisplayName(tempOutcome)}`}
 			/>
 			<TwoColTitleInfo
 				title={"Time left to challenge"}
@@ -147,7 +148,24 @@ function StakingInterface({
 					parseDecimalToBN(market.lastAmountStaked).mul(TWO_BN)
 				)}`}
 			/>
-
+			<Text marginTop={5}>Challenge temp outcome</Text>
+			<TradePriceBoxes
+				market={market}
+				tradePosition={tradePosition}
+				outcomeChosen={favoredOutcome}
+				onOutcomeChosen={(val) => {
+					/**
+					 * Only allow to choose outcome to stake, if temp outcome is undecided
+					 */
+					if (tempOutcome == 2) {
+						setFavoredOutcome(val);
+					}
+				}}
+			/>
+			<TwoColTitleInfo
+				title={"Your favored outcome"}
+				info={`${outcomeDisplayName(favoredOutcome)}`}
+			/>
 			<NumberInput
 				onChange={(val) => {
 					setInput(val);
@@ -157,8 +175,23 @@ function StakingInterface({
 			>
 				<NumberInputField />
 			</NumberInput>
+			<Button
+				onClick={() => {
+					// TODO validation checks
 
-			<Button onClick={() => {}}>
+					// favored outcome can't be 2
+					if (favoredOutcome == 2) {
+						return;
+					}
+
+					send(
+						favoredOutcome,
+						bnValue.toString(),
+						market.oracle.id,
+						market.marketIdentifier
+					);
+				}}
+			>
 				<Text color="white" fontSize="md" fontWeight="medium" mr="2">
 					Challenge
 				</Text>

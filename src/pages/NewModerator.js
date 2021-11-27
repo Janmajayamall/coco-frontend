@@ -8,7 +8,7 @@ import {
 	Input,
 } from "@chakra-ui/react";
 import {
-	convertDaysToBlocks,
+	convertHoursToBlocks,
 	retrieveOracleAddressFormLogs,
 	updateModerator,
 	toCheckSumAddress,
@@ -22,8 +22,8 @@ function Page() {
 	const { chainId, account } = useEthers();
 	const { result, reexecuteQuery } = useQueryOracleByDelegate(account);
 	const [fee, setFee] = useState(0.1);
-	const [escalationLimit, setEscalationLimit] = useState(10);
-	const [expireHours, setExpireHours] = useState(10);
+	const [escalationLimit, setEscalationLimit] = useState(5);
+	const [expireHours, setExpireHours] = useState();
 	const [bufferHours, setBufferHours] = useState(10);
 	const [resolutionHours, setResolutionHours] = useState(10);
 	const [name, setName] = useState("");
@@ -36,9 +36,10 @@ function Page() {
 			const oracleAddress = retrieveOracleAddressFormLogs(
 				state.receipt.logs
 			);
-			await updateModerator(oracleAddress, {
+			const res = await updateModerator(oracleAddress, {
 				name,
 			});
+			console.log(res, " moderator updated");
 		}
 	}, [state]);
 
@@ -60,10 +61,10 @@ function Page() {
 			true,
 			1,
 			10,
-			escalationLimit,
-			convertDaysToBlocks(chainId, expireHours),
-			convertDaysToBlocks(chainId, bufferHours),
-			convertDaysToBlocks(chainId, resolutionHours)
+			5,
+			convertHoursToBlocks(chainId, 0.1),
+			convertHoursToBlocks(chainId, 1),
+			convertHoursToBlocks(chainId, 0.2)
 		);
 	}
 

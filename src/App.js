@@ -81,7 +81,7 @@ function App() {
 
 	useEffect(async () => {
 		const blockNumber = await getRinkebyLatestBlockNumber();
-		console.log(blockNumber, " this is here");
+
 		dispatch(sUpdateRinkebyLatestBlockNumber(blockNumber));
 	}, []);
 
@@ -123,7 +123,7 @@ function App() {
 	}, [result]);
 
 	return (
-		<div style={{ maxWidth: 1650 }}>
+		<div>
 			<HeaderWarning />
 			<Flex borderBottom="1px" borderColor="#BDBDBD">
 				<Flex
@@ -134,13 +134,24 @@ function App() {
 						height: 96,
 					}}
 				>
-					<Heading>Mimi</Heading>
-					<Spacer />
-					<ConnectButton />
+					<Flex
+						style={{
+							width: "100%",
+							height: "100%",
+							maxWidth: 1650,
+							justifyContent: "center",
+							alignItems: "center",
+							paddingLeft: 5,
+							paddingRight: 5,
+						}}
+					>
+						<Heading>Mimi</Heading>
+						<Spacer />
+						<ConnectButton />
+					</Flex>
 				</Flex>
 			</Flex>
 			<LoginModal />
-			<PostTradeModal />
 			<Routes>
 				<Route path="/add" element={<NewPost />} />
 				<Route path="/addModerator" element={<NewModerator />} />

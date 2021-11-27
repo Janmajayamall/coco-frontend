@@ -45,7 +45,7 @@ export function populateMarketWithMetadata(
 		getMarketStateDetails(market),
 		latestBlockNumber
 	);
-	console.log(toCheckSumAddress(market.oracle.id), oraclesInfo, ", where");
+
 	return {
 		...market,
 		oracleInfo: oraclesInfo[toCheckSumAddress(market.oracle.id)],
@@ -157,7 +157,7 @@ export function getTokenAmountToBuyWithAmountC(r0, r1, a, tokenIndex) {
 		tokenAmount = r1.add(a).sub(r0.mul(r1).div(r0.add(a)));
 	}
 	tokenAmount = tokenAmount.sub(ONE_BN);
-	console.log(tokenAmount.toString(), a.toString(), "HERE");
+
 	return {
 		amount: tokenAmount,
 		err: false,
@@ -458,11 +458,13 @@ export function determineFavoredOutcome(market) {
 // export function
 
 export function determineMarketState(stateDetails, blockNumber) {
+
+
 	let stage = 0;
 	let blocksLeft = 0;
 
 	// market stage = closed
-	if ((stateDetails.stage = 4)) {
+	if (stateDetails.stage == 4) {
 		stage = 4;
 		blocksLeft = 0;
 	}
@@ -516,6 +518,8 @@ export function determineMarketState(stateDetails, blockNumber) {
 		stage = 0;
 		blocksLeft = 0;
 	}
+
+
 
 	return {
 		stage,
@@ -572,6 +576,19 @@ export function outcomeDisplayName(outcome) {
 		return "YES";
 	}
 	return "UNDECIDED";
+}
+
+export function marketStageDisplayName(stage) {
+	if (stage == 1) {
+		return "TRADING PERIOD";
+	} else if (stage == 2) {
+		return "CHALLENGE PERIOD";
+	} else if (stage == 3) {
+		return "RESOLVE";
+	} else if (stage == 4) {
+		return "FINALIZED";
+	}
+	return "";
 }
 
 export function totalAmountReceivedInStakeRedeem(

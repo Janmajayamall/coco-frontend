@@ -40,6 +40,7 @@ function Page() {
 	useEffect(async () => {
 		if (state.receipt) {
 			const res = await newPost(selectModerator, imageUrl);
+			console.log(res, " new post created");
 		}
 	}, [state]);
 
@@ -62,7 +63,7 @@ function Page() {
 
 		// const _imageUrl = await uploadImage();
 		const _imageUrl =
-			"https://github.com/dapphub/dapptools/tree/master/src/seth#seth---abi-decode";
+			"https://www.figma.com/n-Markets-for-Content?node-id=137%3A16730";
 		setImageUrl(_imageUrl);
 		newPostTxHelper();
 	}

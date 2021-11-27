@@ -35,6 +35,9 @@ import {
 	SliderFilledTrack,
 	SliderThumb,
 	Slider,
+	Avatar,
+	Heading,
+	Image,
 } from "@chakra-ui/react";
 import { useEthers } from "@usedapp/core/packages/core";
 import { CloseIcon } from "@chakra-ui/icons";
@@ -81,6 +84,7 @@ import {
 	getTradeWinAmount,
 	determineStakeWinnings,
 	totalAmountReceivedInStakeRedeem,
+	marketStageDisplayName,
 } from "../utils";
 import PostDisplay from "../components/PostDisplay";
 import TradingInterface from "../components/TradingInterface";
@@ -91,6 +95,7 @@ import TradePricesBoxes from "../components/TradePriceBoxes";
 import TwoColTitleInfo from "../components/TwoColTitleInfo";
 import StakingInterface from "../components/StakingInterface";
 import ChallengeHistoryTable from "../components/ChallengeHistoryTable";
+import RedeemWinsInterface from "../components/RedeemInterface";
 
 /**
  * You haven't checked errors returned on graph queries. (For example when postId is wrong)
@@ -125,11 +130,6 @@ function Page() {
 	);
 
 	const [market, setMarket] = useState(undefined);
-	// const [marketStage, setMarketStage] = useState(getMarketStageName(-1));
-	// const [stageTimeRemaining, setStageTimeRemaining] = useState(0);
-
-	// console.log(marketStage, " marketStage");
-	// console.log(stageTimeRemaining, "stageTimeRemaining");
 
 	const tradeHistories =
 		mSATResult.data && mSATResult.data.tradeHistories
@@ -193,137 +193,48 @@ function Page() {
 		rinkebyLatestBlockNumber,
 	]);
 
-	// useEffect(() => {
-	// 	if (!market) {
-	// 		return;
-	// 	}
-	// 	console.log(rinkebyLatestBlockNumber, " rinkebyLatestBlockNumber");
-	// 	let { stage, blocksLeft } = determineMarketState(
-	// 		getMarketStateDetails(market),
-	// 		rinkebyLatestBlockNumber
-	// 	);
-	// 	setMarketStage(getMarketStageName(stage));
-	// 	setStageTimeRemaining(convertBlocksToSeconds(blocksLeft));
-	// }, [market, rinkebyLatestBlockNumber]);
-
 	if (!market || !postId) {
 		return <div />;
 	}
 
-	function RedeemWinsInterface() {
-		const finalOutcome = determineOutcome(market);
-		const winningsArr = getTradeWinningsArr(tradePosition, finalOutcome);
-		const stakeArr = getStakeWinArr(stakePosition, finalOutcome);
-		return (
-			<Flex flexDirection="column">
-				<TradePricesBoxes
-					market={market}
-					tradePosition={tradePosition}
-				/>
-				<Text>Outcome resolved</Text>
-				<Text>Trades</Text>
-
-				<TwoColTitleInfo
-					title={"Yes shares"}
-					info={
-						tradePosition
-							? roundValueTwoDP(tradePosition.amount1)
-							: "0"
-					}
-				/>
-				<TwoColTitleInfo
-					title={"No shares"}
-					info={
-						tradePosition
-							? roundValueTwoDP(tradePosition.amount0)
-							: "0"
-					}
-				/>
-				<TwoColTitleInfo
-					title={"Declared outcome"}
-					info={outcomeDisplayName(finalOutcome)}
-				/>
-				<TwoColTitleInfo
-					title={"You receive"}
-					info={getTradeWinAmount(tradePosition, finalOutcome)}
-				/>
-				<Button>
-					<Text>Claim trade winnings</Text>
-				</Button>
-				<Text>Challenges</Text>
-				<TwoColTitleInfo
-					title={"Your stake for YES"}
-					info={
-						stakePosition
-							? roundValueTwoDP(stakePosition.amount1)
-							: "0"
-					}
-				/>
-				<TwoColTitleInfo
-					title={"Your stake for NO"}
-					info={
-						stakePosition
-							? roundValueTwoDP(stakePosition.amount0)
-							: "0"
-					}
-				/>
-				<TwoColTitleInfo
-					title={"Your challenge winnings"}
-					info={roundValueTwoDP(
-						determineStakeWinnings(market, finalOutcome, account)
-					)}
-				/>
-				<TwoColTitleInfo
-					title={"Your receive"}
-					info={formatBNToDecimal(
-						totalAmountReceivedInStakeRedeem(
-							market,
-							finalOutcome,
-							stakePosition,
-							account
-						)
-					)}
-				/>
-
-				{stakeArr.map((obj) => {
-					if (obj.amountSR.isZero()) {
-						return;
-					}
-					return (
-						<Text>
-							{`
-							${formatBNToDecimal(obj.amountSR)} challenge amount used in favor of outcome ${
-								obj.outcome
-							}
-							`}
-						</Text>
-					);
-				})}
-				{finalOutcome == Number(market.lastOutcomeStaked) &&
-				account.toLowerCase() ==
-					(finalOutcome == 0 ? market.staker0 : market.staker1) ? (
-					<Text>
-						{`${
-							finalOutcome == 0
-								? market.stakingReserve0
-								: market.stakingReserve1
-						} from loser's stake`}
-					</Text>
-				) : undefined}
-				<Button>
-					<Text>Claim stake winnings</Text>
-				</Button>
-				<ChallengeHistoryTable stakeHistories={stakeHistories} />
-			</Flex>
-		);
-	}
-	console.log(market, " market here");
 	return (
-		<Flex>
-			<Flex flexDirection={"column"}>
-				<PostDisplay market={market} />
+		<Flex style={{ maxWidth: 1650, marginTop: 5 }}>
+			<Spacer />
+			<Flex width="50%" flexDirection={"column"} marginRight={5}>
+				<Flex flexDirection="column">
+					<Flex paddingBottom={3} paddingTop={4}>
+						<Flex alignItems="center">
+							<Avatar
+								size="sm"
+								name="Dan Abrahmov"
+								src="https://bit.ly/dan-abramov"
+							/>
+							<Heading marginLeft={2} size="xs">
+								{market.oracleInfo
+									? market.oracleInfo.name
+									: ""}
+							</Heading>
+
+							<Heading marginLeft={2} size="xs">
+								Join
+							</Heading>
+						</Flex>
+						<Spacer />
+					</Flex>
+					<Image src={"https://bit.ly/2Z4KKcF"} />
+				</Flex>
+
+				<Text>Your past trades</Text>
+				{/* {tradeHistories.length == 0 ? (
+					<Flex width="100%">
+						<Spacer />
+						<Text fontSize={15} fontWeight="bold">
+							You have 0 trades
+						</Text>
+						<Spacer />
+					</Flex>
+				) : undefined} */}
 				<Table size="sm" variant="simple">
-					<TableCaption>Trade History</TableCaption>
 					<Thead>
 						<Tr>
 							<Th>Direction</Th>
@@ -346,28 +257,56 @@ function Page() {
 					</Tbody>
 				</Table>
 			</Flex>
-			{market && market.stateMetadata.stage == 1 ? (
-				<TradingInterface
-					market={market}
-					tradePosition={tradePosition}
-				/>
-			) : undefined}
-			{market && market.stateMetadata.stage == 2 ? (
-				<StakingInterface
+
+			<Flex width="20%" marginLeft={5} flexDirection="column">
+				<Heading>
+					{marketStageDisplayName(
+						market ? market.stateMetadata.stage : 0
+					)}
+				</Heading>
+				{market && market.stateMetadata.blocksLeft ? (
+					<Text>
+						{`Expires in ${formatTimeInSeconds(
+							convertBlocksToSeconds(
+								market.stateMetadata.blocksLeft
+							)
+						)}`}
+					</Text>
+				) : undefined}
+				{market && market.stateMetadata.stage == 1 ? (
+					<TradingInterface
+						market={market}
+						tradePosition={tradePosition}
+					/>
+				) : undefined}
+				{market && market.stateMetadata.stage == 2 ? (
+					<StakingInterface
+						market={market}
+						tradePosition={tradePosition}
+						stakeHistories={stakeHistories}
+						stakePosition={stakePosition}
+					/>
+				) : undefined}
+				{/* <StakingInterface
 					market={market}
 					tradePosition={tradePosition}
 					stakeHistories={stakeHistories}
 					stakePosition={stakePosition}
-				/>
-			) : undefined}
-			{/* <StakingInterface
-				market={market}
-				tradePosition={tradePosition}
-				stakeHistories={stakeHistories}
-				stakePosition={stakePosition}
-			/> */}
-			<RedeemWinsInterface />
-			{/* <TradingInterface market={market} tradePosition={tradePosition} /> */}
+				/> */}
+				{market && market.stateMetadata.stage == 4 ? (
+					<RedeemWinsInterface
+						market={market}
+						tradePosition={tradePosition}
+						stakeHistories={stakeHistories}
+						stakePosition={stakePosition}
+					/>
+				) : undefined}
+				{/* <TradingInterface
+					market={market}
+					tradePosition={tradePosition}
+				/> */}
+			</Flex>
+			<Spacer />
 		</Flex>
 	);
 }

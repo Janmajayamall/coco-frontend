@@ -52,3 +52,19 @@ export function useSellExactTokensForMinCTokens() {
 	);
 	return { state, send };
 }
+
+export function useStakeForOutcome() {
+	const { state, send } = useContractFunction(
+		marketRouterContract,
+		"stakeForOutcome"
+	);
+	return { state, send };
+}
+
+export function useRedeemWinning() {
+	const { state, send } = useContractFunction(
+		marketRouterContract,
+		"redeemWinning"
+	);
+	return { state, send };
+}
