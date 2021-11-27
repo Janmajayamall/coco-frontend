@@ -129,8 +129,11 @@ const QueryMarketTradeAndStakeInfoByUser = `
 				timestamp
 				tradeIndex
 			}
-			stakeHistories(where: {user: $user, market: $marketIdentifier}, orderBy: stakeIndex, orderDirection: desc){
+			stakeHistories(where: {market: $marketIdentifier}, orderBy: stakeIndex, orderDirection: desc){
 				id
+				user {
+					id
+				}
 				amountC
 				outcomeStaked
 				timestamp

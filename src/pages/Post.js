@@ -84,6 +84,10 @@ import TradingInterface from "../components/TradingInterface";
 import { useParams } from "react-router";
 
 import { BigNumber, ethers, utils } from "ethers";
+import TradePricesBoxes from "../components/TradePriceBoxes";
+import TwoColTitleInfo from "../components/TwoColTitleInfo";
+import StakingInterface from "../components/StakingInterface";
+
 /**
  * You haven't checked errors returned on graph queries. (For example when postId is wrong)
  * Try putting in some validation check for postId (i.e. marketIdentifier)?
@@ -202,58 +206,6 @@ function Page() {
 		return <div />;
 	}
 
-	function StakeInterface() {
-		return (
-			<Flex flexDirection="column">
-				<p>{`YES ${roundValueTwoDP(market.probability1)}`}</p>
-				<p>{`NO ${roundValueTwoDP(market.probability0)}`}</p>
-				<p>
-					{`${outcomeDisplayName(
-						getTempOutcomeInChallengePeriod(market)
-					)} will declared as final decision, if not challenged before ${formatTimeInSeconds(
-						convertBlocksToSeconds(market.stateMetadata.blocksLeft)
-					)}`}
-				</p>
-				<p>{`${
-					Number(market.donEscalationLimit) -
-					Number(market.donEscalationCount)
-				} challenges left`}</p>
-
-				<Text>
-					{parseDecimalToBN(market.lastAmountStaked).isZero()
-						? "You can challenge with any amount > 0"
-						: `Min amount to challenge >= ${formatBNToDecimal(
-								parseDecimalToBN(market.lastAmountStaked).mul(
-									TWO_BN
-								)
-						  )}`}
-				</Text>
-				<NumberInput
-					onChange={(val) => {
-						// setInputBuyAmount(val);
-					}}
-					placeholder="Amount"
-					// value={inputBuyAmount}
-				>
-					<NumberInputField />
-				</NumberInput>
-
-				<Button onClick={() => {}}>
-					<Text
-						color="white"
-						fontSize="md"
-						fontWeight="medium"
-						mr="2"
-					>
-						Challenge
-					</Text>
-				</Button>
-
-				<p>Challenge history</p>
-			</Flex>
-		);
-	}
-
 	function RedeemWinsInterface() {
 		const finalOutcome = determineOutcome(market);
 		const winningsArr = getTradeWinningsArr(tradePosition, finalOutcome);
@@ -319,8 +271,8 @@ function Page() {
 						<Tr>
 							<Th>Direction</Th>
 							<Th>Amount 0</Th>
-							<Th>Amount 0</Th>
 							<Th>Amount 1</Th>
+							<Th>Amount C</Th>
 						</Tr>
 					</Thead>
 					<Tbody>
@@ -336,25 +288,6 @@ function Page() {
 						})}
 					</Tbody>
 				</Table>
-				<Table size="sm" variant="simple">
-					<TableCaption>Stake History</TableCaption>
-					<Thead>
-						<Tr>
-							<Th>Outcome</Th>
-							<Th>Amount</Th>
-						</Tr>
-					</Thead>
-					<Tbody>
-						{stakeHistories.map((row) => {
-							return (
-								<Tr>
-									<Td>{row.outcomeStaked}</Td>
-									<Td>{row.amountC}</Td>
-								</Tr>
-							);
-						})}
-					</Tbody>
-				</Table>
 			</Flex>
 			{market && market.stateMetadata.stage == 1 ? (
 				<TradingInterface
@@ -363,10 +296,21 @@ function Page() {
 				/>
 			) : undefined}
 			{market && market.stateMetadata.stage == 2 ? (
-				<StakeInterface />
+				<StakingInterface
+					market={market}
+					tradePosition={tradePosition}
+					stakeHistories={stakeHistories}
+					stakePosition={stakePosition}
+				/>
 			) : undefined}
+			<StakingInterface
+				market={market}
+				tradePosition={tradePosition}
+				stakeHistories={stakeHistories}
+				stakePosition={stakePosition}
+			/>
 			{/* <RedeemWinsInterface /> */}
-			<TradingInterface market={market} tradePosition={tradePosition} />
+			{/* <TradingInterface market={market} tradePosition={tradePosition} /> */}
 		</Flex>
 	);
 }
