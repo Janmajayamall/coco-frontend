@@ -80,6 +80,7 @@ import {
 	ONE_BN,
 } from "../utils";
 import PostDisplay from "../components/PostDisplay";
+import TradingInterface from "../components/TradingInterface";
 import { useParams } from "react-router";
 
 import { BigNumber, ethers, utils } from "ethers";
@@ -101,12 +102,6 @@ function Page() {
 	const rinkebyLatestBlockNumber = useSelector(
 		selectRinkebyLatestBlockNumber
 	);
-
-	const { state: stateBuy, send: sendBuy } = useBuyMinTokensForExactCTokens();
-	const {
-		state: stateSell,
-		send: sendSell,
-	} = useSellExactTokensForMinCTokens();
 
 	const { result, reexecuteQuery } = useQueryMarketByMarketIdentifier(
 		postId,
@@ -203,294 +198,8 @@ function Page() {
 	// 	setStageTimeRemaining(convertBlocksToSeconds(blocksLeft));
 	// }, [market, rinkebyLatestBlockNumber]);
 
-	const [tabIndex, setTabIndex] = useState(0);
-	const [tokenActionIndex, setTokenActionIndex] = useState(1);
-
-	/**
-	 * Buy side states
-	 */
-	const {
-		input: inputBuyAmount,
-		bnValue: inputBuyAmountBn,
-		setInput: setInputBuyAmount,
-		err: inputBuyAmountErr,
-	} = useBNInput();
-	const [tokenOutAmountBn, setTokenOutAmountBn] = useState(BigNumber.from(0));
-
-	/**
-	 * Sell side states
-	 */
-	const {
-		input: inputSellAmount,
-		bnValue: inputSellAmountBn,
-		setInput: setInputSellAmount,
-		err: inputSellAmountErr,
-	} = useBNInput();
-	const [amountCOutBn, setAmountCOutBn] = useState(BigNumber.from(0));
-
-	const [slippage, setSlippage] = useState(1);
-
-	useEffect(() => {
-		if (
-			!market ||
-			tabIndex != 0 ||
-			tokenActionIndex > 1 ||
-			tokenActionIndex < 0
-		) {
-			return;
-		}
-
-		let { amount, err } = getTokenAmountToBuyWithAmountC(
-			parseDecimalToBN(market.outcomeReserve0),
-			parseDecimalToBN(market.outcomeReserve1),
-			inputBuyAmountBn,
-			tokenActionIndex
-		);
-
-		if (err) {
-			// TODO set error
-			return;
-		}
-
-		setTokenOutAmountBn(amount);
-	}, [inputBuyAmountBn, tokenActionIndex]);
-
-	useEffect(() => {
-		if (
-			!market ||
-			tabIndex != 1 ||
-			tokenActionIndex > 1 ||
-			tokenActionIndex < 0
-		) {
-			return;
-		}
-
-		let { amount, err } = getAmountCBySellTokenAmount(
-			parseDecimalToBN(market.outcomeReserve0),
-			parseDecimalToBN(market.outcomeReserve1),
-			inputSellAmountBn,
-			tokenActionIndex
-		);
-
-		if (err) {
-			// TODO set error
-			return;
-		}
-
-		setAmountCOutBn(amount);
-	}, [inputSellAmountBn, tokenActionIndex]);
-
 	if (!market || !postId) {
 		return <div />;
-	}
-
-	function TradePrices() {
-		return (
-			<Flex marginTop="2" marginBottom="2">
-				<Spacer />
-				<Box
-					backgroundColor="#C5E6DD"
-					borderColor="#00EBA9"
-					borderRadius={4}
-					borderWidth={1}
-					paddingLeft={18}
-					paddingRight={18}
-					// paddingTop={2}
-					// paddingBottom={2}
-					justifyContent={"space-between"}
-					alignItems={"center"}
-				>
-					<Text fontSize="15">{`YES ${roundValueTwoDP(
-						market.probability1
-					)}`}</Text>
-					<Text fontSize="12" fontWeight="bold">{`0 shares`}</Text>
-				</Box>
-				<Spacer />
-				<Box
-					backgroundColor="#E9CFCC"
-					borderColor="#FF523E"
-					borderRadius={4}
-					borderWidth={1}
-					paddingLeft={18}
-					paddingRight={18}
-					justifyContent={"space-between"}
-					alignItems={"center"}
-				>
-					<Text fontSize="15">{`NO ${roundValueTwoDP(
-						market.probability0
-					)}`}</Text>
-					<Text fontSize="12" fontWeight="bold">{`0 shares`}</Text>
-				</Box>
-				<Spacer />
-			</Flex>
-		);
-	}
-
-	function TwoColTitleInfo({ title, info }) {
-		return (
-			<Flex>
-				<Text fontSize="12">{title}</Text>
-				<Spacer />
-				<Text fontSize="12">{info}</Text>
-			</Flex>
-		);
-	}
-
-	function TradeInterface() {
-		return (
-			<Flex flexDirection={"column"}>
-				<Tabs
-					backgroundColor={"#ffffff"}
-					defaultIndex={0}
-					isFitted
-					variant="enclosed"
-					onChange={(index) => {
-						setTabIndex(index);
-					}}
-				>
-					<TabList mb="1em">
-						<Tab>Buy</Tab>
-						<Tab>Sell</Tab>
-					</TabList>
-					<TabPanels>
-						<TabPanel>
-							<TradePrices />
-							<NumberInput
-								onChange={(val) => {
-									setInputBuyAmount(val);
-								}}
-								placeholder="Amount"
-								value={inputBuyAmount}
-							>
-								<NumberInputField />
-							</NumberInput>
-							<Text
-								marginTop="1"
-								fontSize="10"
-								fontWeight="bold"
-							>{`${slippage}% slippage`}</Text>
-							<Slider
-								onChange={(val) => {
-									setSlippage(val);
-								}}
-								value={slippage}
-								min={0}
-								max={5}
-								step={0.5}
-							>
-								<SliderTrack bg="red.100">
-									<Box position="relative" right={10} />
-									<SliderFilledTrack bg="tomato" />
-								</SliderTrack>
-								<SliderThumb boxSize={4} />
-							</Slider>
-							<TwoColTitleInfo
-								title="Estimated shares bought"
-								info={formatBNToDecimal(tokenOutAmountBn)}
-							/>
-							<TwoColTitleInfo
-								title="Avg. Price per share"
-								info={getAvgPrice(
-									inputBuyAmountBn,
-									tokenOutAmountBn
-								)}
-							/>
-							<TwoColTitleInfo
-								title="Max. potential profit"
-								info={formatBNToDecimal(
-									tokenOutAmountBn.sub(inputBuyAmountBn)
-								)}
-							/>
-							<Button
-								marginTop="2"
-								width="100%"
-								backgroundColor="green.100"
-								onClick={() => {
-									let a0 =
-										tokenActionIndex == 0
-											? tokenOutAmountBn
-											: BigNumber.from(0);
-									let a1 =
-										tokenActionIndex == 1
-											? tokenOutAmountBn
-											: BigNumber.from(0);
-
-									sendBuy(
-										a0,
-										a1,
-										inputBuyAmountBn,
-										1 - tokenActionIndex,
-										market.oracle.id,
-										market.marketIdentifier
-									);
-								}}
-							>
-								<Text
-									color="white"
-									fontSize="md"
-									fontWeight="medium"
-									mr="2"
-								>
-									Buy
-								</Text>
-							</Button>
-						</TabPanel>
-						<TabPanel>
-							<TradePrices />
-							<NumberInput
-								onChange={(val) => {
-									setInputSellAmount(val);
-								}}
-								placeholder="Amount"
-								value={inputSellAmount}
-							>
-								<NumberInputField />
-							</NumberInput>
-							<NumberInput placeholder="Slippage %">
-								<NumberInputField />
-							</NumberInput>
-							<Text>{`Amount C ${formatBNToDecimal(
-								amountCOutBn
-							)}`}</Text>
-							{/* <Text>{`Avg sell price`}</Text>
-							<Text>{`Max. potential profit ${convertIntToDecimalStr(
-								tokenOutAmount -
-									convertDecimalStrToInt(inputBuyAmount)
-							)}`}</Text> */}
-							<Button
-								onClick={() => {
-									let a0 =
-										tokenActionIndex == 0
-											? inputSellAmountBn
-											: BigNumber.from(0);
-									let a1 =
-										tokenActionIndex == 1
-											? inputSellAmountBn
-											: BigNumber.from(0);
-
-									sendSell(
-										a0,
-										a1,
-										amountCOutBn,
-										market.oracle.id,
-										market.marketIdentifier
-									);
-								}}
-							>
-								<Text
-									color="white"
-									fontSize="md"
-									fontWeight="medium"
-									mr="2"
-								>
-									Sell
-								</Text>
-							</Button>
-						</TabPanel>
-					</TabPanels>
-				</Tabs>
-			</Flex>
-		);
 	}
 
 	function StakeInterface() {
@@ -524,7 +233,7 @@ function Page() {
 						// setInputBuyAmount(val);
 					}}
 					placeholder="Amount"
-					value={inputBuyAmount}
+					// value={inputBuyAmount}
 				>
 					<NumberInputField />
 				</NumberInput>
@@ -648,13 +357,16 @@ function Page() {
 				</Table>
 			</Flex>
 			{market && market.stateMetadata.stage == 1 ? (
-				<TradeInterface />
+				<TradingInterface
+					market={market}
+					tradePosition={tradePosition}
+				/>
 			) : undefined}
 			{market && market.stateMetadata.stage == 2 ? (
 				<StakeInterface />
 			) : undefined}
 			{/* <RedeemWinsInterface /> */}
-			<TradeInterface />
+			<TradingInterface market={market} tradePosition={tradePosition} />
 		</Flex>
 	);
 }
