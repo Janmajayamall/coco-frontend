@@ -30,6 +30,11 @@ import {
 	Tbody,
 	Td,
 	Tfoot,
+	Spacer,
+	SliderTrack,
+	SliderFilledTrack,
+	SliderThumb,
+	Slider,
 } from "@chakra-ui/react";
 import { useEthers } from "@usedapp/core/packages/core";
 import { CloseIcon } from "@chakra-ui/icons";
@@ -69,6 +74,10 @@ import {
 	outcomeDisplayName,
 	formatTimeInSeconds,
 	determineOutcome,
+	getWinningsArr,
+	getTradeWinningsArr,
+	getStakeWinArr,
+	ONE_BN,
 } from "../utils";
 import PostDisplay from "../components/PostDisplay";
 import { useParams } from "react-router";
@@ -195,7 +204,7 @@ function Page() {
 	// }, [market, rinkebyLatestBlockNumber]);
 
 	const [tabIndex, setTabIndex] = useState(0);
-	const [tokenActionIndex, setTokenActionIndex] = useState(0);
+	const [tokenActionIndex, setTokenActionIndex] = useState(1);
 
 	/**
 	 * Buy side states
@@ -218,6 +227,8 @@ function Page() {
 		err: inputSellAmountErr,
 	} = useBNInput();
 	const [amountCOutBn, setAmountCOutBn] = useState(BigNumber.from(0));
+
+	const [slippage, setSlippage] = useState(1);
 
 	useEffect(() => {
 		if (
@@ -275,10 +286,53 @@ function Page() {
 
 	function TradePrices() {
 		return (
-			<>
-				<p>{`YES ${roundValueTwoDP(market.probability1)}`}</p>
-				<p>{`NO ${roundValueTwoDP(market.probability0)}`}</p>
-			</>
+			<Flex marginTop="2" marginBottom="2">
+				<Spacer />
+				<Box
+					backgroundColor="#C5E6DD"
+					borderColor="#00EBA9"
+					borderRadius={4}
+					borderWidth={1}
+					paddingLeft={18}
+					paddingRight={18}
+					// paddingTop={2}
+					// paddingBottom={2}
+					justifyContent={"space-between"}
+					alignItems={"center"}
+				>
+					<Text fontSize="15">{`YES ${roundValueTwoDP(
+						market.probability1
+					)}`}</Text>
+					<Text fontSize="12" fontWeight="bold">{`0 shares`}</Text>
+				</Box>
+				<Spacer />
+				<Box
+					backgroundColor="#E9CFCC"
+					borderColor="#FF523E"
+					borderRadius={4}
+					borderWidth={1}
+					paddingLeft={18}
+					paddingRight={18}
+					justifyContent={"space-between"}
+					alignItems={"center"}
+				>
+					<Text fontSize="15">{`NO ${roundValueTwoDP(
+						market.probability0
+					)}`}</Text>
+					<Text fontSize="12" fontWeight="bold">{`0 shares`}</Text>
+				</Box>
+				<Spacer />
+			</Flex>
+		);
+	}
+
+	function TwoColTitleInfo({ title, info }) {
+		return (
+			<Flex>
+				<Text fontSize="12">{title}</Text>
+				<Spacer />
+				<Text fontSize="12">{info}</Text>
+			</Flex>
 		);
 	}
 
@@ -310,20 +364,47 @@ function Page() {
 							>
 								<NumberInputField />
 							</NumberInput>
-							<NumberInput placeholder="Slippage %">
-								<NumberInputField />
-							</NumberInput>
-							<Text>{`Amount ${formatBNToDecimal(
-								tokenOutAmountBn
-							)}`}</Text>
-							<Text>{`Avg. Price ${getAvgPrice(
-								inputBuyAmountBn,
-								tokenOutAmountBn
-							)}`}</Text>
-							<Text>{`Max. potential profit ${formatBNToDecimal(
-								tokenOutAmountBn.sub(inputBuyAmountBn)
-							)}`}</Text>
+							<Text
+								marginTop="1"
+								fontSize="10"
+								fontWeight="bold"
+							>{`${slippage}% slippage`}</Text>
+							<Slider
+								onChange={(val) => {
+									setSlippage(val);
+								}}
+								value={slippage}
+								min={0}
+								max={5}
+								step={0.5}
+							>
+								<SliderTrack bg="red.100">
+									<Box position="relative" right={10} />
+									<SliderFilledTrack bg="tomato" />
+								</SliderTrack>
+								<SliderThumb boxSize={4} />
+							</Slider>
+							<TwoColTitleInfo
+								title="Estimated shares bought"
+								info={formatBNToDecimal(tokenOutAmountBn)}
+							/>
+							<TwoColTitleInfo
+								title="Avg. Price per share"
+								info={getAvgPrice(
+									inputBuyAmountBn,
+									tokenOutAmountBn
+								)}
+							/>
+							<TwoColTitleInfo
+								title="Max. potential profit"
+								info={formatBNToDecimal(
+									tokenOutAmountBn.sub(inputBuyAmountBn)
+								)}
+							/>
 							<Button
+								marginTop="2"
+								width="100%"
+								backgroundColor="green.100"
 								onClick={() => {
 									let a0 =
 										tokenActionIndex == 0
@@ -465,19 +546,56 @@ function Page() {
 	}
 
 	function RedeemWinsInterface() {
+		const finalOutcome = determineOutcome(market);
+		const winningsArr = getTradeWinningsArr(tradePosition, finalOutcome);
+		const stakeArr = getStakeWinArr(stakePosition, finalOutcome);
 		return (
 			<Flex flexDirection="column">
-				<Text>Redeem Winnings</Text>
-				<Text>{`Final decision - ${determineOutcome(market)}`}</Text>
+				<Text>Claim Winnings</Text>
+				<Text>{`Final decision - ${finalOutcome}`}</Text>
 				<Text>You receive</Text>
-				<Text></Text>
-				<Text>{
-
-					// TODO
-					determineOutcome(market) == 0 ?
-					`${tradePosition ? tradePosition.amount0}`
-				}</Text>
-				<Text>Claim $5 with 5 YES TOKENS</Text>
+				{winningsArr.map((winning) => {
+					return (
+						<Text>
+							{`
+				${formatBNToDecimal(winning.amountC)} for ${formatBNToDecimal(
+								winning.amountT
+							)} ${winning.outcome} tokens
+			`}
+						</Text>
+					);
+				})}
+				<Button>
+					<Text>Claim trade winnings</Text>
+				</Button>
+				{stakeArr.map((obj) => {
+					if (obj.amountSR.isZero()) {
+						return;
+					}
+					return (
+						<Text>
+							{`
+							${formatBNToDecimal(obj.amountSR)} challenge amount used in favor of outcome ${
+								obj.outcome
+							}
+							`}
+						</Text>
+					);
+				})}
+				{finalOutcome == Number(market.lastOutcomeStaked) &&
+				account.toLowerCase() ==
+					(finalOutcome == 0 ? market.staker0 : market.staker1) ? (
+					<Text>
+						{`${
+							finalOutcome == 0
+								? market.stakingReserve0
+								: market.stakingReserve1
+						} from loser's stake`}
+					</Text>
+				) : undefined}
+				<Button>
+					<Text>Claim stake winnings</Text>
+				</Button>
 			</Flex>
 		);
 	}
@@ -535,7 +653,8 @@ function Page() {
 			{market && market.stateMetadata.stage == 2 ? (
 				<StakeInterface />
 			) : undefined}
-			<StakeInterface />
+			{/* <RedeemWinsInterface /> */}
+			<TradeInterface />
 		</Flex>
 	);
 }

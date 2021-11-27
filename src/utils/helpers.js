@@ -157,6 +157,7 @@ export function getTokenAmountToBuyWithAmountC(r0, r1, a, tokenIndex) {
 		tokenAmount = r1.add(a).sub(r0.mul(r1).div(r0.add(a)));
 	}
 	tokenAmount = tokenAmount.sub(ONE_BN);
+	console.log(tokenAmount.toString(), a.toString(), "HERE");
 	return {
 		amount: tokenAmount,
 		err: false,
@@ -317,6 +318,80 @@ export function useBNInput() {
 	};
 }
 
+export function getTradeWinningsArr(tradePosition, finalOutcome) {
+	if (!tradePosition || !finalOutcome) {
+		return [];
+	}
+
+	let amountT;
+	let outcome;
+
+	if (finalOutcome == 0) {
+		amountT = parseDecimalToBN(tradePosition.amount0);
+		outcome = 0;
+	} else if (finalOutcome == 1) {
+		amountT = parseDecimalToBN(tradePosition.amount1);
+		outcome = 1;
+	} else if (finalOutcome == 2) {
+		let amountT0 = parseDecimalToBN(tradePosition.amount0);
+		let amountT1 = parseDecimalToBN(tradePosition.amount1);
+		return [
+			{
+				outcome: 0,
+				amountT: amountT0,
+				amountC: amountT0.div(TWO_BN),
+			},
+			{
+				outcome: 1,
+				amountT: amountT1,
+				amountC: amountT1.div(TWO_BN),
+			},
+		];
+	}
+
+	if (amountT.isZero()) {
+		return [];
+	}
+
+	return [
+		{
+			outcome,
+			amountT,
+			amountC: amountT,
+		},
+	];
+}
+
+export function getStakeWinArr(stakePosition, finalOutcome) {
+	if (!stakePosition || !finalOutcome) {
+		return [];
+	}
+	let stake0 = parseDecimalToBN(stakePosition.amount0);
+	let stake1 = parseDecimalToBN(stakePosition.amount1);
+	let arr = [];
+	if (finalOutcome == 0) {
+		arr.push({
+			outcome: 0,
+			amountS: stake0,
+			amountSR: stake0,
+		});
+	} else if (finalOutcome == 1) {
+		arr.push({ outcome: 1, amountS: stake1, amountSR: stake1 });
+	} else if (finalOutcome == 2) {
+		arr.push({
+			outcome: 0,
+			amountS: stake0,
+			amountSR: stake0.div(TWO_BN),
+		});
+		arr.push({
+			outcome: 1,
+			amountS: stake1,
+			amountSR: stake1.div(TWO_BN),
+		});
+	}
+	return arr;
+}
+
 /**
  * Assumes that it's called at optimistic stage == 4 only
  */
@@ -361,7 +436,7 @@ export function determineFavoredOutcome(market) {
 	return 2;
 }
 
-export function 
+// export function
 
 export function determineMarketState(stateDetails, blockNumber) {
 	let stage = 0;
