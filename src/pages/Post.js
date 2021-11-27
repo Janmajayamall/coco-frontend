@@ -56,13 +56,19 @@ import {
 	getAmountCToBuyTokens,
 	getAvgPrice,
 	getAvgPriceOfOutcomeToken,
+	getFavoredOutcomeName,
 	getMarketStageName,
 	getMarketStateDetails,
+	getTempOutcomeInChallengePeriod,
 	getTokenAmountToBuyWithAmountC,
 	parseDecimalToBN,
 	populateMarketWithMetadata,
 	roundValueTwoDP,
+	TWO_BN,
 	useBNInput,
+	outcomeDisplayName,
+	formatTimeInSeconds,
+	determineOutcome,
 } from "../utils";
 import PostDisplay from "../components/PostDisplay";
 import { useParams } from "react-router";
@@ -157,6 +163,7 @@ function Page() {
 		if (!result.data || !result.data.market) {
 			return;
 		}
+
 		setMarket(
 			populateMarketWithMetadata(
 				result.data.market,
@@ -269,7 +276,6 @@ function Page() {
 	function TradePrices() {
 		return (
 			<>
-				{" "}
 				<p>{`YES ${roundValueTwoDP(market.probability1)}`}</p>
 				<p>{`NO ${roundValueTwoDP(market.probability0)}`}</p>
 			</>
@@ -407,9 +413,75 @@ function Page() {
 	}
 
 	function StakeInterface() {
+		return (
+			<Flex flexDirection="column">
+				<p>{`YES ${roundValueTwoDP(market.probability1)}`}</p>
+				<p>{`NO ${roundValueTwoDP(market.probability0)}`}</p>
+				<p>
+					{`${outcomeDisplayName(
+						getTempOutcomeInChallengePeriod(market)
+					)} will declared as final decision, if not challenged before ${formatTimeInSeconds(
+						convertBlocksToSeconds(market.stateMetadata.blocksLeft)
+					)}`}
+				</p>
+				<p>{`${
+					Number(market.donEscalationLimit) -
+					Number(market.donEscalationCount)
+				} challenges left`}</p>
 
+				<Text>
+					{parseDecimalToBN(market.lastAmountStaked).isZero()
+						? "You can challenge with any amount > 0"
+						: `Min amount to challenge >= ${formatBNToDecimal(
+								parseDecimalToBN(market.lastAmountStaked).mul(
+									TWO_BN
+								)
+						  )}`}
+				</Text>
+				<NumberInput
+					onChange={(val) => {
+						// setInputBuyAmount(val);
+					}}
+					placeholder="Amount"
+					value={inputBuyAmount}
+				>
+					<NumberInputField />
+				</NumberInput>
+
+				<Button onClick={() => {}}>
+					<Text
+						color="white"
+						fontSize="md"
+						fontWeight="medium"
+						mr="2"
+					>
+						Challenge
+					</Text>
+				</Button>
+
+				<p>Challenge history</p>
+			</Flex>
+		);
 	}
 
+	function RedeemWinsInterface() {
+		return (
+			<Flex flexDirection="column">
+				<Text>Redeem Winnings</Text>
+				<Text>{`Final decision - ${determineOutcome(market)}`}</Text>
+				<Text>You receive</Text>
+				<Text></Text>
+				<Text>{
+
+					// TODO
+					determineOutcome(market) == 0 ?
+					`${tradePosition ? tradePosition.amount0}`
+				}</Text>
+				<Text>Claim $5 with 5 YES TOKENS</Text>
+			</Flex>
+		);
+	}
+	console.log(market, " market here");
 	return (
 		<Flex>
 			<Flex flexDirection={"column"}>
@@ -463,6 +535,7 @@ function Page() {
 			{market && market.stateMetadata.stage == 2 ? (
 				<StakeInterface />
 			) : undefined}
+			<StakeInterface />
 		</Flex>
 	);
 }

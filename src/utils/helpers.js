@@ -3,10 +3,10 @@ import Web3 from "web3";
 import { BigNumber, ethers, utils } from "ethers";
 import { useState } from "react";
 import { useEffect } from "react";
-const ZERO_BN = BigNumber.from("0");
-const ONE_BN = BigNumber.from("1");
-const TWO_BN = BigNumber.from("2");
-const FOUR_BN = BigNumber.from("4");
+export const ZERO_BN = BigNumber.from("0");
+export const ONE_BN = BigNumber.from("1");
+export const TWO_BN = BigNumber.from("2");
+export const FOUR_BN = BigNumber.from("4");
 
 const web3 = new Web3();
 /**
@@ -45,7 +45,7 @@ export function populateMarketWithMetadata(
 		getMarketStateDetails(market),
 		latestBlockNumber
 	);
-	
+	console.log(toCheckSumAddress(market.oracle.id), oraclesInfo, ", where");
 	return {
 		...market,
 		oracleInfo: oraclesInfo[toCheckSumAddress(market.oracle.id)],
@@ -55,11 +55,10 @@ export function populateMarketWithMetadata(
 		follow: groupsFollowed[toCheckSumAddress(market.oracle.id)]
 			? toCheckSumAddress(market.oracle.id)
 			: false,
-		stateMetadata:{
+		stateMetadata: {
 			stage,
 			blocksLeft,
-			
-		}
+		},
 	};
 }
 
@@ -255,17 +254,6 @@ export function getAmountCToBuyTokens(r0, r1, a0, a1) {
 }
 
 export function getMarketStateDetails(market) {
-	console.log({
-		expireAtBlock: Number(market.expireAtBlock),
-		donBufferEndsAtBlock: Number(market.donBufferEndsAtBlock),
-		resolutionEndsAtBlock: Number(market.resolutionEndsAtBlock),
-		donBufferBlocks: Number(market.donBufferBlocks),
-		resolutionBufferBlocks: Number(market.resolutionBufferBlocks),
-		donEscalationCount: Number(market.donEscalationCount),
-		donEscalationLimit: Number(market.donEscalationLimit),
-		outcome: Number(market.outcome),
-		stage: Number(market.stage),
-	});
 	return {
 		expireAtBlock: Number(market.expireAtBlock),
 		donBufferEndsAtBlock: Number(market.donBufferEndsAtBlock),
@@ -328,6 +316,52 @@ export function useBNInput() {
 		err,
 	};
 }
+
+/**
+ * Assumes that it's called at optimistic stage == 4 only
+ */
+export function determineOutcome(market) {
+	let stateDetails = getMarketStateDetails(market);
+
+	if (stateDetails.stage == 4) {
+		return Number(market.outcome);
+	}
+
+	if (!parseDecimalToBN(market.lastAmountStaked).isZero()) {
+		return Number(market.lastOutcomeStaked);
+	} else {
+		return determineFavoredOutcome(market);
+	}
+
+	// // resolution period expired & moderator was supposed to resolve, thus market resolves to last outcome staked
+	// // OR
+	// // buffer period expired, thus market resolves to last staked outcome.
+	// if (
+	// 	(blockNumber >= stateDetails.resolutionEndsAtBlock &&
+	// 		stateDetails.stage == 3) ||
+	// 	blockNumber >= stateDetails.donBufferEndsAtBlock
+	// ) {
+	// 	// if last amount staked > 0, then resolve to last outcome staked. Otherwise resolve to favored outcome.
+	// 	if (!parseDecimalToBN(market.lastAmountStaked).isZero()) {
+	// 		return Number(market.lastOutcomeStaked);
+	// 	} else {
+	// 		return determineFavoredOutcome(market);
+	// 	}
+	// }
+}
+
+export function determineFavoredOutcome(market) {
+	if (Number(market.outcomeReserve0) < Number(market.outcomeReserve1)) {
+		return 0;
+	} else if (
+		Number(market.outcomeReserve0) > Number(market.outcomeReserve1)
+	) {
+		return 1;
+	}
+	return 2;
+}
+
+export function 
 
 export function determineMarketState(stateDetails, blockNumber) {
 	let stage = 0;
@@ -420,4 +454,28 @@ export function convertBlocksToSeconds(blocks) {
 
 export function formatTimeInSeconds(seconds) {
 	return `${seconds} seconds`;
+}
+
+export function getTempOutcomeInChallengePeriod(market) {
+	if (parseDecimalToBN(market.lastAmountStaked).isZero()) {
+		if (Number(market.outcomeReserve0) < Number(market.outcomeReserve1)) {
+			return 0;
+		} else if (
+			Number(market.outcomeReserve0) > Number(market.outcomeReserve1)
+		) {
+			return 1;
+		}
+		return 2;
+	}
+	return Number(market.lastOutcomeStaked);
+}
+
+export function outcomeDisplayName(outcome) {
+	if (outcome == 0) {
+		return "NO";
+	}
+	if (outcome == 1) {
+		return "YES";
+	}
+	return "UNDECIDED";
 }

@@ -17,10 +17,13 @@ import { sUpdatePostTradeModal } from "./../redux/reducers";
 function PostDisplay({ market }) {
 	const dispatch = useDispatch();
 
+	if (!market || !market.oracleInfo) {
+		return <div />;
+	}
+
 	return (
 		<Box
 			onClick={() => {
-
 				dispatch(
 					sUpdatePostTradeModal({
 						isOpen: true,
