@@ -318,6 +318,25 @@ export function useBNInput() {
 	};
 }
 
+export function getTradeWinAmount(tradePosition, finalOutcome) {
+	if (tradePosition == undefined || finalOutcome == undefined) {
+		return "0";
+	}
+	if (finalOutcome == 0) {
+		return roundValueTwoDP(tradePosition.amount0);
+	} else if (finalOutcome == 1) {
+		return roundValueTwoDP(tradePosition.amount1);
+	} else if (finalOutcome == 2) {
+		return formatBNToDecimal(
+			parseDecimalToBN(tradePosition.amount0)
+				.div(TWO_BN)
+				.add(parseDecimalToBN(tradePosition.amount1).div(TWO_BN))
+		);
+	}
+
+	return 0;
+}
+
 export function getTradeWinningsArr(tradePosition, finalOutcome) {
 	if (!tradePosition || !finalOutcome) {
 		return [];
@@ -553,4 +572,54 @@ export function outcomeDisplayName(outcome) {
 		return "YES";
 	}
 	return "UNDECIDED";
+}
+
+export function totalAmountReceivedInStakeRedeem(
+	market,
+	finalOutcome,
+	stakePosition,
+	account
+) {
+	let stakeWinnings = parseDecimalToBN(
+		determineStakeWinnings(market, finalOutcome, account)
+	);
+
+	let stake;
+	if (finalOutcome == 0) {
+		stake = parseDecimalToBN(stakePosition ? stakePosition.amount0 : "0");
+	} else if (finalOutcome == 1) {
+		stake = parseDecimalToBN(stakePosition ? stakePosition.amount1 : "0");
+	} else if (finalOutcome == 2) {
+		stake = parseDecimalToBN(stakePosition ? stakePosition.amount0 : "0");
+		stake.add(
+			parseDecimalToBN(stakePosition ? stakePosition.amount1 : "0")
+		);
+	}
+
+	return stake.add(stakeWinnings);
+}
+
+export function determineStakeWinnings(market, finalOutcome, account) {
+	if (!market || !finalOutcome || !account) {
+		return "0";
+	}
+	if (
+		finalOutcome != 2 &&
+		account.toLowerCase() ==
+			(finalOutcome == 0 ? market.staker0 : market.staker1)
+	) {
+		return finalOutcome == 0
+			? market.stakingReserve1
+			: market.stakingReserve0;
+	}
+	return "0";
+	// 	) ? (
+	// 	<Text>
+	// 		{`${
+	// 			finalOutcome == 0
+	// 				? market.stakingReserve0
+	// 				: market.stakingReserve1
+	// 		} from loser's stake`}
+	// 	</Text>
+	// ) : undefined;
 }

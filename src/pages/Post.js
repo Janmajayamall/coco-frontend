@@ -78,6 +78,9 @@ import {
 	getTradeWinningsArr,
 	getStakeWinArr,
 	ONE_BN,
+	getTradeWinAmount,
+	determineStakeWinnings,
+	totalAmountReceivedInStakeRedeem,
 } from "../utils";
 import PostDisplay from "../components/PostDisplay";
 import TradingInterface from "../components/TradingInterface";
@@ -87,6 +90,7 @@ import { BigNumber, ethers, utils } from "ethers";
 import TradePricesBoxes from "../components/TradePriceBoxes";
 import TwoColTitleInfo from "../components/TwoColTitleInfo";
 import StakingInterface from "../components/StakingInterface";
+import ChallengeHistoryTable from "../components/ChallengeHistoryTable";
 
 /**
  * You haven't checked errors returned on graph queries. (For example when postId is wrong)
@@ -212,23 +216,75 @@ function Page() {
 		const stakeArr = getStakeWinArr(stakePosition, finalOutcome);
 		return (
 			<Flex flexDirection="column">
-				<Text>Claim Winnings</Text>
-				<Text>{`Final decision - ${finalOutcome}`}</Text>
-				<Text>You receive</Text>
-				{winningsArr.map((winning) => {
-					return (
-						<Text>
-							{`
-				${formatBNToDecimal(winning.amountC)} for ${formatBNToDecimal(
-								winning.amountT
-							)} ${winning.outcome} tokens
-			`}
-						</Text>
-					);
-				})}
+				<TradePricesBoxes
+					market={market}
+					tradePosition={tradePosition}
+				/>
+				<Text>Outcome resolved</Text>
+				<Text>Trades</Text>
+
+				<TwoColTitleInfo
+					title={"Yes shares"}
+					info={
+						tradePosition
+							? roundValueTwoDP(tradePosition.amount1)
+							: "0"
+					}
+				/>
+				<TwoColTitleInfo
+					title={"No shares"}
+					info={
+						tradePosition
+							? roundValueTwoDP(tradePosition.amount0)
+							: "0"
+					}
+				/>
+				<TwoColTitleInfo
+					title={"Declared outcome"}
+					info={outcomeDisplayName(finalOutcome)}
+				/>
+				<TwoColTitleInfo
+					title={"You receive"}
+					info={getTradeWinAmount(tradePosition, finalOutcome)}
+				/>
 				<Button>
 					<Text>Claim trade winnings</Text>
 				</Button>
+				<Text>Challenges</Text>
+				<TwoColTitleInfo
+					title={"Your stake for YES"}
+					info={
+						stakePosition
+							? roundValueTwoDP(stakePosition.amount1)
+							: "0"
+					}
+				/>
+				<TwoColTitleInfo
+					title={"Your stake for NO"}
+					info={
+						stakePosition
+							? roundValueTwoDP(stakePosition.amount0)
+							: "0"
+					}
+				/>
+				<TwoColTitleInfo
+					title={"Your challenge winnings"}
+					info={roundValueTwoDP(
+						determineStakeWinnings(market, finalOutcome, account)
+					)}
+				/>
+				<TwoColTitleInfo
+					title={"Your receive"}
+					info={formatBNToDecimal(
+						totalAmountReceivedInStakeRedeem(
+							market,
+							finalOutcome,
+							stakePosition,
+							account
+						)
+					)}
+				/>
+
 				{stakeArr.map((obj) => {
 					if (obj.amountSR.isZero()) {
 						return;
@@ -257,6 +313,7 @@ function Page() {
 				<Button>
 					<Text>Claim stake winnings</Text>
 				</Button>
+				<ChallengeHistoryTable stakeHistories={stakeHistories} />
 			</Flex>
 		);
 	}
@@ -303,13 +360,13 @@ function Page() {
 					stakePosition={stakePosition}
 				/>
 			) : undefined}
-			<StakingInterface
+			{/* <StakingInterface
 				market={market}
 				tradePosition={tradePosition}
 				stakeHistories={stakeHistories}
 				stakePosition={stakePosition}
-			/>
-			{/* <RedeemWinsInterface /> */}
+			/> */}
+			<RedeemWinsInterface />
 			{/* <TradingInterface market={market} tradePosition={tradePosition} /> */}
 		</Flex>
 	);
