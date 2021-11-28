@@ -130,7 +130,7 @@ function Page() {
 	);
 
 	const [market, setMarket] = useState(undefined);
-
+	console.log(mSATResult, " mSATResult");
 	const tradeHistories =
 		mSATResult.data && mSATResult.data.tradeHistories
 			? mSATResult.data.tradeHistories
@@ -139,13 +139,16 @@ function Page() {
 		mSATResult.data && mSATResult.data.stakeHistories
 			? mSATResult.data.stakeHistories
 			: [];
+	const tradePosition = mSATResult.tokenBalances.forEach((obj) => {
+		if (market.oToken0Id == obj.tokenId) // TODO - finish this 
+	})();
 	const tradePosition =
 		mSATResult.data && mSATResult.data.tradePosition
 			? mSATResult.data.tradePosition
 			: undefined;
 	const stakePosition =
 		mSATResult.data && mSATResult.data.stakePosition
-			? mSATResult.data.tradePosition
+			? mSATResult.data.stakePosition
 			: undefined;
 
 	useEffect(async () => {

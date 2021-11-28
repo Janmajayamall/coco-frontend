@@ -139,6 +139,16 @@ const QueryMarketTradeAndStakeInfoByUser = `
 				timestamp
 				stakeIndex
 			}
+
+			tokenBalances(where:{user: $user, market: $marketIdentifier}){
+				id
+				user
+				oracle
+				market
+				tokenId
+				balance
+			}
+			
 			tradePosition(id: $positionIdentifier) {
 				id
 				amount0

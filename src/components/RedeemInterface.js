@@ -44,8 +44,11 @@ import {
 	useBuyMinTokensForExactCTokens,
 	useQueryMarketByMarketIdentifier,
 	useQueryMarketTradeAndStakeInfoByUser,
+	useRedeemWinning,
 	useSellExactTokensForMinCTokens,
 	useStakeForOutcome,
+	useRedeemWinningBothOutcomes,
+	useRedeemStake,
 } from "../hooks";
 import {
 	convertBlocksToSeconds,
@@ -79,6 +82,9 @@ import {
 	getTradeWinningsArr,
 	getStakeWinArr,
 	ONE_BN,
+	getTradeWinAmount,
+	determineStakeWinnings,
+	totalAmountReceivedInStakeRedeem,
 } from "../utils";
 import PostDisplay from "../components/PostDisplay";
 import TwoColTitleInfo from "../components/TwoColTitleInfo";
@@ -95,12 +101,19 @@ function RedeemWinsInterface({
 	tradePosition,
 	stakePosition,
 }) {
+	console.log(stakeHistories, stakePosition, market, " stakeHistories");
+	const { account } = useEthers();
+
+	const { state: stateRW, send: sendRW } = useRedeemWinning();
+	const { state: stateRWB, send: sendRWB } = useRedeemWinningBothOutcomes;
+	const { state: stateRS, send: sendRS } = useRedeemStake(market.oracle.id);
+
 	const finalOutcome = determineOutcome(market);
 	const winningsArr = getTradeWinningsArr(tradePosition, finalOutcome);
-	const stakeArr = getStakeWinArr(stakePosition, finalOutcome);
+	// const stakeArr = getStakeWinArr(stakePosition, finalOutcome);
 	return (
 		<Flex flexDirection="column">
-			<TradePricesBoxes market={market} tradePosition={tradePosition} />
+			<TradePriceBoxes market={market} tradePosition={tradePosition} />
 			<Text>Outcome resolved</Text>
 			<Text>Trades</Text>
 
@@ -124,20 +137,81 @@ function RedeemWinsInterface({
 				title={"You receive"}
 				info={getTradeWinAmount(tradePosition, finalOutcome)}
 			/>
-			<Button>
+			<Button
+				onClick={() => {
+					if (!tradePosition || !market) {
+						return;
+					}
+					let amount0 = parseDecimalToBN(tradePosition.amount0);
+					let amount1 = parseDecimalToBN(tradePosition.amount1);
+
+					if (
+						finalOutcome == 2 &&
+						!amount0.isZero() &&
+						!amount1.isZero()
+					) {
+						sendRWB(
+							amount0,
+							amount1,
+							market.oracle.id,
+							market.marketIdentifier
+						);
+					}
+
+					if (finalOutcome == 2) {
+						if (!amount0.isZero()) {
+							sendRW(
+								2,
+								amount0,
+								market.oracle.id,
+								market.marketIdentifier
+							);
+						} else if (!amount1.isZero()) {
+							sendRW(
+								2,
+								amount1,
+								market.oracle.id,
+								market.marketIdentifier
+							);
+						}
+					}
+
+					if (finalOutcome == 0 && !amount0.isZero()) {
+						sendRW(
+							0,
+							amount0,
+							market.oracle.id,
+							market.marketIdentifier
+						);
+					}
+
+					if (finalOutcome == 1 && !amount1.isZero()) {
+						sendRW(
+							1,
+							amount1,
+							market.oracle.id,
+							market.marketIdentifier
+						);
+					}
+				}}
+			>
 				<Text>Claim trade winnings</Text>
 			</Button>
 			<Text>Challenges</Text>
 			<TwoColTitleInfo
 				title={"Your stake for YES"}
 				info={
-					stakePosition ? roundValueTwoDP(stakePosition.amount1) : "0"
+					stakePosition
+						? roundValueTwoDP(stakePosition.amountStaked1)
+						: "0"
 				}
 			/>
 			<TwoColTitleInfo
 				title={"Your stake for NO"}
 				info={
-					stakePosition ? roundValueTwoDP(stakePosition.amount0) : "0"
+					stakePosition
+						? roundValueTwoDP(stakePosition.amountStaked0)
+						: "0"
 				}
 			/>
 			<TwoColTitleInfo
@@ -158,7 +232,7 @@ function RedeemWinsInterface({
 				)}
 			/>
 
-			{stakeArr.map((obj) => {
+			{/* {stakeArr.map((obj) => {
 				if (obj.amountSR.isZero()) {
 					return;
 				}
@@ -171,8 +245,8 @@ function RedeemWinsInterface({
 							`}
 					</Text>
 				);
-			})}
-			{finalOutcome == Number(market.lastOutcomeStaked) &&
+			})} */}
+			{/* {finalOutcome == Number(market.lastOutcomeStaked) &&
 			account.toLowerCase() ==
 				(finalOutcome == 0 ? market.staker0 : market.staker1) ? (
 				<Text>
@@ -182,8 +256,36 @@ function RedeemWinsInterface({
 							: market.stakingReserve1
 					} from loser's stake`}
 				</Text>
-			) : undefined}
-			<Button>
+			) : undefined} */}
+
+			<Button
+				onClick={() => {
+					if (!stakePosition || !market) {
+						return;
+					}
+
+					let amountS0 = parseDecimalToBN(
+						stakePosition.amountStaked0
+					);
+					let amountS1 = parseDecimalToBN(
+						stakePosition.amountStaked1
+					);
+
+					if (amountS0.isZero() && amountS1.isZero()) {
+						return;
+					}
+
+					if (finalOutcome == 0 && amountS0.isZero()) {
+						return;
+					}
+
+					if (finalOutcome == 1 && amountS1.isZero()) {
+						return;
+					}
+
+					sendRS(market.marketIdentifier);
+				}}
+			>
 				<Text>Claim stake winnings</Text>
 			</Button>
 			<ChallengeHistoryTable stakeHistories={stakeHistories} />

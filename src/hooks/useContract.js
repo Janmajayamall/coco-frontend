@@ -1,6 +1,7 @@
 import addresses from "./../contracts/addresses.json";
 import MarkerRouterAbi from "../contracts/abis/MarketRouter.json";
 import OracleFactoryAbi from "../contracts/abis/OracleFactory.json";
+import OracleAbi from "../contracts/abis/Oracle.json";
 
 import {
 	useEthers,
@@ -67,4 +68,25 @@ export function useRedeemWinning() {
 		"redeemWinning"
 	);
 	return { state, send };
+}
+
+export function useRedeemWinningBothOutcomes() {
+	const { state, send } = useContractFunction(
+		marketRouterContract,
+		"redeemWinningBothOutcomes"
+	);
+	return { state, send };
+}
+
+export function useRedeemStake(oracleAddress) {
+	const oracleContract = new Contract(
+		oracleAddress,
+		new utils.Interface(OracleAbi)
+	);
+
+	const { state, send } = useContractFunction(oracleContract, "redeemStake");
+	return {
+		state,
+		send,
+	};
 }

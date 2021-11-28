@@ -458,8 +458,6 @@ export function determineFavoredOutcome(market) {
 // export function
 
 export function determineMarketState(stateDetails, blockNumber) {
-
-
 	let stage = 0;
 	let blocksLeft = 0;
 
@@ -518,8 +516,6 @@ export function determineMarketState(stateDetails, blockNumber) {
 		stage = 0;
 		blocksLeft = 0;
 	}
-
-
 
 	return {
 		stage,
@@ -603,13 +599,19 @@ export function totalAmountReceivedInStakeRedeem(
 
 	let stake;
 	if (finalOutcome == 0) {
-		stake = parseDecimalToBN(stakePosition ? stakePosition.amount0 : "0");
+		stake = parseDecimalToBN(
+			stakePosition ? stakePosition.amountStaked0 : "0"
+		);
 	} else if (finalOutcome == 1) {
-		stake = parseDecimalToBN(stakePosition ? stakePosition.amount1 : "0");
+		stake = parseDecimalToBN(
+			stakePosition ? stakePosition.amountStaked1 : "0"
+		);
 	} else if (finalOutcome == 2) {
-		stake = parseDecimalToBN(stakePosition ? stakePosition.amount0 : "0");
+		stake = parseDecimalToBN(
+			stakePosition ? stakePosition.amountStaked0 : "0"
+		);
 		stake.add(
-			parseDecimalToBN(stakePosition ? stakePosition.amount1 : "0")
+			parseDecimalToBN(stakePosition ? stakePosition.amountStaked1 : "0")
 		);
 	}
 
