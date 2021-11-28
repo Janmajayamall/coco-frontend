@@ -63,7 +63,7 @@ function Page() {
 
 		// const _imageUrl = await uploadImage();
 		const _imageUrl =
-			"https://www.figma.com/n-Markets-for-Content?node-id=137%3A16730";
+			"https://www.figmakets-for-Content?node-id=137%3A16730";
 		setImageUrl(_imageUrl);
 		newPostTxHelper();
 	}

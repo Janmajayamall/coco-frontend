@@ -85,6 +85,8 @@ import {
 	determineStakeWinnings,
 	totalAmountReceivedInStakeRedeem,
 	marketStageDisplayName,
+	ZERO_DECIMAL_STR,
+	tokenIdBalance,
 } from "../utils";
 import PostDisplay from "../components/PostDisplay";
 import TradingInterface from "../components/TradingInterface";
@@ -130,7 +132,7 @@ function Page() {
 	);
 
 	const [market, setMarket] = useState(undefined);
-	console.log(mSATResult, " mSATResult");
+	console.log(market, mSATResult, " mSATResult");
 	const tradeHistories =
 		mSATResult.data && mSATResult.data.tradeHistories
 			? mSATResult.data.tradeHistories
@@ -139,17 +141,28 @@ function Page() {
 		mSATResult.data && mSATResult.data.stakeHistories
 			? mSATResult.data.stakeHistories
 			: [];
-	const tradePosition = mSATResult.tokenBalances.forEach((obj) => {
-		if (market.oToken0Id == obj.tokenId) // TODO - finish this 
-	})();
-	const tradePosition =
-		mSATResult.data && mSATResult.data.tradePosition
-			? mSATResult.data.tradePosition
-			: undefined;
-	const stakePosition =
-		mSATResult.data && mSATResult.data.stakePosition
-			? mSATResult.data.stakePosition
-			: undefined;
+	const tokenBalances = mSATResult.data ? mSATResult.data.tokenBalances : [];
+	const tradePosition = {
+		amount0: tokenIdBalance(
+			tokenBalances,
+			market ? market.oToken0Id : undefined
+		),
+		amount1: tokenIdBalance(
+			tokenBalances,
+			market ? market.oToken1Id : undefined
+		),
+	};
+	const stakePosition = {
+		amount0: tokenIdBalance(
+			tokenBalances,
+			market ? market.sToken0Id : undefined
+		),
+		amount1: tokenIdBalance(
+			tokenBalances,
+			market ? market.sToken1Id : undefined
+		),
+	};
+	console.log(tradePosition, stakePosition, " thisss is the way");
 
 	useEffect(async () => {
 		if (!result.data || !result.data.market) {

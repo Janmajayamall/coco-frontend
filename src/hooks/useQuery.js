@@ -114,6 +114,10 @@ const QueryMarketByMarketIdentifier = `
 			oracle{
      			id
     		}
+			oToken0Id
+			oToken1Id
+			sToken0Id
+			sToken1Id
 		}
 	}
 `;
@@ -148,7 +152,7 @@ const QueryMarketTradeAndStakeInfoByUser = `
 				tokenId
 				balance
 			}
-			
+
 			tradePosition(id: $positionIdentifier) {
 				id
 				amount0

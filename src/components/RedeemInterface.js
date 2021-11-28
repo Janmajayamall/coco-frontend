@@ -109,7 +109,7 @@ function RedeemWinsInterface({
 	const { state: stateRS, send: sendRS } = useRedeemStake(market.oracle.id);
 
 	const finalOutcome = determineOutcome(market);
-	const winningsArr = getTradeWinningsArr(tradePosition, finalOutcome);
+	// const winningsArr = getTradeWinningsArr(tradePosition, finalOutcome);
 	// const stakeArr = getStakeWinArr(stakePosition, finalOutcome);
 	return (
 		<Flex flexDirection="column">
@@ -201,17 +201,13 @@ function RedeemWinsInterface({
 			<TwoColTitleInfo
 				title={"Your stake for YES"}
 				info={
-					stakePosition
-						? roundValueTwoDP(stakePosition.amountStaked1)
-						: "0"
+					stakePosition ? roundValueTwoDP(stakePosition.amount1) : "0"
 				}
 			/>
 			<TwoColTitleInfo
 				title={"Your stake for NO"}
 				info={
-					stakePosition
-						? roundValueTwoDP(stakePosition.amountStaked0)
-						: "0"
+					stakePosition ? roundValueTwoDP(stakePosition.amount0) : "0"
 				}
 			/>
 			<TwoColTitleInfo
@@ -264,12 +260,8 @@ function RedeemWinsInterface({
 						return;
 					}
 
-					let amountS0 = parseDecimalToBN(
-						stakePosition.amountStaked0
-					);
-					let amountS1 = parseDecimalToBN(
-						stakePosition.amountStaked1
-					);
+					let amountS0 = parseDecimalToBN(stakePosition.amount0);
+					let amountS1 = parseDecimalToBN(stakePosition.amount1);
 
 					if (amountS0.isZero() && amountS1.isZero()) {
 						return;

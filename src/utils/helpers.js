@@ -7,6 +7,7 @@ export const ZERO_BN = BigNumber.from("0");
 export const ONE_BN = BigNumber.from("1");
 export const TWO_BN = BigNumber.from("2");
 export const FOUR_BN = BigNumber.from("4");
+export const ZERO_DECIMAL_STR = "0";
 
 const web3 = new Web3();
 /**
@@ -151,7 +152,7 @@ export function getTokenAmountToBuyWithAmountC(r0, r1, a, tokenIndex) {
 		return { amount: 0, err: true };
 	}
 	let tokenAmount = BigNumber.from(0);
-	if (tokenIndex == 0) {
+	if (tokenIndex === 0) {
 		tokenAmount = r0.add(a).sub(r0.mul(r1).div(r1.add(a)));
 	} else {
 		tokenAmount = r1.add(a).sub(r0.mul(r1).div(r0.add(a)));
@@ -599,19 +600,13 @@ export function totalAmountReceivedInStakeRedeem(
 
 	let stake;
 	if (finalOutcome == 0) {
-		stake = parseDecimalToBN(
-			stakePosition ? stakePosition.amountStaked0 : "0"
-		);
+		stake = parseDecimalToBN(stakePosition ? stakePosition.amount0 : "0");
 	} else if (finalOutcome == 1) {
-		stake = parseDecimalToBN(
-			stakePosition ? stakePosition.amountStaked1 : "0"
-		);
+		stake = parseDecimalToBN(stakePosition ? stakePosition.amount1 : "0");
 	} else if (finalOutcome == 2) {
-		stake = parseDecimalToBN(
-			stakePosition ? stakePosition.amountStaked0 : "0"
-		);
+		stake = parseDecimalToBN(stakePosition ? stakePosition.amount0 : "0");
 		stake.add(
-			parseDecimalToBN(stakePosition ? stakePosition.amountStaked1 : "0")
+			parseDecimalToBN(stakePosition ? stakePosition.amount1 : "0")
 		);
 	}
 
@@ -641,4 +636,17 @@ export function determineStakeWinnings(market, finalOutcome, account) {
 	// 		} from loser's stake`}
 	// 	</Text>
 	// ) : undefined;
+}
+
+export function tokenIdBalance(tokenObjArr, tokenId) {
+	console.log(tokenObjArr, tokenId, "tokenObjArr, tokenId");
+	if (!tokenObjArr || !Array.isArray(tokenObjArr) || !tokenId) {
+		return ZERO_DECIMAL_STR;
+	}
+
+	let tokenObj = tokenObjArr.find((obj) => obj.tokenId == tokenId);
+	if (!tokenObj) {
+		return ZERO_DECIMAL_STR;
+	}
+	return tokenObj.balance;
 }
