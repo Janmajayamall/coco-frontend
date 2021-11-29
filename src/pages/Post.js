@@ -38,6 +38,7 @@ import {
 	Avatar,
 	Heading,
 	Image,
+	Select,
 } from "@chakra-ui/react";
 import { useEthers } from "@usedapp/core/packages/core";
 import { CloseIcon } from "@chakra-ui/icons";
@@ -47,6 +48,7 @@ import {
 	useBuyMinTokensForExactCTokens,
 	useQueryMarketByMarketIdentifier,
 	useQueryMarketTradeAndStakeInfoByUser,
+	useQueryTokenApprovalsByUserAndOracle,
 	useSellExactTokensForMinCTokens,
 } from "../hooks";
 import {
@@ -56,7 +58,7 @@ import {
 	convertIntToDecimalStr,
 	determineMarketState,
 	filterMarketIdentifiersFromMarketsGraph,
-	filterOraclesFromMarketsGraph,
+	filterOracleIdsFromMarketsGraph,
 	findModeratorsByIdArr,
 	findPostsByMarketIdentifierArr,
 	formatBNToDecimal,
@@ -87,6 +89,8 @@ import {
 	marketStageDisplayName,
 	ZERO_DECIMAL_STR,
 	tokenIdBalance,
+	stateSetupOraclesInfo,
+	stateSetupMarketsMetadata,
 } from "../utils";
 import PostDisplay from "../components/PostDisplay";
 import TradingInterface from "../components/TradingInterface";
@@ -98,6 +102,9 @@ import TwoColTitleInfo from "../components/TwoColTitleInfo";
 import StakingInterface from "../components/StakingInterface";
 import ChallengeHistoryTable from "../components/ChallengeHistoryTable";
 import RedeemWinsInterface from "../components/RedeemInterface";
+import addresses from "./../contracts/addresses.json";
+import ResolveInterface from "../components/ResolveInterface";
+import { makeErrorResult } from "@urql/core";
 
 /**
  * You haven't checked errors returned on graph queries. (For example when postId is wrong)
@@ -118,21 +125,22 @@ function Page() {
 		selectRinkebyLatestBlockNumber
 	);
 
-	const { result, reexecuteQuery } = useQueryMarketByMarketIdentifier(
-		postId,
-		false
-	);
-	const {
-		result: mSATResult,
-		reexecuteQuery: mSATRexecuteQuery,
-	} = useQueryMarketTradeAndStakeInfoByUser(
+	const { result } = useQueryMarketByMarketIdentifier(postId, false);
+	const { result: mSATResult } = useQueryMarketTradeAndStakeInfoByUser(
 		postId,
 		account ? account.toLowerCase() : "",
 		false
 	);
 
 	const [market, setMarket] = useState(undefined);
-	console.log(market, mSATResult, " mSATResult");
+
+	const {
+		result: tokenApprovalsResult,
+	} = useQueryTokenApprovalsByUserAndOracle(
+		account ? account.toLocaleLowerCase() : "",
+		market ? market.oracle.id : ""
+	);
+
 	const tradeHistories =
 		mSATResult.data && mSATResult.data.tradeHistories
 			? mSATResult.data.tradeHistories
@@ -162,7 +170,16 @@ function Page() {
 			market ? market.sToken1Id : undefined
 		),
 	};
-	console.log(tradePosition, stakePosition, " thisss is the way");
+
+	const tokenApproval = tokenApprovalsResult.data
+		? (() => {
+				return tokenApprovalsResult.data.tokenApprovals.find(
+					(obj) =>
+						obj.operator == addresses.MarketRouter.toLowerCase() &&
+						obj.approved == true
+				);
+		  })() != undefined
+		: false;
 
 	useEffect(async () => {
 		if (!result.data || !result.data.market) {
@@ -170,21 +187,14 @@ function Page() {
 		}
 		const _market = result.data.market;
 
-		const oracleIds = filterOraclesFromMarketsGraph([_market]);
-		let res = await findModeratorsByIdArr(oracleIds);
-		if (!res || !res.moderators) {
-			return;
-		}
-		dispatch(sUpdateOraclesInfoObj(res.moderators));
-
-		const marketIdentifiers = filterMarketIdentifiersFromMarketsGraph([
-			_market,
-		]);
-		res = await findPostsByMarketIdentifierArr(marketIdentifiers);
-		if (!res || !res.posts) {
-			return;
-		}
-		dispatch(sUpdateMarketsMetadata(res.posts));
+		await stateSetupOraclesInfo(
+			filterOracleIdsFromMarketsGraph([_market]),
+			dispatch
+		);
+		await stateSetupMarketsMetadata(
+			filterMarketIdentifiersFromMarketsGraph([_market]),
+			dispatch
+		);
 	}, [result]);
 
 	useEffect(() => {
@@ -293,6 +303,7 @@ function Page() {
 					<TradingInterface
 						market={market}
 						tradePosition={tradePosition}
+						tokenApproval={tokenApproval}
 					/>
 				) : undefined}
 				{market && market.stateMetadata.stage == 2 ? (
@@ -303,24 +314,21 @@ function Page() {
 						stakePosition={stakePosition}
 					/>
 				) : undefined}
-				{/* <StakingInterface
-					market={market}
-					tradePosition={tradePosition}
-					stakeHistories={stakeHistories}
-					stakePosition={stakePosition}
-				/> */}
 				{market && market.stateMetadata.stage == 4 ? (
 					<RedeemWinsInterface
 						market={market}
 						tradePosition={tradePosition}
 						stakeHistories={stakeHistories}
 						stakePosition={stakePosition}
+						tokenApproval={tokenApproval}
 					/>
 				) : undefined}
-				{/* <TradingInterface
-					market={market}
-					tradePosition={tradePosition}
-				/> */}
+				{market && market.stateMetadata.stage == 3 ? (
+					<ResolveInterface
+						market={market}
+						stakeHistories={stakeHistories}
+					/>
+				) : undefined}
 			</Flex>
 			<Spacer />
 		</Flex>

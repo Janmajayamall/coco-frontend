@@ -54,7 +54,7 @@ import {
 	convertIntToDecimalStr,
 	determineMarketState,
 	filterMarketIdentifiersFromMarketsGraph,
-	filterOraclesFromMarketsGraph,
+	filterOracleIdsFromMarketsGraph,
 	findModeratorsByIdArr,
 	findPostsByMarketIdentifierArr,
 	formatBNToDecimal,

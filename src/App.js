@@ -8,6 +8,7 @@ import OracleConfig from "./pages/OracleConfig";
 import Explore from "./pages/Explore";
 import Feed from "./pages/Feed";
 import Post from "./pages/Post";
+import Pages from "./pages/Pages";
 import {
 	Button,
 	Box,
@@ -40,7 +41,7 @@ import {
 	toCheckSumAddress,
 	getUser,
 	findAllFollows,
-	filterOraclesFromMarketsGraph,
+	filterOracleIdsFromMarketsGraph,
 	findModeratorsByIdArr,
 	filterMarketIdentifiersFromMarketsGraph,
 	findPostsByMarketIdentifierArr,
@@ -106,7 +107,7 @@ function App() {
 
 	useEffect(async () => {
 		if (result.data && result.data.markets) {
-			const oracleIds = filterOraclesFromMarketsGraph(
+			const oracleIds = filterOracleIdsFromMarketsGraph(
 				result.data.markets
 			);
 			let res = await findModeratorsByIdArr(oracleIds);
@@ -161,6 +162,7 @@ function App() {
 				<Route path="/group/:groupId" element={<Feed />} />
 				<Route path="/" element={<Feed />} />
 				<Route path="/post/:postId" element={<Post />} />
+				<Route path="/pages" element={<Pages />} />
 			</Routes>
 		</div>
 	);

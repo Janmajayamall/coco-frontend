@@ -53,7 +53,7 @@ import {
 	convertIntToDecimalStr,
 	determineMarketState,
 	filterMarketIdentifiersFromMarketsGraph,
-	filterOraclesFromMarketsGraph,
+	filterOracleIdsFromMarketsGraph,
 	findModeratorsByIdArr,
 	findPostsByMarketIdentifierArr,
 	formatBNToDecimal,
@@ -87,7 +87,7 @@ import { BigNumber, ethers, utils } from "ethers";
 import TradingInput from "./TradingInput";
 import TradePriceBoxes from "./TradePriceBoxes";
 
-function TradingInterface({ market, tradePosition }) {
+function TradingInterface({ market, tradePosition, tokenApproval }) {
 	/**
 	 * Contract calls
 	 */

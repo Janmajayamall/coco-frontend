@@ -90,3 +90,34 @@ export function useRedeemStake(oracleAddress) {
 		send,
 	};
 }
+
+export function useERC1155SetApprovalForAll(oracleAddress) {
+	const oracleContract = new Contract(
+		oracleAddress,
+		new utils.Interface(OracleAbi)
+	);
+
+	const { state, send } = useContractFunction(
+		oracleContract,
+		"setApprovalForAll"
+	);
+
+	return {
+		state,
+		send,
+	};
+}
+
+export function useSetOutcome(oracleAddress) {
+	const oracleContract = new Contract(
+		oracleAddress,
+		new utils.Interface(OracleAbi)
+	);
+
+	const { state, send } = useContractFunction(oracleContract, "setOutcome");
+
+	return {
+		state,
+		send,
+	};
+}

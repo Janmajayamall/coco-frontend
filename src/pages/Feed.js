@@ -33,7 +33,7 @@ import {
 	toCheckSumAddress,
 	getUser,
 	findAllFollows,
-	filterOraclesFromMarketsGraph,
+	filterOracleIdsFromMarketsGraph,
 	findModeratorsByIdArr,
 	filterMarketIdentifiersFromMarketsGraph,
 	findPostsByMarketIdentifierArr,
@@ -42,6 +42,8 @@ import {
 	followModerator,
 	findModeratorsDetails,
 	numStrFormatter,
+	stateSetupOraclesInfo,
+	stateSetupMarketsMetadata,
 } from "../utils";
 import {
 	sUpdateProfile,
@@ -158,17 +160,15 @@ function Page() {
 		}
 
 		if (_result.data && _result.data.markets) {
-			const oracleIds = filterOraclesFromMarketsGraph(
-				_result.data.markets
+			await stateSetupOraclesInfo(
+				filterOracleIdsFromMarketsGraph(_result.data.markets),
+				dispatch
 			);
-			let res = await findModeratorsByIdArr(oracleIds);
-			dispatch(sUpdateOraclesInfoObj(res.moderators));
 
-			const marketIdentifiers = filterMarketIdentifiersFromMarketsGraph(
-				_result.data.markets
+			await stateSetupMarketsMetadata(
+				filterMarketIdentifiersFromMarketsGraph(_result.data.markets),
+				dispatch
 			);
-			res = await findPostsByMarketIdentifierArr(marketIdentifiers);
-			dispatch(sUpdateMarketsMetadata(res.posts));
 
 			setMarkets([...markets, ..._result.data.markets]);
 		}
@@ -178,7 +178,7 @@ function Page() {
 		const ignoreList = Object.keys(groupsFollowed);
 		let res = await findPopularModerators(ignoreList);
 
-		setPopularGroups(res.moderators);
+		// setPopularGroups(res.moderators);
 	}, []);
 
 	useEffect(async () => {

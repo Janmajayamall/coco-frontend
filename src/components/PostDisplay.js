@@ -14,7 +14,7 @@ import { roundValueTwoDP } from "../utils";
 import { useDispatch } from "react-redux";
 import { sUpdatePostTradeModal } from "./../redux/reducers";
 
-function PostDisplay({ market }) {
+function PostDisplay({ market, onImageClick }) {
 	const dispatch = useDispatch();
 
 	if (!market || !market.oracleInfo) {
@@ -50,7 +50,14 @@ function PostDisplay({ market }) {
 				<Spacer />
 				<Text>Resolved</Text>
 			</Flex>
-			<Image src={"https://bit.ly/2Z4KKcF"} />
+			<Image
+				onClick={() => {
+					if (onImageClick != undefined) {
+						onImageClick(market.marketIdentifier);
+					}
+				}}
+				src={"https://bit.ly/2Z4KKcF"}
+			/>
 			<Flex marginTop={5}>
 				<Spacer />
 				<Flex

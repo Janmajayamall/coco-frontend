@@ -15,7 +15,7 @@ const web3 = new Web3();
  * @note Oracle ids are oracle addresses, thus the value returned
  * is checksummed
  */
-export function filterOraclesFromMarketsGraph(markets) {
+export function filterOracleIdsFromMarketsGraph(markets) {
 	const oracleIds = [];
 	markets.forEach((market) => {
 		if (market.oracle && market.oracle.id) {
@@ -614,7 +614,11 @@ export function totalAmountReceivedInStakeRedeem(
 }
 
 export function determineStakeWinnings(market, finalOutcome, account) {
-	if (!market || !finalOutcome || !account) {
+	if (
+		market == undefined ||
+		finalOutcome == undefined ||
+		account == undefined
+	) {
 		return "0";
 	}
 	if (
@@ -639,7 +643,6 @@ export function determineStakeWinnings(market, finalOutcome, account) {
 }
 
 export function tokenIdBalance(tokenObjArr, tokenId) {
-	console.log(tokenObjArr, tokenId, "tokenObjArr, tokenId");
 	if (!tokenObjArr || !Array.isArray(tokenObjArr) || !tokenId) {
 		return ZERO_DECIMAL_STR;
 	}
@@ -649,4 +652,21 @@ export function tokenIdBalance(tokenObjArr, tokenId) {
 		return ZERO_DECIMAL_STR;
 	}
 	return tokenObj.balance;
+}
+
+export function calculateResolveFee(market, outcome) {
+	if (market == undefined || outcome == undefined || outcome > 1) {
+		return ZERO_DECIMAL_STR;
+	}
+
+	let fee = ZERO_BN;
+	const feeRatio = parseDecimalToBN(market.feeNumerator).div(
+		market.feeDenominator
+	);
+	if (outcome == 0) {
+		fee = parseDecimalToBN(market.stakingReserve1).mul(feeRatio);
+	} else {
+		fee = parseDecimalToBN(market.stakingReserve0).mul(feeRatio);
+	}
+	return formatBNToDecimal(fee);
 }

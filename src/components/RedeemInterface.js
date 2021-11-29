@@ -49,6 +49,7 @@ import {
 	useStakeForOutcome,
 	useRedeemWinningBothOutcomes,
 	useRedeemStake,
+	useERC1155SetApprovalForAll,
 } from "../hooks";
 import {
 	convertBlocksToSeconds,
@@ -57,7 +58,7 @@ import {
 	convertIntToDecimalStr,
 	determineMarketState,
 	filterMarketIdentifiersFromMarketsGraph,
-	filterOraclesFromMarketsGraph,
+	filterOracleIdsFromMarketsGraph,
 	findModeratorsByIdArr,
 	findPostsByMarketIdentifierArr,
 	formatBNToDecimal,
@@ -94,19 +95,24 @@ import { BigNumber, ethers, utils } from "ethers";
 import TradingInput from "./TradingInput";
 import TradePriceBoxes from "./TradePriceBoxes";
 import ChallengeHistoryTable from "./ChallengeHistoryTable";
+import addresses from "./../contracts/addresses.json";
 
 function RedeemWinsInterface({
 	market,
 	stakeHistories,
 	tradePosition,
 	stakePosition,
+	tokenApproval,
 }) {
-	console.log(stakeHistories, stakePosition, market, " stakeHistories");
 	const { account } = useEthers();
 
 	const { state: stateRW, send: sendRW } = useRedeemWinning();
 	const { state: stateRWB, send: sendRWB } = useRedeemWinningBothOutcomes;
 	const { state: stateRS, send: sendRS } = useRedeemStake(market.oracle.id);
+	const {
+		state: stateSetApproval,
+		send: sendSetApproval,
+	} = useERC1155SetApprovalForAll(market.oracle.id);
 
 	const finalOutcome = determineOutcome(market);
 	// const winningsArr = getTradeWinningsArr(tradePosition, finalOutcome);
@@ -138,6 +144,7 @@ function RedeemWinsInterface({
 				info={getTradeWinAmount(tradePosition, finalOutcome)}
 			/>
 			<Button
+				disabled={!tokenApproval}
 				onClick={() => {
 					if (!tradePosition || !market) {
 						return;
@@ -281,6 +288,14 @@ function RedeemWinsInterface({
 				<Text>Claim stake winnings</Text>
 			</Button>
 			<ChallengeHistoryTable stakeHistories={stakeHistories} />
+			<Button
+				disabled={tokenApproval}
+				onClick={() => {
+					sendSetApproval(addresses.MarketRouter, true);
+				}}
+			>
+				<Text>Set approval</Text>
+			</Button>
 		</Flex>
 	);
 }

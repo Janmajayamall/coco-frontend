@@ -35,6 +35,7 @@ import {
 	SliderFilledTrack,
 	SliderThumb,
 	Slider,
+	Select,
 } from "@chakra-ui/react";
 import { useEthers } from "@usedapp/core/packages/core";
 import { CloseIcon } from "@chakra-ui/icons";
@@ -45,6 +46,8 @@ import {
 	useQueryMarketByMarketIdentifier,
 	useQueryMarketTradeAndStakeInfoByUser,
 	useSellExactTokensForMinCTokens,
+	useSetOutcome,
+	useStakeForOutcome,
 } from "../hooks";
 import {
 	convertBlocksToSeconds,
@@ -78,66 +81,63 @@ import {
 	getTradeWinningsArr,
 	getStakeWinArr,
 	ONE_BN,
+	ZERO_BN,
+	ZERO_DECIMAL_STR,
+	calculateResolveFee,
 } from "../utils";
 import PostDisplay from "../components/PostDisplay";
+import TwoColTitleInfo from "../components/TwoColTitleInfo";
 import { useParams } from "react-router";
 
 import { BigNumber, ethers, utils } from "ethers";
+import TradingInput from "./TradingInput";
+import TradePriceBoxes from "./TradePriceBoxes";
+import ChallengeHistoryTable from "./ChallengeHistoryTable";
 
-function TradePricesBoxes({
-	market,
-	tradePosition,
-	outcomeChosen,
-	onOutcomeChosen,
-}) {
+function ResolveInterface({ market, stakeHistories }) {
+	const { account } = useEthers();
+
+	const { state, send } = useSetOutcome(market ? market.oracle.id : "");
+
+	const [chosenOutcome, setChosenOutcome] = useState(2);
+
+	if (!market) {
+		return <div />;
+	}
+
 	return (
-		<Flex marginTop="2" marginBottom="2">
-			<Spacer />
-			<Box
-				onClick={() => {
-					onOutcomeChosen(1);
-				}}
-				backgroundColor="#C5E6DD"
-				borderColor="#00EBA9"
-				borderRadius={4}
-				borderWidth={outcomeChosen == 1 ? 6 : 1}
-				paddingLeft={18}
-				paddingRight={18}
-				// paddingTop={2}
-				// paddingBottom={2}
-				justifyContent={"space-between"}
-				alignItems={"center"}
-			>
-				<Text fontSize="15">{`YES ${roundValueTwoDP(
-					market.probability1
-				)}`}</Text>
-				<Text fontSize="12" fontWeight="bold">{`${
-					tradePosition ? roundValueTwoDP(tradePosition.amount1) : "0"
-				} shares`}</Text>
-			</Box>
-			<Spacer />
-			<Box
-				onClick={() => {
-					onOutcomeChosen(0);
-				}}
-				backgroundColor="#E9CFCC"
-				borderColor="#FF523E"
-				borderRadius={4}
-				borderWidth={outcomeChosen == 0 ? 6 : 1}
-				paddingLeft={18}
-				paddingRight={18}
-				justifyContent={"space-between"}
-				alignItems={"center"}
-			>
-				<Text fontSize="15">{`NO ${roundValueTwoDP(
-					market.probability0
-				)}`}</Text>
-				<Text fontSize="12" fontWeight="bold">{`${
-					tradePosition ? roundValueTwoDP(tradePosition.amount0) : "0"
-				} shares`}</Text>
-			</Box>
-			<Spacer />
+		<Flex flexDirection="column">
+			{account && account.toLowerCase() === market.oracle.delegate ? (
+				<>
+					<TwoColTitleInfo
+						title="Fee"
+						info={calculateResolveFee(market, chosenOutcome)}
+					/>
+					<Select
+						value={chosenOutcome}
+						onChange={(e) => {
+							setChosenOutcome(e.target.value);
+						}}
+						placeholder="Select Outcome"
+					>
+						<option value={0}>NO</option>
+
+						<option value={1}>YES</option>
+
+						<option value={2}>UNDECIDED</option>
+					</Select>
+					<Button
+						onClick={() => {
+							send(chosenOutcome, market.marketIdentifier);
+						}}
+					>
+						<Text>Declare Outcome</Text>
+					</Button>
+				</>
+			) : undefined}
+			<ChallengeHistoryTable stakeHistories={stakeHistories} />
 		</Flex>
 	);
 }
-export default TradePricesBoxes;
+
+export default ResolveInterface;

@@ -5,6 +5,7 @@ import {
 	Select,
 	NumberInput,
 	NumberInputField,
+	Image,
 } from "@chakra-ui/react";
 import { FiFile } from "react-icons/fi";
 import FileUpload from "./../components/FileUpload";
@@ -20,7 +21,8 @@ import { useEthers } from "@usedapp/core/packages/core";
 import { utils } from "ethers";
 
 function Page() {
-	const [selectImage, setSelectImage] = useState(null);
+	const [imageFile, setImageFile] = useState(null);
+	const [imageURL, setImageURL] = useState(null);
 	const [selectModerator, setSelectModerator] = useState(null);
 	const [fundingAmount, setFundingAmount] = useState(0);
 	const [betAmount, setBetAmount] = useState(0);
@@ -40,7 +42,6 @@ function Page() {
 	useEffect(async () => {
 		if (state.receipt) {
 			const res = await newPost(selectModerator, imageUrl);
-			console.log(res, " new post created");
 		}
 	}, [state]);
 
@@ -87,19 +88,36 @@ function Page() {
 
 	return (
 		<>
-			<FileUpload
-				accept={"image/*"}
-				onFileUpload={(file) => {
-					if (!validateFile(file)) {
-						//TODO throw mmax file size error
-						return;
-					}
-					setSelectImage(file);
-				}}
-			>
-				<Button leftIcon={<Icon as={FiFile} />}>Upload</Button>
-			</FileUpload>
-
+			{imageFile == null ? (
+				<FileUpload
+					accept={"image/*"}
+					onFileUpload={(file) => {
+						if (!validateFile(file)) {
+							//TODO throw mmax file size error
+							return;
+						}
+						setImageURL(URL.createObjectURL(file));
+						setImageFile(file);
+					}}
+				>
+					<Button leftIcon={<Icon as={FiFile} />}>
+						Choose Image
+					</Button>
+				</FileUpload>
+			) : undefined}
+			{imageURL != null ? (
+				<Image src={imageURL} width={500} />
+			) : undefined}
+			{imageFile != null ? (
+				<Button
+					onClick={() => {
+						setImageFile(null);
+						setImageURL(null);
+					}}
+				>
+					Remove
+				</Button>
+			) : undefined}
 			<Select
 				onChange={(e) => {
 					setSelectModerator(e.target.value);

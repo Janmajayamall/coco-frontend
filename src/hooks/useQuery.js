@@ -113,6 +113,49 @@ const QueryMarketByMarketIdentifier = `
 			timestamp
 			oracle{
      			id
+				delegate
+    		}
+			oToken0Id
+			oToken1Id
+			sToken0Id
+			sToken1Id
+		}
+	}
+`;
+
+const QueryMarketsAtStage3ByOracles = `
+	query ($oracles: [Bytes!]!) {
+		markets(where: {oracle_in: $oracles}) {
+			id
+			creator
+			eventIdentifier
+			marketIdentifier
+			outcomeReserve0
+			outcomeReserve1
+			probability0
+			probability1
+			stakingReserve0
+			stakingReserve1
+			tokenC
+			feeNumerator
+			feeDenominator
+			fee
+			expireAtBlock
+			donBufferEndsAtBlock
+			resolutionEndsAtBlock
+			donBufferBlocks
+			resolutionBufferBlocks
+			donEscalationCount
+			donEscalationLimit
+			outcome
+			stage
+			staker0
+			staker1
+			lastAmountStaked
+			lastOutcomeStaked
+			timestamp
+			oracle{
+     			id
     		}
 			oToken0Id
 			oToken1Id
@@ -166,6 +209,38 @@ const QueryMarketTradeAndStakeInfoByUser = `
 				timestamp
 			}
 		}
+`;
+
+const QueryOraclesByManager = `
+  query ($manager: Bytes!) {
+	oracles(where:{manager: $manager}){
+		id
+		delegate
+		manager
+		collateralToken
+		isActive
+		feeNumerator
+		feeDenominator
+		donEscalationLimit
+		expireBufferBlocks
+		donBufferBlocks
+		resolutionBufferBlocks
+		factory
+	}
+  }
+
+`;
+
+const QueryTokenApprovalsByUserAndOracle = `
+  query ($user: Bytes!, $oracle: Bytes) {
+	tokenApprovals(where:{user: $user, oracle: $oracle}){
+		id
+		user
+		oracle
+		operator
+		approved
+	}
+  }
 `;
 
 const QueryAllOracles = `
@@ -282,6 +357,43 @@ export function useQueryMarketTradeAndStakeInfoByUser(
 	};
 }
 
+export function useQueryTokenApprovalsByUserAndOracle(user, oracle, pause) {
+	const [result, reexecuteQuery] = useQuery({
+		query: QueryTokenApprovalsByUserAndOracle,
+		variables: {
+			user,
+			oracle,
+		},
+		pause,
+	});
+	return {
+		result,
+		reexecuteQuery,
+	};
+}
+
+export function useQueryOraclesByManager(manager, pause = false) {
+	const [result, reexecuteQuery] = useQuery({
+		query: QueryOraclesByManager,
+		variables: { manager },
+		pause,
+	});
+	return { result, reexecuteQuery };
+}
+
+export function useQueryMarketsAtStage3ByOracles(oracles, pause = false) {
+	const [result, reexecuteQuery] = useQuery({
+		query: QueryMarketsAtStage3ByOracles,
+		variables: { oracles },
+		pause,
+	});
+	return { result, reexecuteQuery };
+}
+
+/**
+ * Below are the old ones
+ */
+
 export function useQueryAllOracles() {
 	const [result, reexecuteQuery] = useQuery({
 		query: QueryAllOracles,
@@ -315,7 +427,7 @@ export function useQueryOracleById(id, pause = false) {
 	};
 }
 
-export function useQueryFeedByModeratorList(moderators) {
+export function useQueryFeedByModeratorList(moderators, pause = false) {
 	const [result, reexecuteQuery] = useQuery({
 		query: QueryFeedByModeratorList,
 		variables: { moderators },

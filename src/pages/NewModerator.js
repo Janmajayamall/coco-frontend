@@ -21,7 +21,7 @@ import { useQueryOracleByDelegate } from "./../hooks";
 function Page() {
 	const { chainId, account } = useEthers();
 	const { result, reexecuteQuery } = useQueryOracleByDelegate(account);
-	const [fee, setFee] = useState(0.1);
+	const [fee, setFee] = useState("0");
 	const [escalationLimit, setEscalationLimit] = useState(5);
 	const [expireHours, setExpireHours] = useState();
 	const [bufferHours, setBufferHours] = useState(10);
@@ -39,7 +39,6 @@ function Page() {
 			const res = await updateModerator(oracleAddress, {
 				name,
 			});
-			console.log(res, " moderator updated");
 		}
 	}, [state]);
 
@@ -50,8 +49,9 @@ function Page() {
 		// return;
 
 		// fee calc
-		const feeNumerator = fee * 100;
-		const feeDenominator = 100;
+		const feeNumerator = Number(fee) * 1000;
+		const feeDenominator = 1000;
+		
 
 		// validation checks
 		send(
@@ -63,8 +63,8 @@ function Page() {
 			10,
 			5,
 			convertHoursToBlocks(chainId, 0.1),
-			convertHoursToBlocks(chainId, 1),
-			convertHoursToBlocks(chainId, 0.2)
+			convertHoursToBlocks(chainId, 0.1),
+			convertHoursToBlocks(chainId, 0.1)
 		);
 	}
 
@@ -84,7 +84,7 @@ function Page() {
 				defaultValue={0}
 				precision={3}
 				value={fee}
-				max={100}
+				max={1}
 			>
 				<NumberInputField />
 			</NumberInput>
