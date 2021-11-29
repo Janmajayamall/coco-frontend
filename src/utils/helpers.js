@@ -672,18 +672,26 @@ export function calculateResolveFee(market, outcome) {
 }
 
 export function filterMarketsByStage(markets, stage) {
-	return markets.find((market) => market.stateMetadata.stage == stage);
+	return markets.filter((market) => market.stateMetadata.stage == stage);
 }
 
 export function filterMarketsByClaim(markets, tokenBalancesObj) {
-	return markets.forEach((market) => {
-		let res = [];
+	let res = [];
+	markets.forEach((market) => {
 		if (market.stateMetadata.stage == 4) {
 			let outcome = determineOutcome(market);
-			let oAmount0 = tokenBalancesObj[market.oToken0Id];
-			let oAmount1 = tokenBalancesObj[market.oToken1Id];
-			let sAmount0 = tokenBalancesObj[market.sToken0Id];
-			let sAmount1 = tokenBalancesObj[market.sToken1Id];
+			let oAmount0 = tokenBalancesObj[market.oToken0Id]
+				? tokenBalancesObj[market.oToken0Id].balance
+				: ZERO_DECIMAL_STR;
+			let oAmount1 = tokenBalancesObj[market.oToken1Id]
+				? tokenBalancesObj[market.oToken1Id].balance
+				: ZERO_DECIMAL_STR;
+			let sAmount0 = tokenBalancesObj[market.sToken0Id]
+				? tokenBalancesObj[market.sToken0Id].balance
+				: ZERO_DECIMAL_STR;
+			let sAmount1 = tokenBalancesObj[market.sToken1Id]
+				? tokenBalancesObj[market.sToken1Id].balance
+				: ZERO_DECIMAL_STR;
 			if (
 				outcome == 0 &&
 				(!parseDecimalToBN(oAmount0).isZero() ||
@@ -708,12 +716,13 @@ export function filterMarketsByClaim(markets, tokenBalancesObj) {
 				res.push(market);
 			}
 		}
-		return res;
 	});
+	return res;
 }
 
 export function filterMarketsByCreator(markets, account) {
-	return markets.find((market) =>
-		market.creator == account ? account.toLowerCase() : ""
-	);
+	if (!account) {
+		return [];
+	}
+	return markets.filter((market) => market.creator == account.toLowerCase());
 }
