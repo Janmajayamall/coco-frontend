@@ -1,3 +1,4 @@
+import { border } from "@chakra-ui/styled-system";
 import axios from "axios";
 import { signMessage } from ".";
 import { generateRequestSignatures } from "./auth";
@@ -140,8 +141,41 @@ export async function updateModerator(oracleAddress, details) {
 	} catch (e) {}
 }
 
-export async function uploadImage() {
-	return "adwadiuahwo";
+export async function getPresignedUrl() {
+	const msg = {
+		value: "upload",
+	};
+	const signatures = generateRequestSignatures(msg);
+	if (!signatures) {
+		return;
+	}
+	try {
+		const { data } = await baseInstance.request({
+			url: "/post/upload",
+			method: "POST",
+			data: {
+				signatures,
+				msg,
+			},
+		});
+
+		return data.response;
+	} catch (e) {}
+}
+
+export async function uploadImageFile(presignedUrl, imageFile) {
+	try {
+		const { data } = await axios.request({
+			url: presignedUrl,
+			method: "PUT",
+			headers: {
+				"Content-type": "multipart/form-data",
+			},
+			data: imageFile,
+		});
+
+		return presignedUrl;
+	} catch (e) {}
 }
 
 export async function findModerators(filter) {

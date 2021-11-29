@@ -20,7 +20,6 @@ import {
 	stateSetupOraclesInfo,
 	filterMarketIdentifiersFromMarketsGraph,
 	populateMarketWithMetadata,
-	toCheckSumAddress,
 } from "./../utils";
 import {
 	useCreateNewMarket,
@@ -65,7 +64,7 @@ function Page() {
 		}
 
 		const oracleIds = oraclesResult.data.oracles.map((obj) => {
-			return toCheckSumAddress(obj.id);
+			return obj.id;
 		});
 		await stateSetupOraclesInfo(oracleIds, dispatch);
 		const d = oracleIds.map((id) => id.toLowerCase());

@@ -5,7 +5,7 @@ import {
 	createHotAccount,
 	getAccountNonce,
 	loginUser,
-	toCheckSumAddress,
+
 	getUser,
 } from "./../utils";
 import { useEthers } from "@usedapp/core/packages/core";

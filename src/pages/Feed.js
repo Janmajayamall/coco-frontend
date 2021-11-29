@@ -30,7 +30,6 @@ import { useEffect, useState } from "react";
 import {
 	newPost,
 	updateModerator,
-	toCheckSumAddress,
 	getUser,
 	findAllFollows,
 	filterOracleIdsFromMarketsGraph,
@@ -285,7 +284,7 @@ function Page() {
 								size="sm"
 								variant="solid"
 							>
-								{groupsFollowed[toCheckSumAddress(groupId)]
+								{groupsFollowed[groupId]
 									? "Leave Group"
 									: "Join Group"}
 							</Button>

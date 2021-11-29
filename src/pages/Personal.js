@@ -33,7 +33,6 @@ import { useEffect, useState } from "react";
 import {
 	newPost,
 	updateModerator,
-	toCheckSumAddress,
 	getUser,
 	findAllFollows,
 	filterOracleIdsFromMarketsGraph,

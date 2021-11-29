@@ -11,7 +11,6 @@ import {
 	convertHoursToBlocks,
 	retrieveOracleAddressFormLogs,
 	updateModerator,
-	toCheckSumAddress,
 } from "./../utils";
 import { useCreateNewOracle } from "./../hooks";
 import { useEthers } from "@usedapp/core/packages/core";
@@ -51,7 +50,6 @@ function Page() {
 		// fee calc
 		const feeNumerator = Number(fee) * 1000;
 		const feeDenominator = 1000;
-		
 
 		// validation checks
 		send(

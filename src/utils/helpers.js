@@ -1,5 +1,4 @@
-import { toCheckSumAddress } from "./auth";
-import Web3 from "web3";
+import {} from "./auth";
 import { BigNumber, ethers, utils } from "ethers";
 import { useState } from "react";
 import { useEffect } from "react";
@@ -9,7 +8,6 @@ export const TWO_BN = BigNumber.from("2");
 export const FOUR_BN = BigNumber.from("4");
 export const ZERO_DECIMAL_STR = "0";
 
-const web3 = new Web3();
 /**
  * Filters oracle ids from market schema returns by Graph index
  * @note Oracle ids are oracle addresses, thus the value returned
@@ -19,7 +17,7 @@ export function filterOracleIdsFromMarketsGraph(markets) {
 	const oracleIds = [];
 	markets.forEach((market) => {
 		if (market.oracle && market.oracle.id) {
-			oracleIds.push(toCheckSumAddress(market.oracle.id));
+			oracleIds.push(market.oracle.id);
 		}
 	});
 	return oracleIds;
@@ -49,13 +47,11 @@ export function populateMarketWithMetadata(
 
 	return {
 		...market,
-		oracleInfo: oraclesInfo[toCheckSumAddress(market.oracle.id)],
+		oracleInfo: oraclesInfo[market.oracle.id],
 		imageUrl: marketsMetadata[market.marketIdentifier]
 			? marketsMetadata[market.marketIdentifier].eventIdentifierStr
 			: undefined,
-		follow: groupsFollowed[toCheckSumAddress(market.oracle.id)]
-			? toCheckSumAddress(market.oracle.id)
-			: false,
+		follow: groupsFollowed[market.oracle.id] ? market.oracle.id : false,
 		stateMetadata: {
 			stage,
 			blocksLeft,

@@ -17,17 +17,8 @@ export function convertHoursToBlocks(chainId, hours) {
 
 export function retrieveOracleAddressFormLogs(logs) {
 	const oracleAddress = logs[2].topics[1];
-	return web3.utils.toChecksumAddress(`0x${oracleAddress.slice(26)}`);
+	return `0x${oracleAddress.slice(26)}`.toLowerCase();
 }
-
-export function toCheckSumAddress(address) {
-	try {
-		return web3.utils.toChecksumAddress(address);
-	} catch (e) {
-		return undefined;
-	}
-}
-
 export async function getOracleDetails(address) {
 	// try {
 	// 	const oracleContract = new web3.eth.Contract(OracleAbi, address);

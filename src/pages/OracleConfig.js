@@ -13,12 +13,7 @@ import {
 import { useEthers } from "@usedapp/core/packages/core";
 import { useSearchParams, useParams } from "react-router-dom";
 import { useQueryOracleById } from "./../hooks";
-import {
-	toCheckSumAddress,
-	getOracleDetails,
-	updateModerator,
-	findModerators,
-} from "./../utils";
+import { getOracleDetails, updateModerator, findModerators } from "./../utils";
 
 function Page() {
 	const { account } = useEthers();
@@ -41,7 +36,7 @@ function Page() {
 			setOracleDetails(oracleDetails);
 
 			const res = await findModerators({
-				address: toCheckSumAddress(oracleAddress),
+				address: oracleAddress,
 			});
 			if (res.moderators.length > 0) {
 				setOracleMetaData(res.moderators[0]);
@@ -54,7 +49,7 @@ function Page() {
 	}
 
 	async function updateModeratorHelper() {
-		const res = await updateModerator(toCheckSumAddress(oracleAddress), {
+		const res = await updateModerator(oracleAddress, {
 			name,
 		});
 

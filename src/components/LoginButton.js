@@ -5,7 +5,7 @@ import {
 	createHotAccount,
 	getAccountNonce,
 	loginUser,
-	toCheckSumAddress,
+
 	getUser,
 } from "./../utils";
 import { useEthers } from "@usedapp/core/packages/core";
@@ -26,7 +26,7 @@ function LoginButton() {
 		}
 
 		// account Nonce
-		var res = await getAccountNonce(toCheckSumAddress(accounts[0]));
+		var res = await getAccountNonce(accounts[0]);
 		if (!res) {
 			//TODO show error & return
 			return;

@@ -15,6 +15,7 @@ import {
 	newPost,
 	newPostTrial,
 	findModerators,
+	getPresignedUrl,
 } from "./../utils";
 import { useCreateNewMarket } from "./../hooks";
 import { useEthers } from "@usedapp/core/packages/core";
@@ -45,6 +46,13 @@ function Page() {
 		}
 	}, [state]);
 
+	useEffect(async () => {
+		if (!imageURL || imageURL.length == 0) {
+			return;
+		}
+		newPostTxHelper();
+	}, [imageURL]);
+
 	function validateFile(file) {
 		const fsMb = file.size / (1024 * 1024);
 		const MAX_FILE_SIZE = 10;
@@ -61,12 +69,11 @@ function Page() {
 		// 	"0x4838e42180000000000000000000000000000000000000000000000000000000"
 		// );
 		// return;
-
-		// const _imageUrl = await uploadImage();
+		// const presignedUrl = await getPresignedUrl();
+		// const _imageUrl = await uploadImageFile(presignedUrl);
 		const _imageUrl =
 			"https://www.figmakets-for-Content?node-id=137%3A16730";
 		setImageUrl(_imageUrl);
-		newPostTxHelper();
 	}
 
 	async function newPostTxHelper() {

@@ -1,7 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { act } from "react-dom/test-utils";
 import { useSelector } from "react-redux";
-import { toCheckSumAddress } from "./../../utils";
 
 const initialState = { oraclesInfoObj: new Object() };
 
@@ -20,12 +19,8 @@ const slice = createSlice({
 				};
 				action.payload.forEach((info) => {
 					if (info.oracleAddress) {
-						updateOraclesInfo[
-							toCheckSumAddress(info.oracleAddress)
-						] = {
-							oracleAddress: toCheckSumAddress(
-								info.oracleAddress
-							),
+						updateOraclesInfo[info.oracleAddress] = {
+							oracleAddress: info.oracleAddress,
 							name: info.name,
 						};
 					}

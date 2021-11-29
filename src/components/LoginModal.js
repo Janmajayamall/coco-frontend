@@ -35,7 +35,7 @@ import {
 	createHotAccount,
 	getAccountNonce,
 	loginUser,
-	toCheckSumAddress,
+
 } from "../utils";
 import { useNavigate } from "react-router";
 
@@ -54,7 +54,7 @@ function LoginModal() {
 			return;
 		}
 
-		let res = await getAccountNonce(toCheckSumAddress(account));
+		let res = await getAccountNonce(account);
 		if (!res) {
 			return;
 		}
@@ -70,13 +70,11 @@ function LoginModal() {
 			],
 		});
 
-
 		// login user
 		res = await loginUser(signature, address, accountNonce);
 		if (!res) {
 			return;
 		}
-
 
 		// store creds locally
 		localStorage.setItem("hotPvKey", privateKey);
