@@ -5,6 +5,7 @@ import PostDisplay from "./components/PostDisplay";
 import NewPost from "./pages/NewPost";
 import NewModerator from "./pages/NewModerator";
 import OracleConfig from "./pages/OracleConfig";
+import Personal from "./pages/Personal";
 import Explore from "./pages/Explore";
 import Feed from "./pages/Feed";
 import Post from "./pages/Post";
@@ -163,6 +164,7 @@ function App() {
 				<Route path="/" element={<Feed />} />
 				<Route path="/post/:postId" element={<Post />} />
 				<Route path="/pages" element={<Pages />} />
+				<Route path="/personal" element={<Personal />} />
 			</Routes>
 		</div>
 	);

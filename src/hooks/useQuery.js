@@ -228,7 +228,53 @@ const QueryOraclesByManager = `
 		factory
 	}
   }
+`;
 
+const QueryMarketsByUserInteraction = `
+  query ($user: Bytes!) {
+	user(id: $user){
+		markets{
+			market{
+				id
+				marketIdentifier
+				creator
+				eventIdentifier
+				marketIdentifier
+				outcomeReserve0
+				outcomeReserve1
+				probability0
+				probability1
+				stakingReserve0
+				stakingReserve1
+				tokenC
+				feeNumerator
+				feeDenominator
+				fee
+				expireAtBlock
+				donBufferEndsAtBlock
+				resolutionEndsAtBlock
+				donBufferBlocks
+				resolutionBufferBlocks
+				donEscalationCount
+				donEscalationLimit
+				outcome
+				stage
+				staker0
+				staker1
+				lastAmountStaked
+				lastOutcomeStaked
+				timestamp
+				oracle{
+					id
+				}
+				oToken0Id
+				oToken1Id
+				sToken0Id
+				sToken1Id
+			}
+		}
+	}
+  }
 `;
 
 const QueryTokenApprovalsByUserAndOracle = `
@@ -239,6 +285,19 @@ const QueryTokenApprovalsByUserAndOracle = `
 		oracle
 		operator
 		approved
+	}
+  }
+`;
+
+const QueryTokenBalancesByUser = `
+  query ($user: Bytes!) {
+	  tokenBalances(where:{user: $user}){
+		id
+		user
+		oracle
+		market
+		tokenId
+		balance
 	}
   }
 `;
@@ -385,6 +444,23 @@ export function useQueryMarketsAtStage3ByOracles(oracles, pause = false) {
 	const [result, reexecuteQuery] = useQuery({
 		query: QueryMarketsAtStage3ByOracles,
 		variables: { oracles },
+		pause,
+	});
+	return { result, reexecuteQuery };
+}
+
+export function useQueryMarketsByUserInteraction(user, pause = false) {
+	const [result, reexecuteQuery] = useQuery({
+		query: QueryMarketsByUserInteraction,
+		variables: { user },
+		pause,
+	});
+	return { result, reexecuteQuery };
+}
+export function useQueryTokenBalancesByUser(user, pause = false) {
+	const [result, reexecuteQuery] = useQuery({
+		query: QueryTokenBalancesByUser,
+		variables: { user },
 		pause,
 	});
 	return { result, reexecuteQuery };

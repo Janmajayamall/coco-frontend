@@ -670,3 +670,50 @@ export function calculateResolveFee(market, outcome) {
 	}
 	return formatBNToDecimal(fee);
 }
+
+export function filterMarketsByStage(markets, stage) {
+	return markets.find((market) => market.stateMetadata.stage == stage);
+}
+
+export function filterMarketsByClaim(markets, tokenBalancesObj) {
+	return markets.forEach((market) => {
+		let res = [];
+		if (market.stateMetadata.stage == 4) {
+			let outcome = determineOutcome(market);
+			let oAmount0 = tokenBalancesObj[market.oToken0Id];
+			let oAmount1 = tokenBalancesObj[market.oToken1Id];
+			let sAmount0 = tokenBalancesObj[market.sToken0Id];
+			let sAmount1 = tokenBalancesObj[market.sToken1Id];
+			if (
+				outcome == 0 &&
+				(!parseDecimalToBN(oAmount0).isZero() ||
+					!parseDecimalToBN(sAmount0))
+			) {
+				res.push(market);
+			}
+			if (
+				outcome == 1 &&
+				(!parseDecimalToBN(oAmount1).isZero() ||
+					!parseDecimalToBN(sAmount1))
+			) {
+				res.push(market);
+			}
+			if (
+				outcome == 2 &&
+				(!parseDecimalToBN(oAmount1).isZero() ||
+					!parseDecimalToBN(sAmount1) ||
+					!parseDecimalToBN(oAmount0).isZero() ||
+					!parseDecimalToBN(sAmount0))
+			) {
+				res.push(market);
+			}
+		}
+		return res;
+	});
+}
+
+export function filterMarketsByCreator(markets, account) {
+	return markets.find((market) =>
+		market.creator == account ? account.toLowerCase() : ""
+	);
+}
