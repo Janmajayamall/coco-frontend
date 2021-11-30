@@ -91,7 +91,7 @@ function App() {
 	useEffect(() => {
 		const interval = setInterval(async () => {
 			const blockNumber = await getRinkebyLatestBlockNumber();
-			console.log(blockNumber, " blockNumber");
+
 			dispatch(sUpdateRinkebyLatestBlockNumber(blockNumber));
 		}, 5000);
 		return () => clearInterval(interval);

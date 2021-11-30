@@ -116,7 +116,7 @@ function Page() {
 		queryOracles,
 		true
 	);
-	console.log(result0, result1);
+
 	// initial graph protocol call
 	useEffect(() => {
 		setMarkets([]);
@@ -364,7 +364,6 @@ function Page() {
 				</Heading>
 				<Flex flexDirection={"column"}>
 					{popularGroups.map((group) => {
-						console.log(group, " djaiodjaoi");
 						return (
 							<Flex>
 								<Text>{group.name}</Text>

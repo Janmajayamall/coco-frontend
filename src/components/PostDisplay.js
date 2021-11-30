@@ -20,7 +20,7 @@ import { sUpdatePostTradeModal, sAddGroupFollow } from "./../redux/reducers";
 
 function PostDisplay({ market, onImageClick }) {
 	const dispatch = useDispatch();
-	console.log(market, "post display market");
+
 	if (!market || !market.oracleInfo) {
 		return <div />;
 	}
@@ -50,9 +50,8 @@ function PostDisplay({ market, onImageClick }) {
 
 					<Text
 						onClick={async () => {
-							console.log(market.oracle.id, "djaioja");
 							const res = await followModerator(market.oracle.id);
-							console.log(res, "daoi");
+
 							if (res == undefined) {
 								return;
 							}

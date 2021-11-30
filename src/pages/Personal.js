@@ -107,7 +107,6 @@ function Page() {
 
 	const [markets, setMarkets] = useState([]);
 	const [filteredMarkets, setFilteredMarkets] = useState([]);
-	console.log(filteredMarkets, " filteredMarkets");
 	const [filter, setFilter] = useState(0);
 	const [tokenBalancesObj, setTokenBalancesObj] = useState({});
 

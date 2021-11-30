@@ -17,7 +17,6 @@ export function convertHoursToBlocks(chainId, hours) {
 
 export function convertBlocksToHours(chainId, blocks) {
 	if (chainId == 421611) {
-		console.log(blocks, "saosjaoi");
 		return (blocks * 15) / 3600;
 	}
 	return 0;

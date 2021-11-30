@@ -56,9 +56,6 @@ function Page() {
 		reexecuteQuery: marketsToResolveReexecuteQuery,
 	} = useQueryMarketsAtStage3ByOracles(oracleIds, true);
 
-	console.log(oraclesResult);
-	console.log(marketsToResolveResult);
-
 	useEffect(async () => {
 		if (oraclesResult.data == undefined) {
 			return;
@@ -83,7 +80,7 @@ function Page() {
 		if (marketsToResolveResult.data == undefined) {
 			return;
 		}
-		console.log(marketsToResolveResult, " marketsToResolveResult");
+
 		await stateSetupMarketsMetadata(
 			filterMarketIdentifiersFromMarketsGraph(
 				marketsToResolveResult.data.markets
@@ -106,8 +103,7 @@ function Page() {
 								marketsMetadata,
 								groupsFollowed
 							);
-							console.log(oraclesInfoObj, " oraclesInfoObj");
-							console.log(populatedMarket, " populatedMarket");
+
 							return (
 								<PostDisplay
 									market={populatedMarket}
