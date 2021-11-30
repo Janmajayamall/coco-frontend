@@ -15,6 +15,7 @@ import {
 	SliderTrack,
 	SliderFilledTrack,
 	SliderThumb,
+	IconButton,
 } from "@chakra-ui/react";
 
 import { useEthers } from "@usedapp/core/packages/core";
@@ -43,6 +44,7 @@ import {
 	numStrFormatter,
 	stateSetupOraclesInfo,
 	stateSetupMarketsMetadata,
+	unfollowModerator,
 } from "../utils";
 import {
 	sUpdateProfile,
@@ -52,6 +54,9 @@ import {
 	sUpdateMarketsMetadata,
 	sUpdateGroupsFollowed,
 	selectGroupsFollowed,
+	selectRinkebyLatestBlockNumber,
+	sAddGroupFollow,
+	sDeleteGroupFollow,
 } from "../redux/reducers";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -88,6 +93,9 @@ function Page() {
 	const oraclesInfoObj = useSelector(selectOracleInfoObj);
 	const marketsMetadata = useSelector(selectMarketsMetadata);
 	const groupsFollowed = useSelector(selectGroupsFollowed);
+	const rinkebyLatestBlockNumber = useSelector(
+		selectRinkebyLatestBlockNumber
+	);
 
 	const [pagination, setPagination] = useState({ first: 0, skip: 0 });
 	const [queryOracles, setQueryOracles] = useState([]);
@@ -108,7 +116,7 @@ function Page() {
 		queryOracles,
 		true
 	);
-
+	console.log(result0, result1);
 	// initial graph protocol call
 	useEffect(() => {
 		setMarkets([]);
@@ -176,8 +184,10 @@ function Page() {
 	useEffect(async () => {
 		const ignoreList = Object.keys(groupsFollowed);
 		let res = await findPopularModerators(ignoreList);
-
-		// setPopularGroups(res.moderators);
+		if (res == undefined) {
+			return;
+		}
+		setPopularGroups(res.moderators);
 	}, []);
 
 	useEffect(async () => {
@@ -186,7 +196,6 @@ function Page() {
 			dispatch(sUpdateProfile(res.user));
 		}
 		res = await findAllFollows();
-
 		if (res != undefined) {
 			dispatch(sUpdateGroupsFollowed(res.relations));
 		}
@@ -273,8 +282,7 @@ function Page() {
 						</Flex>
 						<Flex marginBottom={5}>
 							<Text fontSize="sm">
-								Group description. This group is only for good
-								posts. Please avoid posting any bad posts
+								{groupDetails.description}
 							</Text>
 						</Flex>
 						<Flex>
@@ -293,8 +301,33 @@ function Page() {
 				) : undefined}
 				{feedType == 0 || feedType == 1 ? (
 					<Flex justifyContent="center" margin={5}>
-						<FireIcon marginRight={5} w={10} h={10} />
-						<HomeIcon marginLeft={5} w={10} h={10} />
+						<IconButton
+							onClick={() => {
+								if (location.pathname == "/explore") {
+									return;
+								}
+								navigate("/explore");
+							}}
+							colorScheme={
+								feedType == 0 ? "twitter" : "whiteAlpha"
+							}
+							padding="1"
+							icon={<FireIcon w={10} h={10} />}
+						/>
+
+						<IconButton
+							onClick={() => {
+								if (location.pathname == "/home") {
+									return;
+								}
+								navigate("/home");
+							}}
+							colorScheme={
+								feedType == 1 ? "twitter" : "whiteAlpha"
+							}
+							padding="1"
+							icon={<HomeIcon w={10} h={10} />}
+						/>
 					</Flex>
 				) : undefined}
 				{markets.map((market) => {
@@ -302,12 +335,21 @@ function Page() {
 						market,
 						oraclesInfoObj,
 						marketsMetadata,
-						groupsFollowed
+						groupsFollowed,
+						rinkebyLatestBlockNumber
 					);
+
 					if (!populatedMarket.oracleInfo) {
 						return;
 					}
-					return <PostDisplay market={populatedMarket} />;
+					return (
+						<PostDisplay
+							market={populatedMarket}
+							onImageClick={(marketIdentifier) => {
+								navigate(`/post/${marketIdentifier}`);
+							}}
+						/>
+					);
 				})}
 			</Flex>
 			<Flex
@@ -322,20 +364,50 @@ function Page() {
 				</Heading>
 				<Flex flexDirection={"column"}>
 					{popularGroups.map((group) => {
+						console.log(group, " djaiodjaoi");
 						return (
 							<Flex>
 								<Text>{group.name}</Text>
 								<Spacer />
-								<Button
-									onClick={async () => {
-										await followModerator(
-											group.oracleAddress
-										);
-									}}
-									size="sm"
-								>
-									daow
-								</Button>
+								{groupsFollowed[group.oracleAddress] != true ? (
+									<Button
+										onClick={async () => {
+											const res = await followModerator(
+												group.oracleAddress
+											);
+											if (res == undefined) {
+												return;
+											}
+											dispatch(
+												sAddGroupFollow(
+													group.oracleAddress
+												)
+											);
+										}}
+										size="sm"
+									>
+										Follow
+									</Button>
+								) : (
+									<Button
+										onClick={async () => {
+											const res = await unfollowModerator(
+												group.oracleAddress
+											);
+											if (res == undefined) {
+												return;
+											}
+											dispatch(
+												sDeleteGroupFollow(
+													group.oracleAddress
+												)
+											);
+										}}
+										size="sm"
+									>
+										Unfollow
+									</Button>
+								)}
 							</Flex>
 						);
 					})}

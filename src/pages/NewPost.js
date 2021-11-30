@@ -23,12 +23,11 @@ import { utils } from "ethers";
 
 function Page() {
 	const [imageFile, setImageFile] = useState(null);
-	const [imageURL, setImageURL] = useState(null);
+	const [imageUrl, setImageUrl] = useState(null);
 	const [selectModerator, setSelectModerator] = useState(null);
 	const [fundingAmount, setFundingAmount] = useState(0);
 	const [betAmount, setBetAmount] = useState(0);
-	const [imageUrl, setImageUrl] = useState("");
-
+	const [loading, setLoading] = useState(false);
 	const [moderators, setModerators] = useState([]);
 
 	const { account } = useEthers();
@@ -46,12 +45,12 @@ function Page() {
 		}
 	}, [state]);
 
-	useEffect(async () => {
-		if (!imageURL || imageURL.length == 0) {
+	useEffect(() => {
+		if (imageUrl == undefined || imageUrl == "") {
 			return;
 		}
 		newPostTxHelper();
-	}, [imageURL]);
+	}, [imageUrl]);
 
 	function validateFile(file) {
 		const fsMb = file.size / (1024 * 1024);
@@ -71,8 +70,8 @@ function Page() {
 		// return;
 		// const presignedUrl = await getPresignedUrl();
 		// const _imageUrl = await uploadImageFile(presignedUrl);
-		const _imageUrl =
-			"https://www.figmakets-for-Content?node-id=137%3A16730";
+		const _imageUrl = "https://www.finode-id=137%3A16730";
+		console.log(_imageUrl);
 		setImageUrl(_imageUrl);
 	}
 
@@ -83,7 +82,6 @@ function Page() {
 		// validation checks
 		// check image url is not empty
 		// check rest of the values are fine as well
-
 		send(
 			keccak256(imageUrl),
 			selectModerator,
@@ -103,7 +101,7 @@ function Page() {
 							//TODO throw mmax file size error
 							return;
 						}
-						setImageURL(URL.createObjectURL(file));
+						setImageUrl(URL.createObjectURL(file));
 						setImageFile(file);
 					}}
 				>
@@ -112,14 +110,14 @@ function Page() {
 					</Button>
 				</FileUpload>
 			) : undefined}
-			{imageURL != null ? (
-				<Image src={imageURL} width={500} />
+			{imageUrl != null ? (
+				<Image src={imageUrl} width={500} />
 			) : undefined}
 			{imageFile != null ? (
 				<Button
 					onClick={() => {
 						setImageFile(null);
-						setImageURL(null);
+						setImageUrl(null);
 					}}
 				>
 					Remove

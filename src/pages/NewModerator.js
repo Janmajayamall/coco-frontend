@@ -60,9 +60,9 @@ function Page() {
 			1,
 			10,
 			5,
-			convertHoursToBlocks(chainId, 0.1),
-			convertHoursToBlocks(chainId, 0.1),
-			convertHoursToBlocks(chainId, 0.1)
+			convertHoursToBlocks(chainId, 0.05),
+			convertHoursToBlocks(chainId, 0.05),
+			convertHoursToBlocks(chainId, 0.05)
 		);
 	}
 
@@ -102,7 +102,7 @@ function Page() {
 					setExpireHours(val);
 				}}
 				defaultValue={0}
-				precision={0}
+				precision={2}
 			>
 				<NumberInputField />
 			</NumberInput>
@@ -112,7 +112,7 @@ function Page() {
 					setBufferHours(val);
 				}}
 				defaultValue={0}
-				precision={0}
+				precision={2}
 			>
 				<NumberInputField />
 			</NumberInput>
@@ -122,7 +122,7 @@ function Page() {
 					setResolutionHours(val);
 				}}
 				defaultValue={0}
-				precision={0}
+				precision={2}
 			>
 				<NumberInputField />
 			</NumberInput>

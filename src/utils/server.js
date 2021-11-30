@@ -281,7 +281,7 @@ export async function unfollowModerator(moderatorAddress) {
 				msg,
 			},
 		});
-
+		console.log(data, " data fromm unfollow");
 		return data.response;
 	} catch (e) {}
 }

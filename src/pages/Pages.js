@@ -7,9 +7,10 @@ import {
 	NumberInputField,
 	Image,
 	Text,
+	Flex,
 } from "@chakra-ui/react";
 import { FiFile } from "react-icons/fi";
-import FileUpload from "./../components/FileUpload";
+import FileUpload from "../components/FileUpload";
 import {
 	uploadImage,
 	keccak256,
@@ -20,12 +21,12 @@ import {
 	stateSetupOraclesInfo,
 	filterMarketIdentifiersFromMarketsGraph,
 	populateMarketWithMetadata,
-} from "./../utils";
+} from "../utils";
 import {
 	useCreateNewMarket,
 	useQueryOraclesByManager,
 	useQueryMarketsAtStage3ByOracles,
-} from "./../hooks";
+} from "../hooks";
 import { useEthers } from "@usedapp/core/packages/core";
 import { utils } from "ethers";
 import { useDispatch, useSelector } from "react-redux";
@@ -95,31 +96,36 @@ function Page() {
 	// show all posts that need attention
 
 	return (
-		<>
-			{marketsToResolveResult.data
-				? marketsToResolveResult.data.markets.map((market) => {
-						const populatedMarket = populateMarketWithMetadata(
-							market,
-							oraclesInfoObj,
-							marketsMetadata,
-							groupsFollowed
-						);
-						console.log(oraclesInfoObj, " oraclesInfoObj");
-						console.log(populatedMarket, " populatedMarket");
-						return (
-							<PostDisplay
-								market={populatedMarket}
-								onImageClick={(marketIdentifier) => {
-									navigate(`/post/${marketIdentifier}`);
-								}}
-							/>
-						);
-				  })
-				: undefined}
-			{oracleIds.map((id) => {
-				return <Text>{id}</Text>;
-			})}
-		</>
+		<Flex flexDirection="row">
+			<Flex flexDirection="column">
+				{marketsToResolveResult.data
+					? marketsToResolveResult.data.markets.map((market) => {
+							const populatedMarket = populateMarketWithMetadata(
+								market,
+								oraclesInfoObj,
+								marketsMetadata,
+								groupsFollowed
+							);
+							console.log(oraclesInfoObj, " oraclesInfoObj");
+							console.log(populatedMarket, " populatedMarket");
+							return (
+								<PostDisplay
+									market={populatedMarket}
+									onImageClick={(marketIdentifier) => {
+										navigate(`/post/${marketIdentifier}`);
+									}}
+								/>
+							);
+					  })
+					: undefined}
+			</Flex>
+			<Flex flexDirection="column">
+				<Text>Groups you manage or delegate</Text>
+				{oracleIds.map((id) => {
+					return <Text>{id}</Text>;
+				})}
+			</Flex>
+		</Flex>
 	);
 }
 

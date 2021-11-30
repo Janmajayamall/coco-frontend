@@ -121,3 +121,20 @@ export function useSetOutcome(oracleAddress) {
 		send,
 	};
 }
+
+export function useUpdateMarketConfig(oracleAddress) {
+	const oracleContract = new Contract(
+		oracleAddress,
+		new utils.Interface(OracleAbi)
+	);
+
+	const { state, send } = useContractFunction(
+		oracleContract,
+		"updateMarketConfig"
+	);
+
+	return {
+		state,
+		send,
+	};
+}

@@ -10,6 +10,7 @@ import Explore from "./pages/Explore";
 import Feed from "./pages/Feed";
 import Post from "./pages/Post";
 import Pages from "./pages/Pages";
+import PageSettings from "./pages/PageSettings";
 import {
 	Button,
 	Box,
@@ -60,6 +61,7 @@ import {
 	sUpdateGroupsFollowed,
 	selectGroupsFollowed,
 	sUpdateRinkebyLatestBlockNumber,
+	selectRinkebyLatestBlockNumber,
 } from "./redux/reducers";
 import { useDispatch, useSelector } from "react-redux";
 import { Route, Routes, useNavigate } from "react-router";
@@ -72,27 +74,28 @@ function App() {
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
 
-	const oraclesInfoObj = useSelector(selectOracleInfoObj);
-	const marketsMetadata = useSelector(selectMarketsMetadata);
 	const groupsFollowed = useSelector(selectGroupsFollowed);
+	const rinkebyLatestBlockNumber = useSelector(
+		selectRinkebyLatestBlockNumber
+	);
 
 	const { result, reexecuteQuery } = useQueryExploreMarkets();
 
 	const [markets, setMarkets] = useState([]);
-	const [popularGroups, setPopularGroups] = useState([]);
 
 	useEffect(async () => {
 		const blockNumber = await getRinkebyLatestBlockNumber();
-
 		dispatch(sUpdateRinkebyLatestBlockNumber(blockNumber));
 	}, []);
 
-	useEffect(async () => {
-		const ignoreList = Object.keys(groupsFollowed);
-		let res = await findPopularModerators(ignoreList);
-
-		setPopularGroups(res.moderators);
-	}, []);
+	useEffect(() => {
+		const interval = setInterval(async () => {
+			const blockNumber = await getRinkebyLatestBlockNumber();
+			console.log(blockNumber, " blockNumber");
+			dispatch(sUpdateRinkebyLatestBlockNumber(blockNumber));
+		}, 5000);
+		return () => clearInterval(interval);
+	}, [rinkebyLatestBlockNumber]);
 
 	useEffect(async () => {
 		var res = await getUser();
@@ -163,7 +166,11 @@ function App() {
 				<Route path="/group/:groupId" element={<Feed />} />
 				<Route path="/" element={<Feed />} />
 				<Route path="/post/:postId" element={<Post />} />
-				<Route path="/pages" element={<Pages />} />
+				<Route path="/settings/pages" element={<Pages />} />
+				<Route
+					path="/settings/pages/:pageId"
+					element={<PageSettings />}
+				/>
 				<Route path="/personal" element={<Personal />} />
 			</Routes>
 		</div>

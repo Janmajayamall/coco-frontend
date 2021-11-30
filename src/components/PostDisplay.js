@@ -10,13 +10,17 @@ import {
 	Avatar,
 } from "@chakra-ui/react";
 import { TriangleUpIcon, TriangleDownIcon } from "@chakra-ui/icons";
-import { roundValueTwoDP } from "../utils";
+import {
+	followModerator,
+	marketStageDisplayName,
+	roundValueTwoDP,
+} from "../utils";
 import { useDispatch } from "react-redux";
-import { sUpdatePostTradeModal } from "./../redux/reducers";
+import { sUpdatePostTradeModal, sAddGroupFollow } from "./../redux/reducers";
 
 function PostDisplay({ market, onImageClick }) {
 	const dispatch = useDispatch();
-
+	console.log(market, "post display market");
 	if (!market || !market.oracleInfo) {
 		return <div />;
 	}
@@ -27,6 +31,7 @@ function PostDisplay({ market, onImageClick }) {
 				dispatch(
 					sUpdatePostTradeModal({
 						isOpen: true,
+
 						marketIdentifier: market.marketIdentifier,
 					})
 				);
@@ -43,12 +48,27 @@ function PostDisplay({ market, onImageClick }) {
 						{market.oracleInfo.name}
 					</Heading>
 
-					<Heading marginLeft={2} size="xs">
-						Join
-					</Heading>
+					<Text
+						onClick={async () => {
+							console.log(market.oracle.id, "djaioja");
+							const res = await followModerator(market.oracle.id);
+							console.log(res, "daoi");
+							if (res == undefined) {
+								return;
+							}
+							dispatch(sAddGroupFollow(market.oracle.id));
+						}}
+						fontSize="12"
+						fontWeight="bold"
+						marginLeft="2"
+					>
+						{market.follow != true ? "Join" : undefined}
+					</Text>
 				</Flex>
 				<Spacer />
-				<Text>Resolved</Text>
+				<Text>
+					{marketStageDisplayName(market.stateMetadata.stage)}
+				</Text>
 			</Flex>
 			<Image
 				onClick={() => {

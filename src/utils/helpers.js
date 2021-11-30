@@ -51,7 +51,7 @@ export function populateMarketWithMetadata(
 		imageUrl: marketsMetadata[market.marketIdentifier]
 			? marketsMetadata[market.marketIdentifier].eventIdentifierStr
 			: undefined,
-		follow: groupsFollowed[market.oracle.id] ? market.oracle.id : false,
+		follow: groupsFollowed[market.oracle.id] ? true : false,
 		stateMetadata: {
 			stage,
 			blocksLeft,
@@ -542,6 +542,8 @@ export function getMarketStageName(stage) {
 export function convertBlocksToSeconds(blocks) {
 	return blocks * 15;
 }
+
+
 
 export function formatTimeInSeconds(seconds) {
 	return `${seconds} seconds`;

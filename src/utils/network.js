@@ -15,6 +15,14 @@ export function convertHoursToBlocks(chainId, hours) {
 	return 0;
 }
 
+export function convertBlocksToHours(chainId, blocks) {
+	if (chainId == 421611) {
+		console.log(blocks, "saosjaoi");
+		return (blocks * 15) / 3600;
+	}
+	return 0;
+}
+
 export function retrieveOracleAddressFormLogs(logs) {
 	const oracleAddress = logs[2].topics[1];
 	return `0x${oracleAddress.slice(26)}`.toLowerCase();

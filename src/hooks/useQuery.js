@@ -322,7 +322,19 @@ const QueryOracleByDelegate = `
 const QueryOracleById = `
   query ($id: String!){
     oracle(id:$id){
-        id
+		id
+		delegate
+		manager
+		collateralToken
+		isActive
+		feeNumerator
+		feeDenominator
+		donEscalationLimit
+		expireBufferBlocks
+		donBufferBlocks
+		resolutionBufferBlocks
+		tokenBalances
+		factory
     }
   }
 `;
@@ -466,6 +478,18 @@ export function useQueryTokenBalancesByUser(user, pause = false) {
 	return { result, reexecuteQuery };
 }
 
+export function useQueryOracleById(id, pause = false) {
+	const [result, reexecuteQuery] = useQuery({
+		query: QueryOracleById,
+		variables: { id },
+		pause,
+	});
+	return {
+		result,
+		reexecuteQuery,
+	};
+}
+
 /**
  * Below are the old ones
  */
@@ -484,18 +508,6 @@ export function useQueryOracleByDelegate(delegateAddress) {
 	const [result, reexecuteQuery] = useQuery({
 		query: QueryOracleByDelegate,
 		variables: { delegate: delegateAddress },
-	});
-	return {
-		result,
-		reexecuteQuery,
-	};
-}
-
-export function useQueryOracleById(id, pause = false) {
-	const [result, reexecuteQuery] = useQuery({
-		query: QueryOracleById,
-		variables: { id },
-		pause,
 	});
 	return {
 		result,

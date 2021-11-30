@@ -241,9 +241,11 @@ function Page() {
 									: ""}
 							</Heading>
 
-							<Heading marginLeft={2} size="xs">
-								Join
-							</Heading>
+							{market.follow != true ? (
+								<Heading marginLeft={2} size="xs">
+									Join
+								</Heading>
+							) : undefined}
 						</Flex>
 						<Spacer />
 					</Flex>
@@ -274,9 +276,9 @@ function Page() {
 							return (
 								<Tr>
 									<Td>{row.buy ? "BUY" : "SELL"}</Td>
-									<Td>{row.amount0}</Td>
-									<Td>{row.amount1}</Td>
-									<Td>{row.amountC}</Td>
+									<Td>{roundValueTwoDP(row.amount0)}</Td>
+									<Td>{roundValueTwoDP(row.amount1)}</Td>
+									<Td>{roundValueTwoDP(row.amountC)}</Td>
 								</Tr>
 							);
 						})}
