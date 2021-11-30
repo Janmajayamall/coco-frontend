@@ -209,7 +209,7 @@ function Page() {
 				setGroupDetails(groupDetails);
 			}
 		}
-	}, []);
+	}, [groupId]);
 
 	return (
 		<Flex
@@ -241,7 +241,7 @@ function Page() {
 						>
 							<ArrowBackIcon
 								onClick={() => {
-									navigate("/feed");
+									navigate("/explore");
 								}}
 								marginRight={5}
 								w={5}

@@ -17,9 +17,11 @@ import {
 } from "../utils";
 import { useDispatch } from "react-redux";
 import { sUpdatePostTradeModal, sAddGroupFollow } from "./../redux/reducers";
+import { useNavigate } from "react-router";
 
 function PostDisplay({ market, onImageClick }) {
 	const dispatch = useDispatch();
+	const navigate = useNavigate();
 
 	if (!market || !market.oracleInfo) {
 		return <div />;
@@ -44,7 +46,13 @@ function PostDisplay({ market, onImageClick }) {
 						name="Dan Abrahmov"
 						src="https://bit.ly/dan-abramov"
 					/>
-					<Heading marginLeft={2} size="xs">
+					<Heading
+						onClick={() => {
+							navigate(`/group/${market.oracle.id}`);
+						}}
+						marginLeft={2}
+						size="xs"
+					>
 						{market.oracleInfo.name}
 					</Heading>
 

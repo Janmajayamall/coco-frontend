@@ -186,23 +186,27 @@ function Page() {
 
 	return (
 		<Flex>
-			{filteredMarkets.map((market) => {
-				return <PostDisplay market={market} />;
-			})}
-			<Select
-				onChange={(e) => {
-					setFilter(e.target.value);
-				}}
-				placeholder="Select Filter"
-			>
-				<option value={0}>No</option>
-				<option value={1}>Trading</option>
-				<option value={2}>Challenge</option>
-				<option value={3}>Resolve</option>
-				<option value={4}>Finalized</option>
-				<option value={5}>Claim</option>
-				<option value={6}>Created by me</option>
-			</Select>
+			<Spacer />
+			<Flex flexDirection={"column"}>
+				<Select
+					onChange={(e) => {
+						setFilter(e.target.value);
+					}}
+					placeholder="Select Filter"
+				>
+					<option value={0}>No</option>
+					<option value={1}>Trading</option>
+					<option value={2}>Challenge</option>
+					<option value={3}>Resolve</option>
+					<option value={4}>Finalized</option>
+					<option value={5}>Claim</option>
+					<option value={6}>Created by me</option>
+				</Select>
+				{filteredMarkets.map((market) => {
+					return <PostDisplay market={market} />;
+				})}
+			</Flex>
+			<Spacer />
 		</Flex>
 	);
 }

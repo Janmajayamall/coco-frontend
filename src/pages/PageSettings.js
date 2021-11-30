@@ -79,7 +79,6 @@ function Page() {
 		if (oracleResult.data == undefined) {
 			return;
 		}
-
 		await stateSetupOraclesInfo([oracleResult.data.oracle.id], dispatch);
 	}, [oracleResult]);
 
@@ -100,6 +99,7 @@ function Page() {
 	}, [oracleResult, oraclesInfoObj]);
 
 	useEffect(() => {
+		console.log(oracleData, " oracleData");
 		setName(oracleData.name);
 		setDescription(oracleData.description);
 		setImage(oracleData.image);

@@ -95,7 +95,9 @@ function TradePricesBoxes({
 			<Spacer />
 			<Box
 				onClick={() => {
-					onOutcomeChosen(1);
+					if (onOutcomeChosen) {
+						onOutcomeChosen(1);
+					}
 				}}
 				backgroundColor="#C5E6DD"
 				borderColor="#00EBA9"
@@ -118,7 +120,9 @@ function TradePricesBoxes({
 			<Spacer />
 			<Box
 				onClick={() => {
-					onOutcomeChosen(0);
+					if (onOutcomeChosen) {
+						onOutcomeChosen(0);
+					}
 				}}
 				backgroundColor="#E9CFCC"
 				borderColor="#FF523E"

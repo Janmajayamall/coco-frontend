@@ -20,8 +20,7 @@ const slice = createSlice({
 				action.payload.forEach((info) => {
 					if (info.oracleAddress) {
 						updateOraclesInfo[info.oracleAddress] = {
-							oracleAddress: info.oracleAddress,
-							name: info.name,
+							...info,
 						};
 					}
 				});
