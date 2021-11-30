@@ -270,7 +270,16 @@ function TradingInterface({ market, tradePosition, tokenApproval }) {
 							slippageValue={slippage}
 							setInput={setInputSellAmount}
 							inputValue={inputSellAmount}
+							setMaxSell={() => {
+								if (tokenActionIndex == 0) {
+									setInputSellAmount(tradePosition.amount0);
+								}
+								if (tokenActionIndex == 1) {
+									setInputSellAmount(tradePosition.amount1);
+								}
+							}}
 						/>
+
 						<TwoColTitleInfo
 							title="Estimated amount received"
 							info={formatBNToDecimal(amountCOutBn)}

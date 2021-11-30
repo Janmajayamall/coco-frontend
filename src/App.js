@@ -6,7 +6,7 @@ import NewPost from "./pages/NewPost";
 import NewModerator from "./pages/NewModerator";
 import OracleConfig from "./pages/OracleConfig";
 import Personal from "./pages/Personal";
-import Explore from "./pages/Explore";
+
 import Feed from "./pages/Feed";
 import Post from "./pages/Post";
 import Pages from "./pages/Pages";

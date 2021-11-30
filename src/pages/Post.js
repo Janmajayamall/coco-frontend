@@ -301,13 +301,18 @@ function Page() {
 						)}`}
 					</Text>
 				) : undefined}
-				{market && market.stateMetadata.stage == 1 ? (
+				{/* {market && market.stateMetadata.stage == 1 ? (
 					<TradingInterface
 						market={market}
 						tradePosition={tradePosition}
 						tokenApproval={tokenApproval}
 					/>
-				) : undefined}
+				) : undefined} */}
+				<TradingInterface
+					market={market}
+					tradePosition={tradePosition}
+					tokenApproval={tokenApproval}
+				/>
 				{market && market.stateMetadata.stage == 2 ? (
 					<StakingInterface
 						market={market}

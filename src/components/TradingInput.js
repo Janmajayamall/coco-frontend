@@ -25,7 +25,13 @@ import {
 	Slider,
 } from "@chakra-ui/react";
 
-function TradingInput({ slippageValue, setSlippage, setInput, inputValue }) {
+function TradingInput({
+	slippageValue,
+	setSlippage,
+	setInput,
+	inputValue,
+	setMaxSell,
+}) {
 	return (
 		<Flex marginTop="2" marginBottom="2" flexDirection="column">
 			<NumberInput
@@ -36,6 +42,18 @@ function TradingInput({ slippageValue, setSlippage, setInput, inputValue }) {
 				value={inputValue}
 			>
 				<NumberInputField />
+				{setMaxSell != undefined ? (
+					<Flex>
+						<Spacer />
+						<Text
+							onClick={setMaxSell}
+							fontSize={12}
+							textDecoration="underline"
+						>
+							Max
+						</Text>
+					</Flex>
+				) : undefined}
 			</NumberInput>
 			<Text
 				marginTop="1"
