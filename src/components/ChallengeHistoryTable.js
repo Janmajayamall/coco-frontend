@@ -1,32 +1,6 @@
-import {
-	Button,
-	Box,
-	Text,
-	Flex,
-	Tabs,
-	TabList,
-	TabPanel,
-	TabPanels,
-	Tab,
-	NumberInput,
-	NumberInputField,
-	Table,
-	TableCaption,
-	Thead,
-	Tr,
-	Th,
-	Tbody,
-	Td,
-	Tfoot,
-	Spacer,
-	SliderTrack,
-	SliderFilledTrack,
-	SliderThumb,
-	Slider,
-} from "@chakra-ui/react";
+import { Text, Flex, Table, Thead, Tr, Th, Td } from "@chakra-ui/react";
 
 function ChallengeHistoryTable({ stakeHistories }) {
-
 	return (
 		<Flex marginTop={5} flexDirection="column">
 			<Text>Past Challenges</Text>

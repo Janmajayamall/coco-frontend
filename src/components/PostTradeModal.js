@@ -15,11 +15,6 @@ import {
 	Switch,
 	Heading,
 	Image,
-	Avatar,
-	Slider,
-	SliderTrack,
-	SliderFilledTrack,
-	SliderThumb,
 	Modal,
 	ModalBody,
 	ModalOverlay,
@@ -69,7 +64,6 @@ function PostTradeModal() {
 		account ? account.toLowerCase() : "",
 		false
 	);
-
 
 	const [tabIndex, setTabIndex] = useState(0);
 

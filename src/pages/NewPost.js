@@ -6,6 +6,7 @@ import {
 	NumberInput,
 	NumberInputField,
 	Image,
+	useToast,
 } from "@chakra-ui/react";
 import { FiFile } from "react-icons/fi";
 import FileUpload from "./../components/FileUpload";
@@ -22,13 +23,16 @@ import { useEthers } from "@usedapp/core/packages/core";
 import { utils } from "ethers";
 
 function Page() {
+	const toast = useToast();
+
 	const [imageFile, setImageFile] = useState(null);
-	const [imageUrl, setImageUrl] = useState(null);
+	const [s3ImageUrl, setS3ImageUrl] = useState(null);
 	const [selectModerator, setSelectModerator] = useState(null);
 	const [fundingAmount, setFundingAmount] = useState(0);
 	const [betAmount, setBetAmount] = useState(0);
 	const [loading, setLoading] = useState(false);
 	const [moderators, setModerators] = useState([]);
+	const [newPostLoading, setNewPostLoading] = useState(false);
 
 	const { account } = useEthers();
 
@@ -41,16 +45,39 @@ function Page() {
 
 	useEffect(async () => {
 		if (state.receipt) {
-			const res = await newPost(selectModerator, imageUrl);
+			const res = await newPost(selectModerator, s3ImageUrl);
+
+			// TODO give a success message & navigate to explorer
+			displayToast("Post created", "success");
+
+			// end new post loading
+			setNewPostLoading(false);
+		}
+	}, [state]);
+
+	useEffect(async () => {
+		if (state.status == "Exception" || state.status == "Fail") {
+			// TODO tell user about the exception
+			displayToast("Metamask error!", "error");
+			setS3ImageUrl("");
+			setNewPostLoading(false);
 		}
 	}, [state]);
 
 	useEffect(() => {
-		if (imageUrl == undefined || imageUrl == "") {
+		if (s3ImageUrl == undefined || s3ImageUrl == "") {
 			return;
 		}
 		newPostTxHelper();
-	}, [imageUrl]);
+	}, [s3ImageUrl]);
+
+	function displayToast(title, status) {
+		toast({
+			title: title,
+			status: status,
+			isClosable: true,
+		});
+	}
 
 	function validateFile(file) {
 		const fsMb = file.size / (1024 * 1024);
@@ -62,28 +89,52 @@ function Page() {
 		return true;
 	}
 
+	function validateInputs() {
+		if (
+			selectModerator == undefined ||
+			fundingAmount === "" ||
+			betAmount === "" ||
+			fundingAmount <= 0 ||
+			imageFile == undefined
+		) {
+			setNewPostLoading(false);
+			return false;
+		}
+		return true;
+	}
+
 	async function uploadImageHelper() {
-		// await newPostTrial(
-		// 	"0xb9181365C266cD4e361a455567B77a16bd8044a8",
-		// 	"0x4838e42180000000000000000000000000000000000000000000000000000000"
-		// );
-		// return;
+		// start new post loading
+		setNewPostLoading(true);
+
+		// validate inputs
+		if (!validateInputs()) {
+			// TODO give error
+			displayToast("Invalid Inputs!", "error");
+			return;
+		}
+
 		// const presignedUrl = await getPresignedUrl();
-		// const _imageUrl = await uploadImageFile(presignedUrl);
-		const _imageUrl = "https://www.finode-id=137%3A16730";
-		console.log(_imageUrl);
-		setImageUrl(_imageUrl);
+		// const s3Url = await uploadImageFile(presignedUrl);
+		const s3Url = "http=137%3A16730";
+		if (s3Url == undefined) {
+			// TODO give error
+			displayToast("Something went wrong!", "error");
+			setNewPostLoading(false);
+		}
+		setS3ImageUrl(s3Url);
 	}
 
 	async function newPostTxHelper() {
-		// upload image
-		// await uploadImageHelper();
-
 		// validation checks
-		// check image url is not empty
-		// check rest of the values are fine as well
+		if (!validateInputs()) {
+			displayToast("Invalid Inputs!", "error");
+			setS3ImageUrl("");
+			return;
+		}
+
 		send(
-			keccak256(imageUrl),
+			keccak256(s3ImageUrl),
 			selectModerator,
 			utils.parseEther(String(fundingAmount)),
 			utils.parseEther(String(betAmount)),
@@ -101,7 +152,6 @@ function Page() {
 							//TODO throw mmax file size error
 							return;
 						}
-						setImageUrl(URL.createObjectURL(file));
 						setImageFile(file);
 					}}
 				>
@@ -110,14 +160,13 @@ function Page() {
 					</Button>
 				</FileUpload>
 			) : undefined}
-			{imageUrl != null ? (
-				<Image src={imageUrl} width={500} />
+			{imageFile != null ? (
+				<Image src={URL.createObjectURL(imageFile)} width={500} />
 			) : undefined}
 			{imageFile != null ? (
 				<Button
 					onClick={() => {
 						setImageFile(null);
-						setImageUrl(null);
 					}}
 				>
 					Remove
@@ -160,7 +209,13 @@ function Page() {
 				<NumberInputField />
 			</NumberInput>
 
-			<Button onClick={uploadImageHelper}>Submit</Button>
+			<Button
+				isLoading={newPostLoading}
+				loadingText="Posting..."
+				onClick={uploadImageHelper}
+			>
+				Submit
+			</Button>
 		</>
 	);
 }

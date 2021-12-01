@@ -5,7 +5,6 @@ import {
 	createHotAccount,
 	getAccountNonce,
 	loginUser,
-
 	getUser,
 } from "./../utils";
 import { useEthers } from "@usedapp/core/packages/core";

@@ -6,37 +6,19 @@ import {
 } from "../redux/reducers";
 import {
 	Button,
-	Box,
-	Text,
 	Flex,
 	Spacer,
-	Switch,
 	Heading,
-	Image,
-	Avatar,
-	Slider,
-	SliderTrack,
-	SliderFilledTrack,
-	SliderThumb,
 	Modal,
 	ModalBody,
 	ModalOverlay,
 	ModalContent,
-	ModalHeader,
-	ModalCloseButton,
-	ModalFooter,
-	Lorem,
 } from "@chakra-ui/react";
 import { useEthers } from "@usedapp/core/packages/core";
 import { CloseIcon } from "@chakra-ui/icons";
 import { useEffect } from "react";
 import { useState } from "react";
-import {
-	createHotAccount,
-	getAccountNonce,
-	loginUser,
-
-} from "../utils";
+import { createHotAccount, getAccountNonce, loginUser } from "../utils";
 import { useNavigate } from "react-router";
 
 function LoginModal() {
@@ -88,14 +70,6 @@ function LoginModal() {
 
 	useEffect(async () => {
 		if (account && window.ethereum) {
-			// await window.ethereum.request({
-			// 	method: "personal_sign",
-			// 	params: [account, "dwai"],
-			// });
-			// const signature = await web3.currentProvider.sendAsync(
-			// 	"djaiwodjaoidjaodjao"
-			// );
-
 			setStage(1);
 		}
 	}, [account]);

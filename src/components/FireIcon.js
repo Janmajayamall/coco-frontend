@@ -1,6 +1,6 @@
 import { Icon } from "@chakra-ui/icons";
 /**
- * 
+ *
  */
 export function FireIcon(props) {
 	return (

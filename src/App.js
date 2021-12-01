@@ -74,14 +74,13 @@ function App() {
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
 
-	const groupsFollowed = useSelector(selectGroupsFollowed);
+	const { account } = useEthers();
+
 	const rinkebyLatestBlockNumber = useSelector(
 		selectRinkebyLatestBlockNumber
 	);
 
 	const { result, reexecuteQuery } = useQueryExploreMarkets();
-
-	const [markets, setMarkets] = useState([]);
 
 	useEffect(async () => {
 		const blockNumber = await getRinkebyLatestBlockNumber();
@@ -98,34 +97,18 @@ function App() {
 	}, [rinkebyLatestBlockNumber]);
 
 	useEffect(async () => {
-		var res = await getUser();
-		if (res != undefined) {
-			dispatch(sUpdateProfile(res.user));
+		let res = await getUser();
+		if (res == undefined) {
+			return;
 		}
+		dispatch(sUpdateProfile(res.user));
+
 		res = await findAllFollows();
-
-		if (res != undefined) {
-			dispatch(sUpdateGroupsFollowed(res.relations));
+		if (res == undefined) {
+			return;
 		}
-	}, []);
-
-	useEffect(async () => {
-		if (result.data && result.data.markets) {
-			const oracleIds = filterOracleIdsFromMarketsGraph(
-				result.data.markets
-			);
-			let res = await findModeratorsByIdArr(oracleIds);
-			dispatch(sUpdateOraclesInfoObj(res.moderators));
-
-			const marketIdentifiers = filterMarketIdentifiersFromMarketsGraph(
-				result.data.markets
-			);
-			res = await findPostsByMarketIdentifierArr(marketIdentifiers);
-			dispatch(sUpdateMarketsMetadata(res.posts));
-
-			setMarkets(result.data.markets);
-		}
-	}, [result]);
+		dispatch(sUpdateGroupsFollowed(res.relations));
+	}, [account]);
 
 	return (
 		<div>

@@ -77,12 +77,7 @@ import { HomeIcon } from "../components/HomeIcon";
 import { ArrowBackIcon } from "@chakra-ui/icons";
 
 /**
- * Posted by me
- * Trading
- * Staking
- * Resolution
- * Finished
- * You can redeem
+ * Shows different posts user has interacted with in any form. 
  */
 
 function Page() {

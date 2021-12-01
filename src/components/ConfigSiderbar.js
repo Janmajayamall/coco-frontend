@@ -1,13 +1,7 @@
 import {
-	Button,
-	Box,
 	Text,
 	Flex,
-	Spacer,
-	Switch,
 	Heading,
-	Image,
-	Avatar,
 	Slider,
 	SliderTrack,
 	SliderFilledTrack,

@@ -1,88 +1,5 @@
-import { useDisclosure } from "@chakra-ui/hooks";
-import { useDispatch, useSelector } from "react-redux";
-import {
-	selectPostTradeModalState,
-	selectOracleInfoObj,
-	selectMarketsMetadata,
-	sUpdatePostTradeModal,
-	sUpdateOraclesInfoObj,
-	sUpdateMarketsMetadata,
-	selectGroupsFollowed,
-	selectRinkebyLatestBlockNumber,
-} from "../redux/reducers";
-import {
-	Button,
-	Box,
-	Text,
-	Flex,
-	Tabs,
-	TabList,
-	TabPanel,
-	TabPanels,
-	Tab,
-	NumberInput,
-	NumberInputField,
-	Table,
-	TableCaption,
-	Thead,
-	Tr,
-	Th,
-	Tbody,
-	Td,
-	Tfoot,
-	Spacer,
-	SliderTrack,
-	SliderFilledTrack,
-	SliderThumb,
-	Slider,
-} from "@chakra-ui/react";
-import { useEthers } from "@usedapp/core/packages/core";
-import { CloseIcon } from "@chakra-ui/icons";
-import { useEffect } from "react";
-import { useState } from "react";
-import {
-	useBuyMinTokensForExactCTokens,
-	useQueryMarketByMarketIdentifier,
-	useQueryMarketTradeAndStakeInfoByUser,
-	useSellExactTokensForMinCTokens,
-} from "../hooks";
-import {
-	convertBlocksToSeconds,
-	convertDecimalStrToBigNumber,
-	convertDecimalStrToInt,
-	convertIntToDecimalStr,
-	determineMarketState,
-	filterMarketIdentifiersFromMarketsGraph,
-	filterOracleIdsFromMarketsGraph,
-	findModeratorsByIdArr,
-	findPostsByMarketIdentifierArr,
-	formatBNToDecimal,
-	getAmountCBySellTokenAmount,
-	getAmountCToBuyTokens,
-	getAvgPrice,
-	getAvgPriceOfOutcomeToken,
-	getFavoredOutcomeName,
-	getMarketStageName,
-	getMarketStateDetails,
-	getTempOutcomeInChallengePeriod,
-	getTokenAmountToBuyWithAmountC,
-	parseDecimalToBN,
-	populateMarketWithMetadata,
-	roundValueTwoDP,
-	TWO_BN,
-	useBNInput,
-	outcomeDisplayName,
-	formatTimeInSeconds,
-	determineOutcome,
-	getWinningsArr,
-	getTradeWinningsArr,
-	getStakeWinArr,
-	ONE_BN,
-} from "../utils";
-import PostDisplay from "../components/PostDisplay";
-import { useParams } from "react-router";
-
-import { BigNumber, ethers, utils } from "ethers";
+import { Button, Box, Text, Flex, Spacer } from "@chakra-ui/react";
+import { roundValueTwoDP } from "../utils";
 
 function TradePricesBoxes({
 	market,
@@ -105,8 +22,6 @@ function TradePricesBoxes({
 				borderWidth={outcomeChosen == 1 ? 6 : 1}
 				paddingLeft={18}
 				paddingRight={18}
-				// paddingTop={2}
-				// paddingBottom={2}
 				justifyContent={"space-between"}
 				alignItems={"center"}
 			>

@@ -38,6 +38,11 @@ import {
 import PostDisplay from "../components/PostDisplay";
 import { useNavigate } from "react-router";
 
+/**
+ * Shows two things
+ * 1. Posts, within the groups that you manage, that need to be resolved
+ * 2. Shows a list of groups that you manage or are delegate of
+ */
 function Page() {
 	const { account } = useEthers();
 	const dispatch = useDispatch();
@@ -88,9 +93,6 @@ function Page() {
 			dispatch
 		);
 	}, [marketsToResolveResult]);
-
-	// retrieve all pages managed by me
-	// show all posts that need attention
 
 	return (
 		<Flex flexDirection="row">

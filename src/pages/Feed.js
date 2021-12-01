@@ -1,6 +1,5 @@
-import ConnectButton from "../components/ConnectButton";
-import LoginButton from "../components/LoginButton";
 import PostDisplay from "../components/PostDisplay";
+import Loader from "../components/Loader";
 import {
 	Button,
 	Box,
@@ -70,6 +69,7 @@ import ConfigSidebar from "../components/ConfigSiderbar";
 import { FireIcon } from "../components/FireIcon";
 import { HomeIcon } from "../components/HomeIcon";
 import { ArrowBackIcon } from "@chakra-ui/icons";
+import SuggestionSidebar from "../components/SuggestionSidebar";
 
 function Page() {
 	const navigate = useNavigate();
@@ -102,6 +102,7 @@ function Page() {
 	const [markets, setMarkets] = useState([]);
 	const [popularGroups, setPopularGroups] = useState([]);
 	const [groupDetails, setGroupDetails] = useState({});
+	const [loadingMarkets, setLoadingMarkets] = useState(true);
 
 	const { result: result0, reexecuteQuery: rQ0 } = useQueryExploreMarkets(
 		pagination.first,
@@ -136,13 +137,13 @@ function Page() {
 			setPagination({ first: 10, skip: 0 });
 			setQueryOracles([groupId.toLowerCase()]);
 		}
-	}, [groupsFollowed]);
+	}, [groupsFollowed, feedType]);
 
 	useEffect(() => {
 		if (feedType == 0 && pagination.first > 0) {
 			rQ0();
 		}
-	}, [pagination]);
+	}, [pagination, feedType]);
 
 	useEffect(() => {
 		if (
@@ -152,12 +153,16 @@ function Page() {
 		) {
 			rQ1();
 		}
-	}, [queryOracles, pagination]);
+	}, [queryOracles, pagination, feedType]);
 
 	useEffect(async () => {
 		if (feedType == undefined) {
+			setMarkets([]);
 			return;
 		}
+
+		// start loading
+		setLoadingMarkets(true);
 
 		let _result;
 		if (feedType == 0) {
@@ -178,28 +183,13 @@ function Page() {
 			);
 
 			setMarkets([...markets, ..._result.data.markets]);
+		} else {
+			setMarkets([]);
 		}
-	}, [result0, result1]);
 
-	useEffect(async () => {
-		const ignoreList = Object.keys(groupsFollowed);
-		let res = await findPopularModerators(ignoreList);
-		if (res == undefined) {
-			return;
-		}
-		setPopularGroups(res.moderators);
-	}, []);
-
-	useEffect(async () => {
-		var res = await getUser();
-		if (res != undefined) {
-			dispatch(sUpdateProfile(res.user));
-		}
-		res = await findAllFollows();
-		if (res != undefined) {
-			dispatch(sUpdateGroupsFollowed(res.relations));
-		}
-	}, []);
+		// end loading
+		setLoadingMarkets(false);
+	}, [result0, result1, feedType]);
 
 	useEffect(async () => {
 		if (groupId) {
@@ -226,6 +216,7 @@ function Page() {
 			<Flex
 				flexDirection="column"
 				width={"50%"}
+				minHeight="100vh"
 				paddingRight={21}
 				paddingLeft={21}
 				borderRightWidth={1}
@@ -330,6 +321,7 @@ function Page() {
 						/>
 					</Flex>
 				) : undefined}
+				{loadingMarkets == true ? <Loader /> : undefined}
 				{markets.map((market) => {
 					const populatedMarket = populateMarketWithMetadata(
 						market,
@@ -352,66 +344,7 @@ function Page() {
 					);
 				})}
 			</Flex>
-			<Flex
-				width={"20%"}
-				paddingRight={6}
-				paddingLeft={6}
-				paddingTop={5}
-				flexDirection="column"
-			>
-				<Heading size="md" marginBottom={5}>
-					Explore Groups
-				</Heading>
-				<Flex flexDirection={"column"}>
-					{popularGroups.map((group) => {
-						return (
-							<Flex>
-								<Text>{group.name}</Text>
-								<Spacer />
-								{groupsFollowed[group.oracleAddress] != true ? (
-									<Button
-										onClick={async () => {
-											const res = await followModerator(
-												group.oracleAddress
-											);
-											if (res == undefined) {
-												return;
-											}
-											dispatch(
-												sAddGroupFollow(
-													group.oracleAddress
-												)
-											);
-										}}
-										size="sm"
-									>
-										Follow
-									</Button>
-								) : (
-									<Button
-										onClick={async () => {
-											const res = await unfollowModerator(
-												group.oracleAddress
-											);
-											if (res == undefined) {
-												return;
-											}
-											dispatch(
-												sDeleteGroupFollow(
-													group.oracleAddress
-												)
-											);
-										}}
-										size="sm"
-									>
-										Unfollow
-									</Button>
-								)}
-							</Flex>
-						);
-					})}
-				</Flex>
-			</Flex>
+			<SuggestionSidebar />
 			<Spacer />
 		</Flex>
 	);

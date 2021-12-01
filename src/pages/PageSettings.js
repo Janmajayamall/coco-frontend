@@ -45,7 +45,13 @@ import {
 } from "../redux/reducers";
 import PostDisplay from "../components/PostDisplay";
 import { useNavigate, useParams } from "react-router";
+import Loader from "../components/Loader";
 
+/**
+ * Things left -
+ * 1. Upload & set image
+ * 2. Loading & error handling of inputs
+ */
 function Page() {
 	const { account, chainId } = useEthers();
 	const dispatch = useDispatch();
@@ -58,6 +64,7 @@ function Page() {
 	const { send, state } = useUpdateMarketConfig(oracleId);
 
 	const [oracleData, setOracleData] = useState({});
+	const [loadingOracleData, setLoadingOracleData] = useState(true);
 
 	/**
 	 * Meta data states
@@ -83,10 +90,7 @@ function Page() {
 	}, [oracleResult]);
 
 	useEffect(() => {
-		if (
-			oracleResult.data == undefined ||
-			oraclesInfoObj[oracleResult.data.oracle.id] == undefined
-		) {
+		if (oracleResult.data == undefined) {
 			return;
 		}
 		setOracleData({
@@ -96,6 +100,7 @@ function Page() {
 				Number(oracleResult.data.oracle.feeNumerator) /
 				Number(oracleResult.data.oracle.feeDenominator),
 		});
+		setLoadingOracleData(false);
 	}, [oracleResult, oraclesInfoObj]);
 
 	useEffect(() => {
@@ -122,135 +127,147 @@ function Page() {
 
 	return (
 		<Flex flexDirection="row">
-			<Flex flexDirection="column">
-				{/* <Input
+			{loadingOracleData == false ? (
+				<>
+					<Flex flexDirection="column">
+						{/* <Input
 						placeholder="Name"
 						onChange={(e) => {
 							setName(e.target.value);
 						}}
 						value={name}
 					/> */}
-				<Input
-					placeholder="Name"
-					onChange={(e) => {
-						setName(e.target.value);
-					}}
-					value={name}
-				/>
-				<Input
-					placeholder="Description"
-					onChange={(e) => {
-						setDescription(e.target.value);
-					}}
-					value={description}
-				/>
-				<Button
-					disabled={
-						account == undefined ||
-						account.toLowerCase() != oracleData.manager
-					}
-					onClick={async () => {
-						if (
-							account == undefined ||
-							account.toLowerCase() != oracleData.manager
-						) {
-							return;
-						}
-						const res = await updateModerator(oracleData.id, {
-							name,
-							description,
-						});
-					}}
-				>
-					<Text>Update Metadata</Text>
-				</Button>
-			</Flex>
-			<Flex flexDirection="column">
-				<NumberInput
-					onChange={(val) => {
-						setFee(val);
-					}}
-					defaultValue={0}
-					precision={3}
-					value={fee}
-					max={1}
-				>
-					<NumberInputField />
-				</NumberInput>
+						<Input
+							placeholder="Name"
+							onChange={(e) => {
+								setName(e.target.value);
+							}}
+							value={name}
+						/>
+						<Input
+							placeholder="Description"
+							onChange={(e) => {
+								setDescription(e.target.value);
+							}}
+							value={description}
+						/>
+						<Button
+							disabled={
+								account == undefined ||
+								account.toLowerCase() != oracleData.manager
+							}
+							onClick={async () => {
+								if (
+									account == undefined ||
+									account.toLowerCase() != oracleData.manager
+								) {
+									return;
+								}
+								const res = await updateModerator(
+									oracleData.id,
+									{
+										name,
+										description,
+									}
+								);
+							}}
+						>
+							<Text>Update Metadata</Text>
+						</Button>
+					</Flex>
+					<Flex flexDirection="column">
+						<NumberInput
+							onChange={(val) => {
+								setFee(val);
+							}}
+							defaultValue={0}
+							precision={3}
+							value={fee}
+							max={1}
+						>
+							<NumberInputField />
+						</NumberInput>
 
-				<NumberInput
-					onChange={(val) => {
-						setEscalationLimit(val);
-					}}
-					defaultValue={0}
-					precision={0}
-					value={escalationLimit}
-				>
-					<NumberInputField />
-				</NumberInput>
+						<NumberInput
+							onChange={(val) => {
+								setEscalationLimit(val);
+							}}
+							defaultValue={0}
+							precision={0}
+							value={escalationLimit}
+						>
+							<NumberInputField />
+						</NumberInput>
 
-				<NumberInput
-					onChange={(val) => {
-						setExpireHours(val);
-					}}
-					defaultValue={0}
-					precision={2}
-					value={expireHours}
-				>
-					<NumberInputField />
-				</NumberInput>
+						<NumberInput
+							onChange={(val) => {
+								setExpireHours(val);
+							}}
+							defaultValue={0}
+							precision={2}
+							value={expireHours}
+						>
+							<NumberInputField />
+						</NumberInput>
 
-				<NumberInput
-					onChange={(val) => {
-						setBufferHours(val);
-					}}
-					defaultValue={0}
-					precision={2}
-					value={bufferHours}
-				>
-					<NumberInputField />
-				</NumberInput>
+						<NumberInput
+							onChange={(val) => {
+								setBufferHours(val);
+							}}
+							defaultValue={0}
+							precision={2}
+							value={bufferHours}
+						>
+							<NumberInputField />
+						</NumberInput>
 
-				<NumberInput
-					onChange={(val) => {
-						setResolutionHours(val);
-					}}
-					defaultValue={0}
-					precision={2}
-					value={resolutionHours}
-				>
-					<NumberInputField />
-				</NumberInput>
-				<Button
-					disabled={
-						account == undefined ||
-						account.toLowerCase() != oracleData.delegate
-					}
-					onClick={() => {
-						if (
-							account == undefined ||
-							account.toLowerCase() != oracleData.delegate
-						) {
-							return;
-						}
+						<NumberInput
+							onChange={(val) => {
+								setResolutionHours(val);
+							}}
+							defaultValue={0}
+							precision={2}
+							value={resolutionHours}
+						>
+							<NumberInputField />
+						</NumberInput>
+						<Button
+							disabled={
+								account == undefined ||
+								account.toLowerCase() != oracleData.delegate
+							}
+							onClick={() => {
+								if (
+									account == undefined ||
+									account.toLowerCase() != oracleData.delegate
+								) {
+									return;
+								}
 
-						const feeNumerator = Number(fee) * 1000;
-						const feeDenominator = 1000;
+								const feeNumerator = Number(fee) * 1000;
+								const feeDenominator = 1000;
 
-						send(
-							true,
-							feeNumerator,
-							feeDenominator,
-							escalationLimit,
-							convertHoursToBlocks(chainId, expireHours),
-							convertHoursToBlocks(chainId, bufferHours),
-							convertHoursToBlocks(chainId, resolutionHours)
-						);
-					}}
-				>
-					<Text>Update Config</Text>
-				</Button>
-			</Flex>
+								send(
+									true,
+									feeNumerator,
+									feeDenominator,
+									escalationLimit,
+									convertHoursToBlocks(chainId, expireHours),
+									convertHoursToBlocks(chainId, bufferHours),
+									convertHoursToBlocks(
+										chainId,
+										resolutionHours
+									)
+								);
+							}}
+						>
+							<Text>Update Config</Text>
+						</Button>
+					</Flex>
+				</>
+			) : (
+				<Loader />
+			)}
 		</Flex>
 	);
 }

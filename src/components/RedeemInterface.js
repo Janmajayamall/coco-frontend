@@ -52,25 +52,7 @@ import {
 	useERC1155SetApprovalForAll,
 } from "../hooks";
 import {
-	convertBlocksToSeconds,
-	convertDecimalStrToBigNumber,
-	convertDecimalStrToInt,
-	convertIntToDecimalStr,
-	determineMarketState,
-	filterMarketIdentifiersFromMarketsGraph,
-	filterOracleIdsFromMarketsGraph,
-	findModeratorsByIdArr,
-	findPostsByMarketIdentifierArr,
 	formatBNToDecimal,
-	getAmountCBySellTokenAmount,
-	getAmountCToBuyTokens,
-	getAvgPrice,
-	getAvgPriceOfOutcomeToken,
-	getFavoredOutcomeName,
-	getMarketStageName,
-	getMarketStateDetails,
-	getTempOutcomeInChallengePeriod,
-	getTokenAmountToBuyWithAmountC,
 	parseDecimalToBN,
 	populateMarketWithMetadata,
 	roundValueTwoDP,
@@ -115,8 +97,6 @@ function RedeemWinsInterface({
 	} = useERC1155SetApprovalForAll(market.oracle.id);
 
 	const finalOutcome = determineOutcome(market);
-	// const winningsArr = getTradeWinningsArr(tradePosition, finalOutcome);
-	// const stakeArr = getStakeWinArr(stakePosition, finalOutcome);
 	return (
 		<Flex flexDirection="column">
 			<TradePriceBoxes market={market} tradePosition={tradePosition} />
@@ -234,32 +214,6 @@ function RedeemWinsInterface({
 					)
 				)}
 			/>
-
-			{/* {stakeArr.map((obj) => {
-				if (obj.amountSR.isZero()) {
-					return;
-				}
-				return (
-					<Text>
-						{`
-							${formatBNToDecimal(obj.amountSR)} challenge amount used in favor of outcome ${
-							obj.outcome
-						}
-							`}
-					</Text>
-				);
-			})} */}
-			{/* {finalOutcome == Number(market.lastOutcomeStaked) &&
-			account.toLowerCase() ==
-				(finalOutcome == 0 ? market.staker0 : market.staker1) ? (
-				<Text>
-					{`${
-						finalOutcome == 0
-							? market.stakingReserve0
-							: market.stakingReserve1
-					} from loser's stake`}
-				</Text>
-			) : undefined} */}
 
 			<Button
 				onClick={() => {

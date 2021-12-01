@@ -17,6 +17,13 @@ import { useEthers } from "@usedapp/core/packages/core";
 
 import addresses from "./../contracts/addresses.json";
 import { useQueryOracleByDelegate } from "./../hooks";
+
+/**
+ * @note For the sake of simplicity, during the initial days, oracles from UI have following constraints
+ * 1. manager == delegate.
+ * 2. Buffer blocks cannot be smaller than an hour
+ * 3. Escalation limit cannot be zero
+ */
 function Page() {
 	const { chainId, account } = useEthers();
 	const { result, reexecuteQuery } = useQueryOracleByDelegate(account);
@@ -42,16 +49,12 @@ function Page() {
 	}, [state]);
 
 	async function createModeratorHelper() {
-		// await updateModerator("0xb9181365C266cD4e361a455567B77a16bd8044a8", {
-		// 	name: "Oracle 1",
-		// });
-		// return;
-
 		// fee calc
 		const feeNumerator = Number(fee) * 1000;
 		const feeDenominator = 1000;
 
 		// validation checks
+
 		send(
 			account,
 			account,
