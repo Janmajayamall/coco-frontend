@@ -9,6 +9,7 @@ import {
 	sUpdateMarketsMetadata,
 	selectGroupsFollowed,
 	selectRinkebyLatestBlockNumber,
+	selectUserProfile,
 } from "../redux/reducers";
 import {
 	Button,
@@ -87,7 +88,8 @@ function RedeemWinsInterface({
 	tokenApproval,
 }) {
 	const { account } = useEthers();
-
+	const userProfile = useSelector(selectUserProfile);
+	const isAuthenticated = userProfile && account;
 	const { state: stateRW, send: sendRW } = useRedeemWinning();
 	const { state: stateRWB, send: sendRWB } = useRedeemWinningBothOutcomes;
 	const { state: stateRS, send: sendRS } = useRedeemStake(market.oracle.id);
@@ -124,9 +126,14 @@ function RedeemWinsInterface({
 				info={getTradeWinAmount(tradePosition, finalOutcome)}
 			/>
 			<Button
-				disabled={!tokenApproval}
+				disabled={!tokenApproval || !isAuthenticated}
 				onClick={() => {
-					if (!tradePosition || !market) {
+					if (
+						!tradePosition ||
+						!market ||
+						!tokenApproval ||
+						!isAuthenticated
+					) {
 						return;
 					}
 					let amount0 = parseDecimalToBN(tradePosition.amount0);
@@ -216,8 +223,9 @@ function RedeemWinsInterface({
 			/>
 
 			<Button
+				disabled={!stakePosition || !market || !isAuthenticated}
 				onClick={() => {
-					if (!stakePosition || !market) {
+					if (!stakePosition || !market || !isAuthenticated) {
 						return;
 					}
 

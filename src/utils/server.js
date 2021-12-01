@@ -308,3 +308,14 @@ export async function findAllFollows() {
 		return data.response;
 	} catch (e) {}
 }
+
+export async function getRinkebyLatestBlockNumber() {
+	try {
+		const { data } = await baseInstance.request({
+			url: "/latestBlockNumber",
+			method: "GET",
+		});
+
+		return data.response;
+	} catch (e) {}
+}

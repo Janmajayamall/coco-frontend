@@ -9,6 +9,7 @@ import {
 	sUpdateMarketsMetadata,
 	selectGroupsFollowed,
 	selectRinkebyLatestBlockNumber,
+	selectUserProfile,
 } from "../redux/reducers";
 import {
 	Button,
@@ -96,6 +97,8 @@ import ChallengeHistoryTable from "./ChallengeHistoryTable";
 
 function ResolveInterface({ market, stakeHistories }) {
 	const { account } = useEthers();
+	const userProfile = useSelector(selectUserProfile);
+	const isAuthenticated = userProfile && account;
 
 	const { state, send } = useSetOutcome(market ? market.oracle.id : "");
 
@@ -107,7 +110,8 @@ function ResolveInterface({ market, stakeHistories }) {
 
 	return (
 		<Flex flexDirection="column">
-			{account && account.toLowerCase() === market.oracle.delegate ? (
+			{isAuthenticated &&
+			account.toLowerCase() === market.oracle.delegate ? (
 				<>
 					<TwoColTitleInfo
 						title="Fee"

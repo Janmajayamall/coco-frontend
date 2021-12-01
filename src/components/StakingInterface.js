@@ -9,6 +9,7 @@ import {
 	sUpdateMarketsMetadata,
 	selectGroupsFollowed,
 	selectRinkebyLatestBlockNumber,
+	selectUserProfile,
 } from "../redux/reducers";
 import {
 	Button,
@@ -95,6 +96,10 @@ function StakingInterface({
 	stakePosition,
 	stakeHistories,
 }) {
+	const { account } = useEthers();
+	const userProfile = useSelector(selectUserProfile);
+	const isAuthenticated = account && userProfile;
+
 	const { state, send } = useStakeForOutcome();
 
 	const { input, bnValue, setInput, err } = useBNInput();
@@ -176,7 +181,12 @@ function StakingInterface({
 				<NumberInputField />
 			</NumberInput>
 			<Button
+				disabled={!isAuthenticated}
 				onClick={() => {
+					if (!isAuthenticated) {
+						return;
+					}
+
 					// TODO validation checks
 
 					// favored outcome can't be 2

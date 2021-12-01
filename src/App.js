@@ -83,16 +83,25 @@ function App() {
 	const { result, reexecuteQuery } = useQueryExploreMarkets();
 
 	useEffect(async () => {
-		const blockNumber = await getRinkebyLatestBlockNumber();
-		dispatch(sUpdateRinkebyLatestBlockNumber(blockNumber));
+		let res = await getRinkebyLatestBlockNumber();
+		console.log(res);
+		if (res == undefined) {
+			return;
+		}
+		dispatch(sUpdateRinkebyLatestBlockNumber(res.rinkebyLatestBlockNumber));
 	}, []);
 
 	useEffect(() => {
 		const interval = setInterval(async () => {
-			const blockNumber = await getRinkebyLatestBlockNumber();
-
-			dispatch(sUpdateRinkebyLatestBlockNumber(blockNumber));
-		}, 5000);
+			let res = await getRinkebyLatestBlockNumber();
+			console.log(res);
+			if (res == undefined) {
+				return;
+			}
+			dispatch(
+				sUpdateRinkebyLatestBlockNumber(res.rinkebyLatestBlockNumber)
+			);
+		}, 30000);
 		return () => clearInterval(interval);
 	}, [rinkebyLatestBlockNumber]);
 

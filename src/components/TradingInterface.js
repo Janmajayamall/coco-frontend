@@ -9,6 +9,7 @@ import {
 	sUpdateMarketsMetadata,
 	selectGroupsFollowed,
 	selectRinkebyLatestBlockNumber,
+	selectUserProfile,
 } from "../redux/reducers";
 import {
 	Button,
@@ -88,6 +89,10 @@ import TradingInput from "./TradingInput";
 import TradePriceBoxes from "./TradePriceBoxes";
 
 function TradingInterface({ market, tradePosition, tokenApproval }) {
+	const { account } = useEthers();
+	const userProfile = useSelector(selectUserProfile);
+	const isAuthenticated = userProfile && account;
+
 	/**
 	 * Contract calls
 	 */
@@ -223,10 +228,15 @@ function TradingInterface({ market, tradePosition, tokenApproval }) {
 							)}
 						/>
 						<Button
+							disabled={!isAuthenticated}
 							marginTop="2"
 							width="100%"
 							backgroundColor="green.100"
 							onClick={() => {
+								if (!isAuthenticated) {
+									return;
+								}
+
 								let a0 =
 									tokenActionIndex == 0
 										? tokenOutAmountBn
@@ -290,10 +300,15 @@ function TradingInterface({ market, tradePosition, tokenApproval }) {
 						/>
 
 						<Button
+							disabled={!isAuthenticated}
 							backgroundColor="red.100"
 							marginTop="2"
 							width="100%"
 							onClick={() => {
+								if (!isAuthenticated) {
+									return;
+								}
+
 								let a0 =
 									tokenActionIndex == 0
 										? inputSellAmountBn
