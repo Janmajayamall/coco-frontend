@@ -154,21 +154,9 @@ function StakingInterface({
 				)}`}
 			/>
 			<Text marginTop={5}>Challenge temp outcome</Text>
-			<TradePriceBoxes
-				market={market}
-				tradePosition={tradePosition}
-				outcomeChosen={favoredOutcome}
-				onOutcomeChosen={(val) => {
-					/**
-					 * Only allow to choose outcome to stake, if temp outcome is undecided
-					 */
-					if (tempOutcome == 2) {
-						setFavoredOutcome(val);
-					}
-				}}
-			/>
+
 			<TwoColTitleInfo
-				title={"Your favored outcome"}
+				title={"You favor outcome"}
 				info={`${outcomeDisplayName(favoredOutcome)}`}
 			/>
 			<NumberInput

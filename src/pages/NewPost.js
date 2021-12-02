@@ -116,7 +116,7 @@ function Page() {
 
 		// const presignedUrl = await getPresignedUrl();
 		// const s3Url = await uploadImageFile(presignedUrl);
-		const s3Url = "http=137%3A16730";
+		const s3Url = "ht7dqijwdaiojwsaiosjaioj%3A16730";
 		if (s3Url == undefined) {
 			// TODO give error
 			displayToast("Something went wrong!", "error");

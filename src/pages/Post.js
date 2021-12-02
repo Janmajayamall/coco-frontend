@@ -255,7 +255,7 @@ function Page() {
 					</Flex>
 				) : undefined}
 
-				{loadingMarket == false ? (
+				{/* {loadingMarket == false ? (
 					<>
 						<Text>Your past trades</Text>
 						<Table size="sm" variant="simple">
@@ -287,7 +287,7 @@ function Page() {
 							</Tbody>
 						</Table>
 					</>
-				) : undefined}
+				) : undefined} */}
 			</Flex>
 
 			<Flex width="20%" marginLeft={5} flexDirection="column">
@@ -307,7 +307,7 @@ function Page() {
 								)}`}
 							</Text>
 						) : undefined}
-						{market && market.stateMetadata.stage == 1 ? (
+						{/* {market && market.stateMetadata.stage == 1 ? (
 							<TradingInterface
 								market={market}
 								tradePosition={tradePosition}
@@ -336,7 +336,25 @@ function Page() {
 								market={market}
 								stakeHistories={stakeHistories}
 							/>
-						) : undefined}
+						) : undefined} */}
+						{/* <TradingInterface
+							market={market}
+							tradePosition={tradePosition}
+							tokenApproval={tokenApproval}
+						/> */}
+						{/* <StakingInterface
+							market={market}
+							tradePosition={tradePosition}
+							stakeHistories={stakeHistories}
+							stakePosition={stakePosition}
+						/> */}
+						<RedeemWinsInterface
+							market={market}
+							tradePosition={tradePosition}
+							stakeHistories={stakeHistories}
+							stakePosition={stakePosition}
+							tokenApproval={tokenApproval}
+						/>
 					</>
 				) : (
 					<Loader />
