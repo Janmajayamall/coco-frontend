@@ -209,8 +209,17 @@ function Page() {
 			}}
 		>
 			<Spacer />
-			<Flex width={"20%"}>
+			<Flex width={"20%"} flexDirection="column">
 				<ConfigSidebar />
+
+				<Button
+					onClick={() => {
+						navigate("/add");
+					}}
+					marginTop={4}
+				>
+					<Text>Add post</Text>
+				</Button>
 			</Flex>
 
 			<Flex
