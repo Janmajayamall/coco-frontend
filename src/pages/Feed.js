@@ -56,6 +56,7 @@ import {
 	selectRinkebyLatestBlockNumber,
 	sAddGroupFollow,
 	sDeleteGroupFollow,
+	selectFeedDisplayConfigs,
 } from "../redux/reducers";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -96,6 +97,8 @@ function Page() {
 	const rinkebyLatestBlockNumber = useSelector(
 		selectRinkebyLatestBlockNumber
 	);
+	const feedDisplayConfigs = useSelector(selectFeedDisplayConfigs);
+	const feedThreshold = feedDisplayConfigs.threshold;
 
 	const [pagination, setPagination] = useState({ first: 0, skip: 0 });
 	const [queryOracles, setQueryOracles] = useState([]);
@@ -341,6 +344,13 @@ function Page() {
 					);
 
 					if (!populatedMarket.oracleInfo) {
+						return;
+					}
+
+					if (
+						Number(populatedMarket.probability1) <
+						Number(feedThreshold) / 100
+					) {
 						return;
 					}
 					return (

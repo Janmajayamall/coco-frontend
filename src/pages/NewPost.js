@@ -7,6 +7,8 @@ import {
 	NumberInputField,
 	Image,
 	useToast,
+	Flex,
+	Spacer,
 } from "@chakra-ui/react";
 import { FiFile } from "react-icons/fi";
 import FileUpload from "./../components/FileUpload";
@@ -143,80 +145,100 @@ function Page() {
 	}
 
 	return (
-		<>
-			{imageFile == null ? (
-				<FileUpload
-					accept={"image/*"}
-					onFileUpload={(file) => {
-						if (!validateFile(file)) {
-							//TODO throw mmax file size error
-							return;
-						}
-						setImageFile(file);
-					}}
-				>
-					<Button leftIcon={<Icon as={FiFile} />}>
-						Choose Image
+		<Flex>
+			<Spacer />
+			<Flex
+				width="40%"
+				height="100vh"
+				flexDirection="column"
+				justifyContent="center"
+				alignItems="center"
+			>
+				{imageFile == null ? (
+					<Flex>
+						<FileUpload
+							accept={"image/*"}
+							onFileUpload={(file) => {
+								if (!validateFile(file)) {
+									//TODO throw mmax file size error
+									return;
+								}
+								setImageFile(file);
+							}}
+						>
+							<Button leftIcon={<Icon as={FiFile} />}>
+								Choose Image
+							</Button>
+						</FileUpload>
+					</Flex>
+				) : undefined}
+				{imageFile != null ? (
+					<Image src={URL.createObjectURL(imageFile)} width="90%" />
+				) : undefined}
+				{imageFile != null ? (
+					<Button
+						onClick={() => {
+							setImageFile(null);
+						}}
+					>
+						Remove
 					</Button>
-				</FileUpload>
-			) : undefined}
-			{imageFile != null ? (
-				<Image src={URL.createObjectURL(imageFile)} width={500} />
-			) : undefined}
-			{imageFile != null ? (
-				<Button
-					onClick={() => {
-						setImageFile(null);
+				) : undefined}
+			</Flex>
+			<Flex
+				width="40%"
+				flexDirection="column"
+				justifyContent="center"
+				alignItems="center"
+				height="100vh"
+			>
+				<Select
+					onChange={(e) => {
+						setSelectModerator(e.target.value);
 					}}
+					placeholder="Select Page"
 				>
-					Remove
+					{moderators.map((obj) => {
+						return (
+							<>
+								<option value={obj.oracleAddress}>
+									{`${obj.name}`}
+								</option>
+							</>
+						);
+					})}
+				</Select>
+
+				<NumberInput
+					onChange={(val) => {
+						setFundingAmount(val);
+					}}
+					defaultValue={0}
+					precision={2}
+				>
+					<NumberInputField />
+				</NumberInput>
+
+				<NumberInput
+					onChange={(val) => {
+						setBetAmount(val);
+					}}
+					defaultValue={0}
+					precision={2}
+				>
+					<NumberInputField />
+				</NumberInput>
+
+				<Button
+					isLoading={newPostLoading}
+					loadingText="Posting..."
+					onClick={uploadImageHelper}
+				>
+					Submit
 				</Button>
-			) : undefined}
-			<Select
-				onChange={(e) => {
-					setSelectModerator(e.target.value);
-				}}
-				placeholder="Select Page"
-			>
-				{moderators.map((obj) => {
-					return (
-						<>
-							<option value={obj.oracleAddress}>
-								{`${obj.name}`}
-							</option>
-						</>
-					);
-				})}
-			</Select>
-
-			<NumberInput
-				onChange={(val) => {
-					setFundingAmount(val);
-				}}
-				defaultValue={0}
-				precision={2}
-			>
-				<NumberInputField />
-			</NumberInput>
-
-			<NumberInput
-				onChange={(val) => {
-					setBetAmount(val);
-				}}
-				defaultValue={0}
-				precision={2}
-			>
-				<NumberInputField />
-			</NumberInput>
-
-			<Button
-				isLoading={newPostLoading}
-				loadingText="Posting..."
-				onClick={uploadImageHelper}
-			>
-				Submit
-			</Button>
-		</>
+			</Flex>
+			<Spacer />
+		</Flex>
 	);
 }
 

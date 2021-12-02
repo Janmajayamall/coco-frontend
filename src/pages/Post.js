@@ -307,7 +307,7 @@ function Page() {
 								)}`}
 							</Text>
 						) : undefined}
-						{/* {market && market.stateMetadata.stage == 1 ? (
+						{market && market.stateMetadata.stage == 1 ? (
 							<TradingInterface
 								market={market}
 								tradePosition={tradePosition}
@@ -336,7 +336,7 @@ function Page() {
 								market={market}
 								stakeHistories={stakeHistories}
 							/>
-						) : undefined} */}
+						) : undefined}
 						{/* <TradingInterface
 							market={market}
 							tradePosition={tradePosition}
@@ -348,13 +348,13 @@ function Page() {
 							stakeHistories={stakeHistories}
 							stakePosition={stakePosition}
 						/> */}
-						<RedeemWinsInterface
+						{/* <RedeemWinsInterface
 							market={market}
 							tradePosition={tradePosition}
 							stakeHistories={stakeHistories}
 							stakePosition={stakePosition}
 							tokenApproval={tokenApproval}
-						/>
+						/> */}
 					</>
 				) : (
 					<Loader />
