@@ -1,13 +1,8 @@
-import {} from "./auth";
 import { BigNumber, ethers, utils } from "ethers";
 import { useState } from "react";
 import { useEffect } from "react";
 import { parse } from "graphql";
-export const ZERO_BN = BigNumber.from("0");
-export const ONE_BN = BigNumber.from("1");
-export const TWO_BN = BigNumber.from("2");
-export const FOUR_BN = BigNumber.from("4");
-export const ZERO_DECIMAL_STR = "0";
+import { ZERO_BN, TWO_BN } from "./constants";
 
 export function populateMarketWithMetadata(
 	market,
@@ -96,6 +91,7 @@ export function parseDecimalToBN(val, base = 18) {
 }
 
 export function formatBNToDecimal(val, base = 18, dp = 2) {
+	
 	val = ethers.utils.formatUnits(val, base);
 	return parseFloat(val).toFixed(2);
 }

@@ -19,48 +19,18 @@ import {
 	NumberInputField,
 } from "@chakra-ui/react";
 import { useEthers } from "@usedapp/core/packages/core";
-import { CloseIcon } from "@chakra-ui/icons";
+
 import { useEffect } from "react";
 import { useState } from "react";
-import {
-	useBuyMinTokensForExactCTokens,
-	useQueryMarketByMarketIdentifier,
-	useQueryMarketTradeAndStakeInfoByUser,
-	useSellExactTokensForMinCTokens,
-	useStakeForOutcome,
-} from "../hooks";
+import { useStakeForOutcome } from "../hooks";
 import {
 	convertBlocksToSeconds,
-	convertDecimalStrToBigNumber,
-	convertDecimalStrToInt,
-	convertIntToDecimalStr,
-	determineMarketState,
-	filterMarketIdentifiersFromMarketsGraph,
-	filterOracleIdsFromMarketsGraph,
-	findModeratorsByIdArr,
-	findPostsByMarketIdentifierArr,
 	formatBNToDecimal,
-	getAmountCBySellTokenAmount,
-	getAmountCToBuyTokens,
-	getAvgPrice,
-	getAvgPriceOfOutcomeToken,
-	getFavoredOutcomeName,
-	getMarketStageName,
-	getMarketStateDetails,
-	getTempOutcomeInChallengePeriod,
-	getTokenAmountToBuyWithAmountC,
 	parseDecimalToBN,
-	populateMarketWithMetadata,
-	roundValueTwoDP,
 	TWO_BN,
 	useBNInput,
 	outcomeDisplayName,
 	formatTimeInSeconds,
-	determineOutcome,
-	getWinningsArr,
-	getTradeWinningsArr,
-	getStakeWinArr,
-	ONE_BN,
 	determineOutcomeInExpiry,
 } from "../utils";
 import PostDisplay from "../components/PostDisplay";
@@ -87,7 +57,7 @@ function StakingInterface({ market, stakeHistories }) {
 		setInput(
 			ethers.utils.formatUnits(
 				market.lastAmountStaked.isZero()
-					? ONE_BN
+					? parseDecimalToBN("1")
 					: market.lastAmountStaked.mul(TWO_BN),
 				18
 			)
@@ -126,7 +96,7 @@ function StakingInterface({ market, stakeHistories }) {
 			<TwoColTitleInfo
 				title={"Min amount to challenge"}
 				info={`${formatBNToDecimal(
-					parseDecimalToBN(market.lastAmountStaked).mul(TWO_BN)
+					market.lastAmountStaked.mul(TWO_BN)
 				)}`}
 			/>
 			<Text marginTop={5}>Challenge temp outcome</Text>

@@ -27,6 +27,7 @@ import {
 	useRedeemStake,
 	useERC1155SetApprovalForAll,
 	useRedeemMaxWinning,
+	useRedeemMaxWinningAndStake,
 } from "../hooks";
 import {
 	formatBNToDecimal,
@@ -72,7 +73,10 @@ function RedeemWinsInterface({
 	const isAuthenticated = userProfile && account;
 
 	const { state: stateRMaxW, send: sendRMaxW } = useRedeemMaxWinning();
-	const { state: stateRMaxWS, send: sendRMaxWS } = useRedeemMaxWinning();
+	const {
+		state: stateRMaxWS,
+		send: sendRMaxWS,
+	} = useRedeemMaxWinningAndStake();
 	const {
 		state: stateSetApproval,
 		send: sendSetApproval,

@@ -1,3 +1,6 @@
+import { BigNumber } from "ethers";
+import { ZERO_BN, TWO_BN, FOUR_BN, ONE_BN } from "./constants";
+
 export function isValidTradeEq(r0, r1, a0, a1, a, isBuy) {
 	if (typeof isBuy !== "boolean") {
 		return false;
