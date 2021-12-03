@@ -4,7 +4,7 @@ import { signMessage } from ".";
 import { generateRequestSignatures } from "./auth";
 const baseInstance = axios.create({
 	// baseURL: "http://localhost:5000",
-	baseURL: process.env.BASE_API_URL,
+	baseURL: "https://pm-backend-9.herokuapp.com/",
 	timeout: 1000,
 	headers: { "Content-Type": "application/json" },
 });
