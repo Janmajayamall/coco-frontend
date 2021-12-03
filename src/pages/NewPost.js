@@ -23,9 +23,11 @@ import {
 import { useCreateNewMarket } from "./../hooks";
 import { useEthers } from "@usedapp/core/packages/core";
 import { utils } from "ethers";
+import { useNavigate } from "react-router";
 
 function Page() {
 	const toast = useToast();
+	const navigate = useNavigate();
 
 	const [imageFile, setImageFile] = useState(null);
 	const [s3ImageUrl, setS3ImageUrl] = useState(null);
@@ -49,11 +51,15 @@ function Page() {
 		if (state.receipt) {
 			const res = await newPost(selectModerator, s3ImageUrl);
 
-			// TODO give a success message & navigate to explorer
-			displayToast("Post created", "success");
+			setTimeout(() => {
+				// TODO give a success message & navigate to explorer
+				displayToast("Post created", "success");
 
-			// end new post loading
-			setNewPostLoading(false);
+				// end new post loading
+				setNewPostLoading(false);
+
+				navigate("/explore");
+			}, 5000);
 		}
 	}, [state]);
 
@@ -118,7 +124,7 @@ function Page() {
 
 		// const presignedUrl = await getPresignedUrl();
 		// const s3Url = await uploadImageFile(presignedUrl);
-		const s3Url = "ht7dqijwdaiojwsaiosjaioj%3A16730";
+		const s3Url = "ht7cfvgybuhj16730";
 		if (s3Url == undefined) {
 			// TODO give error
 			displayToast("Something went wrong!", "error");

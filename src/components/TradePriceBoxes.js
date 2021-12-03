@@ -8,7 +8,6 @@ function TradePricesBoxes({
 	onOutcomeChosen,
 }) {
 	function OutcomeProbText({ outcome }) {
-		console.log(outcome);
 		const prob = roundDecimalStr(
 			market.optimisticState.stage === 4
 				? market.optimisticState.outcome === outcome
@@ -18,7 +17,7 @@ function TradePricesBoxes({
 				? market.probability1
 				: market.probability0
 		);
-		console.log(prob);
+
 		return (
 			<Text fontSize="15">{`${
 				outcome === 1 ? "YES" : "NO"

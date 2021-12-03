@@ -17,6 +17,7 @@ import {
 	Flex,
 	NumberInput,
 	NumberInputField,
+	useToast,
 } from "@chakra-ui/react";
 import { useEthers } from "@usedapp/core/packages/core";
 
@@ -32,6 +33,7 @@ import {
 	outcomeDisplayName,
 	formatTimeInSeconds,
 	determineOutcomeInExpiry,
+	GRAPH_BUFFER_MS,
 } from "../utils";
 import PostDisplay from "../components/PostDisplay";
 import TwoColTitleInfo from "../components/TwoColTitleInfo";
@@ -42,8 +44,10 @@ import TradingInput from "./TradingInput";
 import TradePriceBoxes from "./TradePriceBoxes";
 import ChallengeHistoryTable from "./ChallengeHistoryTable";
 
-function StakingInterface({ market, stakeHistories }) {
+function StakingInterface({ market, stakeHistories, refreshFn }) {
 	const { account } = useEthers();
+	const toast = useToast();
+
 	const userProfile = useSelector(selectUserProfile);
 	const isAuthenticated = account && userProfile;
 
@@ -52,6 +56,7 @@ function StakingInterface({ market, stakeHistories }) {
 	const { input, bnValue, setInput, err } = useBNInput();
 	const [tempOutcome, setTempOutcome] = useState(0);
 	const [favoredOutcome, setFavoredOutcome] = useState();
+	const [stakeLoading, setStakeLoading] = useState(false);
 
 	function setInputToMinStakeReq() {
 		setInput(
@@ -74,6 +79,37 @@ function StakingInterface({ market, stakeHistories }) {
 		setTempOutcome(_tempOutcome);
 		setFavoredOutcome(_tempOutcome == 2 ? 2 : 1 - _tempOutcome);
 	}, []);
+
+	// stake tx state loading
+	useEffect(() => {
+		if (state.status === "Success") {
+			setTimeout(() => {
+				toast({
+					title: "Success!",
+					status: "success",
+					isClosable: true,
+				});
+
+				setStakeLoading(false);
+
+				if (refreshFn) {
+					refreshFn();
+				}
+			}, GRAPH_BUFFER_MS);
+		}
+	}, [state]);
+
+	// stake tx state error
+	useEffect(() => {
+		if (state.status === "Exception" || state.status === "Fail") {
+			toast({
+				title: "Metamask err!",
+				status: "error",
+				isClosable: true,
+			});
+			setStakeLoading(false);
+		}
+	}, [state]);
 
 	return (
 		<Flex flexDirection="column">
@@ -115,6 +151,8 @@ function StakingInterface({ market, stakeHistories }) {
 				<NumberInputField />
 			</NumberInput>
 			<Button
+				loadingText="Processing..."
+				isLoading={stakeLoading}
 				disabled={!isAuthenticated}
 				onClick={() => {
 					if (!isAuthenticated) {
@@ -127,6 +165,8 @@ function StakingInterface({ market, stakeHistories }) {
 					if (favoredOutcome == 2) {
 						return;
 					}
+
+					setStakeLoading(true);
 
 					send(
 						favoredOutcome,

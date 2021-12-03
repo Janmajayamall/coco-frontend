@@ -1,4 +1,4 @@
-import { useDisclosure } from "@chakra-ui/hooks";
+import { useDisclosure, useFocusEffect } from "@chakra-ui/hooks";
 import { useDispatch, useSelector } from "react-redux";
 import {
 	selectPostTradeModalState,
@@ -11,7 +11,7 @@ import {
 	selectRinkebyLatestBlockNumber,
 	selectUserProfile,
 } from "../redux/reducers";
-import { Button, Text, Flex } from "@chakra-ui/react";
+import { Button, Text, Flex, useToast } from "@chakra-ui/react";
 import { useEthers } from "@usedapp/core/packages/core";
 import { CloseIcon } from "@chakra-ui/icons";
 import { useEffect } from "react";
@@ -50,6 +50,7 @@ import {
 	ZERO_DECIMAL_STR,
 	determineTotalAmountStakeRedeem,
 	determineTradeWinAmount,
+	GRAPH_BUFFER_MS,
 } from "../utils";
 import PostDisplay from "../components/PostDisplay";
 import TwoColTitleInfo from "../components/TwoColTitleInfo";
@@ -67,8 +68,10 @@ function RedeemWinsInterface({
 	tradePosition,
 	stakePosition,
 	tokenApproval,
+	refreshFn,
 }) {
 	const { account } = useEthers();
+	const toast = useToast();
 	const userProfile = useSelector(selectUserProfile);
 	const isAuthenticated = userProfile && account;
 
@@ -81,6 +84,75 @@ function RedeemWinsInterface({
 		state: stateSetApproval,
 		send: sendSetApproval,
 	} = useERC1155SetApprovalForAll(market.oracle.id);
+
+	// redeem tx loading
+	const [redeemLoading, setRedeemLoading] = useState(false);
+	const [approvalLoading, setApprovalLoading] = useState(false);
+
+	useEffect(() => {
+		if (
+			stateRMaxW.status === "Success" ||
+			stateRMaxWS.status === "Success"
+		) {
+			setTimeout(() => {
+				setRedeemLoading(false);
+				toast({
+					title: "Success!",
+					status: "success",
+					isClosable: true,
+				});
+				if (refreshFn) {
+					refreshFn();
+				}
+			}, GRAPH_BUFFER_MS);
+		}
+	}, [stateRMaxW, stateRMaxWS]);
+
+	useEffect(() => {
+		if (stateSetApproval.status === "Success") {
+			setTimeout(() => {
+				setApprovalLoading(false);
+				toast({
+					title: "Success!",
+					status: "success",
+					isClosable: true,
+				});
+				if (refreshFn) {
+					refreshFn();
+				}
+			}, GRAPH_BUFFER_MS);
+		}
+	}, [stateSetApproval]);
+
+	useEffect(() => {
+		if (
+			stateSetApproval.status === "Exception" ||
+			stateSetApproval.status === "Fail"
+		) {
+			setApprovalLoading(false);
+			toast({
+				title: "Metamask Err!",
+				status: "error",
+				isClosable: true,
+			});
+		}
+	});
+
+	useEffect(() => {
+		if (
+			stateRMaxW.status === "Exception" ||
+			stateRMaxWS.status === "Exception" ||
+			stateRMaxW.status === "Fail" ||
+			stateRMaxWS.status === "Fail"
+		) {
+			setRedeemLoading(false);
+			toast({
+				title: "Metamask Err!",
+				status: "error",
+				isClosable: true,
+			});
+		}
+	}, [stateRMaxW, stateRMaxWS]);
 
 	function determineWinLevel() {
 		let tradeWinnings = determineTradeWinAmount(
@@ -193,12 +265,15 @@ function RedeemWinsInterface({
 
 			<Button
 				disabled={!isAuthenticated || determineWinLevel() === 0}
+				loadingText="Processing..."
+				isLoading={redeemLoading}
 				onClick={() => {
 					let winLevel = determineWinLevel();
-					console.log(winLevel, "djaio");
 					if (winLevel === 0) {
 						return;
 					}
+
+					setRedeemLoading(true);
 
 					if (winLevel === 1) {
 						sendRMaxW(market.oracle.id, market.marketIdentifier);
@@ -212,7 +287,10 @@ function RedeemWinsInterface({
 			<ChallengeHistoryTable stakeHistories={stakeHistories} />
 			<Button
 				disabled={tokenApproval}
+				loadingText="Processing..."
+				isLoading={approvalLoading}
 				onClick={() => {
+					setApprovalLoading(true);
 					sendSetApproval(addresses.MarketRouter, true);
 				}}
 			>

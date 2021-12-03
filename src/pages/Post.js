@@ -91,6 +91,7 @@ import {
 	findTokenIdBalanceInTokenArr,
 	stateSetupOraclesInfo,
 	stateSetupMarketsMetadata,
+	ZERO_BN,
 } from "../utils";
 import PostDisplay from "../components/PostDisplay";
 import TradingInterface from "../components/TradingInterface";
@@ -122,60 +123,37 @@ function Page() {
 		selectRinkebyLatestBlockNumber
 	);
 
-	const { result } = useQueryMarketByMarketIdentifier(postId);
-	const { result: mSATResult } = useQueryMarketTradeAndStakeInfoByUser(
+	const { result, reexecuteQuery } = useQueryMarketByMarketIdentifier(postId);
+	const {
+		result: mSATResult,
+		reexecuteQuery: mSATReexecuteQuery,
+	} = useQueryMarketTradeAndStakeInfoByUser(
 		postId,
 		account ? account.toLowerCase() : ""
 	);
 	const {
 		result: tokenApprovalsResult,
+		reexecuteQuery: tokenApprovalsReexecuteQuery,
 	} = useQueryTokenApprovalsByUserAndOracle(
 		account ? account.toLocaleLowerCase() : "",
 		result.data && result.data.market ? result.data.market.oracle.id : ""
 	);
 
+	useEffect(() => {}, [result]);
+
 	const [market, setMarket] = useState(undefined);
 	const [loadingMarket, setLoadingMarket] = useState(true);
-
-	const tradeHistories =
-		mSATResult.data && mSATResult.data.tradeHistories
-			? mSATResult.data.tradeHistories
-			: [];
-	const stakeHistories =
-		mSATResult.data && mSATResult.data.stakeHistories
-			? mSATResult.data.stakeHistories
-			: [];
-	const tokenBalances = mSATResult.data ? mSATResult.data.tokenBalances : [];
-	const tradePosition = {
-		amount0: findTokenIdBalanceInTokenArr(
-			tokenBalances,
-			market ? market.oToken0Id : undefined
-		),
-		amount1: findTokenIdBalanceInTokenArr(
-			tokenBalances,
-			market ? market.oToken1Id : undefined
-		),
-	};
-	const stakePosition = {
-		amount0: findTokenIdBalanceInTokenArr(
-			tokenBalances,
-			market ? market.sToken0Id : undefined
-		),
-		amount1: findTokenIdBalanceInTokenArr(
-			tokenBalances,
-			market ? market.sToken1Id : undefined
-		),
-	};
-
-	const tokenApproval = tokenApprovalsResult.data
-		? (() => {
-				return tokenApprovalsResult.data.tokenApprovals.find(
-					(obj) =>
-						obj.operator == addresses.MarketRouter.toLowerCase() &&
-						obj.approved == true
-				);
-		  })() != undefined
-		: false;
+	const [tradeHistories, setTradeHistories] = useState([]);
+	const [stakeHistories, setStakeHistories] = useState([]);
+	const [tradePosition, setTradePosition] = useState({
+		amount0: ZERO_BN,
+		amount1: ZERO_BN,
+	});
+	const [stakePosition, setStakePosition] = useState({
+		amount0: ZERO_BN,
+		amount1: ZERO_BN,
+	});
+	const [tokenApproval, setTokenApproval] = useState(false);
 
 	useEffect(async () => {
 		if (!result.data || !result.data.market) {
@@ -215,6 +193,68 @@ function Page() {
 		groupsFollowed,
 		rinkebyLatestBlockNumber,
 	]);
+
+	useEffect(() => {
+		setTradeHistories(
+			mSATResult.data && mSATResult.data.tradeHistories
+				? mSATResult.data.tradeHistories
+				: []
+		);
+
+		setStakeHistories(
+			mSATResult.data && mSATResult.data.stakeHistories
+				? mSATResult.data.stakeHistories
+				: []
+		);
+
+		const tokenBalances = mSATResult.data
+			? mSATResult.data.tokenBalances
+			: [];
+
+		setTradePosition({
+			amount0: findTokenIdBalanceInTokenArr(
+				tokenBalances,
+				market ? market.oToken0Id : undefined
+			),
+			amount1: findTokenIdBalanceInTokenArr(
+				tokenBalances,
+				market ? market.oToken1Id : undefined
+			),
+		});
+
+		setStakePosition({
+			amount0: findTokenIdBalanceInTokenArr(
+				tokenBalances,
+				market ? market.sToken0Id : undefined
+			),
+			amount1: findTokenIdBalanceInTokenArr(
+				tokenBalances,
+				market ? market.sToken1Id : undefined
+			),
+		});
+	}, [mSATResult, market]);
+
+	useEffect(() => {
+		const tokenApprovals =
+			tokenApprovalsResult.data &&
+			tokenApprovalsResult.data.tokenApprovals
+				? tokenApprovalsResult.data.tokenApprovals
+				: [];
+		const obj = tokenApprovals.find(
+			(obj) =>
+				obj.operator == addresses.MarketRouter.toLowerCase() &&
+				obj.approved == true
+		);
+		setTokenApproval(obj != undefined);
+	}, [tokenApprovalsResult]);
+
+	function refreshPost() {
+		// console.log("daiowjaiosja");
+		// reexecuteQuery();
+		// mSATReexecuteQuery();
+		// tokenApprovalsReexecuteQuery();
+		window.location.reload();
+	}
 
 	return (
 		<Flex style={{ maxWidth: 1650, marginTop: 5 }}>
@@ -304,6 +344,7 @@ function Page() {
 								market={market}
 								tradePosition={tradePosition}
 								tokenApproval={tokenApproval}
+								refreshFn={refreshPost}
 							/>
 						) : undefined}
 						{market.optimisticState.stage === 2 ? (
@@ -312,6 +353,7 @@ function Page() {
 								tradePosition={tradePosition}
 								stakeHistories={stakeHistories}
 								stakePosition={stakePosition}
+								refreshFn={refreshPost}
 							/>
 						) : undefined}
 						{market.optimisticState.stage === 4 ? (
@@ -321,6 +363,7 @@ function Page() {
 								stakeHistories={stakeHistories}
 								stakePosition={stakePosition}
 								tokenApproval={tokenApproval}
+								refreshFn={refreshPost}
 							/>
 						) : undefined}
 						{market && market.optimisticState.stage === 3 ? (

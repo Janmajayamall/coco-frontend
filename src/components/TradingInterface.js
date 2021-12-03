@@ -36,6 +36,7 @@ import {
 	SliderFilledTrack,
 	SliderThumb,
 	Slider,
+	useToast,
 } from "@chakra-ui/react";
 import { useEthers } from "@usedapp/core/packages/core";
 import { CloseIcon } from "@chakra-ui/icons";
@@ -81,6 +82,7 @@ import {
 	ONE_BN,
 	getAvgPriceBN,
 	getDecStrAvgPriceBN,
+	GRAPH_BUFFER_MS,
 } from "../utils";
 import PostDisplay from "../components/PostDisplay";
 import TwoColTitleInfo from "../components/TwoColTitleInfo";
@@ -90,10 +92,11 @@ import { BigNumber, ethers, utils } from "ethers";
 import TradingInput from "./TradingInput";
 import TradePriceBoxes from "./TradePriceBoxes";
 
-function TradingInterface({ market, tradePosition, tokenApproval }) {
+function TradingInterface({ market, tradePosition, tokenApproval, refreshFn }) {
 	const { account } = useEthers();
 	const userProfile = useSelector(selectUserProfile);
 	const isAuthenticated = userProfile && account;
+	const toast = useToast();
 
 	/**
 	 * Contract calls
@@ -135,6 +138,10 @@ function TradingInterface({ market, tradePosition, tokenApproval }) {
 	const [amountCOutBn, setAmountCOutBn] = useState(BigNumber.from(0));
 
 	const [slippage, setSlippage] = useState(0);
+
+	// tx loading
+	const [buyLoading, setBuyLoading] = useState(false);
+	const [sellLoading, setSellLoading] = useState(false);
 
 	useEffect(() => {
 		if (
@@ -185,6 +192,42 @@ function TradingInterface({ market, tradePosition, tokenApproval }) {
 
 		setAmountCOutBn(amount);
 	}, [inputSellAmountBn, tokenActionIndex]);
+
+	// tx loading
+	useEffect(() => {
+		if (stateBuy.status == "Success" || stateSell.status == "Success") {
+			setTimeout(() => {
+				displayToast("Success!", "success");
+				setBuyLoading(false);
+				setSellLoading(false);
+				if (refreshFn) {
+					refreshFn();
+				}
+			}, GRAPH_BUFFER_MS);
+		}
+	}, [stateSell, stateBuy]);
+
+	// handle tx error
+	useEffect(() => {
+		if (
+			stateBuy.status == "Exception" ||
+			stateBuy.status == "Fail" ||
+			stateSell.status == "Exception" ||
+			stateSell.status == "Fail"
+		) {
+			displayToast("Metmask err!", "error");
+			setBuyLoading(false);
+			setSellLoading(false);
+		}
+	}, [stateBuy, stateSell]);
+
+	function displayToast(title, status) {
+		toast({
+			title: title,
+			status: status,
+			isClosable: true,
+		});
+	}
 
 	return (
 		<Flex flexDirection={"column"}>
@@ -244,6 +287,8 @@ function TradingInterface({ market, tradePosition, tokenApproval }) {
 									return;
 								}
 
+								setBuyLoading(true);
+
 								let a0 =
 									tokenActionIndex == 0
 										? tokenOutAmountBn
@@ -262,6 +307,8 @@ function TradingInterface({ market, tradePosition, tokenApproval }) {
 									market.marketIdentifier
 								);
 							}}
+							isLoading={buyLoading}
+							loadingText={"Processing..."}
 						>
 							<Text
 								color="white"
@@ -319,6 +366,8 @@ function TradingInterface({ market, tradePosition, tokenApproval }) {
 									return;
 								}
 
+								setSellLoading(true);
+
 								let a0 =
 									tokenActionIndex == 0
 										? inputSellAmountBn
@@ -336,6 +385,8 @@ function TradingInterface({ market, tradePosition, tokenApproval }) {
 									market.marketIdentifier
 								);
 							}}
+							isLoading={sellLoading}
+							loadingText={"Processing..."}
 						>
 							<Text
 								color="white"
