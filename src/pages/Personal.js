@@ -77,7 +77,7 @@ import { HomeIcon } from "../components/HomeIcon";
 import { ArrowBackIcon } from "@chakra-ui/icons";
 
 /**
- * Shows different posts user has interacted with in any form. 
+ * Shows different posts user has interacted with in any form.
  */
 
 function Page() {
@@ -148,7 +148,10 @@ function Page() {
 
 		let dict = {};
 		tokenBalancesResult.data.tokenBalances.forEach((obj) => {
-			dict[obj.tokenId] = obj;
+			dict[obj.tokenId] = {
+				...obj,
+				balance: parseDecimalToBN(obj.balance),
+			};
 		});
 		setTokenBalancesObj(dict);
 	}, [tokenBalancesResult]);

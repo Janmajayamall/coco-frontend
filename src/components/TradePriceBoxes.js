@@ -1,5 +1,5 @@
 import { Button, Box, Text, Flex, Spacer } from "@chakra-ui/react";
-import { determineOutcome, roundValueTwoDP } from "../utils";
+import { determineOutcome, roundDecimalStr, roundValueTwoDP } from "../utils";
 
 function TradePricesBoxes({
 	market,
@@ -9,15 +9,16 @@ function TradePricesBoxes({
 }) {
 	function OutcomeProbText({ outcome }) {
 		console.log(outcome);
-		const prob = roundValueTwoDP(
-			market.stateMetadata.stage === 4
-				? determineOutcome(market) === outcome
+		const prob = roundDecimalStr(
+			market.optimisticState.stage === 4
+				? market.optimisticState.outcome === outcome
 					? 1
 					: 0
 				: outcome == 1
 				? market.probability1
 				: market.probability0
 		);
+		console.log(prob);
 		return (
 			<Text fontSize="15">{`${
 				outcome === 1 ? "YES" : "NO"

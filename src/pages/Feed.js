@@ -348,7 +348,7 @@ function Page() {
 					}
 
 					if (
-						Number(populatedMarket.probability1) <
+						populatedMarket.probability1 <
 						Number(feedThreshold) / 100
 					) {
 						return;

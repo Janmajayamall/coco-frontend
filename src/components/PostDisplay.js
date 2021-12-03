@@ -13,7 +13,7 @@ import { TriangleUpIcon, TriangleDownIcon } from "@chakra-ui/icons";
 import {
 	followModerator,
 	marketStageDisplayName,
-	roundValueTwoDP,
+	roundDecimalStr,
 } from "../utils";
 import { useDispatch } from "react-redux";
 import { sUpdatePostTradeModal, sAddGroupFollow } from "./../redux/reducers";
@@ -28,17 +28,7 @@ function PostDisplay({ market, onImageClick }) {
 	}
 
 	return (
-		<Box
-			onClick={() => {
-				dispatch(
-					sUpdatePostTradeModal({
-						isOpen: true,
-
-						marketIdentifier: market.marketIdentifier,
-					})
-				);
-			}}
-		>
+		<Box>
 			<Flex paddingBottom={3} paddingTop={4}>
 				<Flex alignItems="center">
 					<Avatar
@@ -56,25 +46,32 @@ function PostDisplay({ market, onImageClick }) {
 						{market.oracleInfo.name}
 					</Heading>
 
-					<Text
-						onClick={async () => {
-							const res = await followModerator(market.oracle.id);
+					{market.following === false ? (
+						<Text
+							onClick={async () => {
+								if (market.following === true) {
+									return;
+								}
+								const res = await followModerator(
+									market.oracle.id
+								);
 
-							if (res == undefined) {
-								return;
-							}
-							dispatch(sAddGroupFollow(market.oracle.id));
-						}}
-						fontSize="12"
-						fontWeight="bold"
-						marginLeft="2"
-					>
-						{market.follow != true ? "Join" : undefined}
-					</Text>
+								if (res == undefined) {
+									return;
+								}
+								dispatch(sAddGroupFollow(market.oracle.id));
+							}}
+							fontSize="12"
+							fontWeight="bold"
+							marginLeft="2"
+						>
+							Join
+						</Text>
+					) : undefined}
 				</Flex>
 				<Spacer />
 				<Text>
-					{marketStageDisplayName(market.stateMetadata.stage)}
+					{marketStageDisplayName(market.optimisticState.stage)}
 				</Text>
 			</Flex>
 			<Image
@@ -105,7 +102,7 @@ function PostDisplay({ market, onImageClick }) {
 						h={3}
 						color="#0B0B0B"
 					/>
-					<Text>{roundValueTwoDP(market.probability1)}</Text>
+					<Text>{roundDecimalStr(market.probability1)}</Text>
 				</Flex>
 				<Flex
 					backgroundColor="#E9CFCC"
@@ -124,7 +121,7 @@ function PostDisplay({ market, onImageClick }) {
 						h={3}
 						color="#0B0B0B"
 					/>
-					<Text>{roundValueTwoDP(market.probability0)}</Text>
+					<Text>{roundDecimalStr(market.probability0)}</Text>
 				</Flex>
 			</Flex>
 		</Box>

@@ -140,6 +140,42 @@
   {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "oracle",
+        "type": "address"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "marketIdentifier",
+        "type": "bytes32"
+      }
+    ],
+    "name": "redeemMaxWinning",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "oracle",
+        "type": "address"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "marketIdentifier",
+        "type": "bytes32"
+      }
+    ],
+    "name": "redeemMaxWinningAndStake",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "uint256",
         "name": "_for",
         "type": "uint256"

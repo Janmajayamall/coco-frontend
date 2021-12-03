@@ -58,21 +58,27 @@
     "inputs": [
       {
         "indexed": true,
+        "internalType": "bytes32",
+        "name": "marketIdentifier",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
         "internalType": "address",
         "name": "creator",
         "type": "address"
       },
       {
-        "indexed": true,
+        "indexed": false,
         "internalType": "bytes32",
         "name": "eventIdentifier",
         "type": "bytes32"
       },
       {
-        "indexed": true,
-        "internalType": "bytes32",
-        "name": "marketIdentifier",
-        "type": "bytes32"
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "fundingAmount",
+        "type": "uint256"
       }
     ],
     "name": "MarketCreated",
@@ -82,6 +88,56 @@
     "anonymous": false,
     "inputs": [],
     "name": "OracleConfigUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "marketIdentifier",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "by",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amountC",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount0",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount1",
+        "type": "uint256"
+      }
+    ],
+    "name": "OutcomeBought",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "marketIdentifier",
+        "type": "bytes32"
+      }
+    ],
+    "name": "OutcomeReservesClaimed",
     "type": "event"
   },
   {
@@ -107,10 +163,59 @@
         "type": "bytes32"
       },
       {
-        "indexed": true,
+        "indexed": false,
         "internalType": "address",
         "name": "by",
         "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amountC",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount0",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount1",
+        "type": "uint256"
+      }
+    ],
+    "name": "OutcomeSold",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "marketIdentifier",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "by",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint8",
+        "name": "outcome",
+        "type": "uint8"
       }
     ],
     "name": "OutcomeStaked",
@@ -126,26 +231,7 @@
         "type": "bytes32"
       },
       {
-        "indexed": true,
-        "internalType": "address",
-        "name": "by",
-        "type": "address"
-      }
-    ],
-    "name": "OutcomeTraded",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "bytes32",
-        "name": "marketIdentifier",
-        "type": "bytes32"
-      },
-      {
-        "indexed": true,
+        "indexed": false,
         "internalType": "address",
         "name": "by",
         "type": "address"
@@ -257,7 +343,7 @@
         "type": "bytes32"
       },
       {
-        "indexed": true,
+        "indexed": false,
         "internalType": "address",
         "name": "by",
         "type": "address"
@@ -359,6 +445,19 @@
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "marketIdentifier",
+        "type": "bytes32"
+      }
+    ],
+    "name": "claimOutcomeReserves",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -788,14 +887,9 @@
   {
     "inputs": [
       {
-        "internalType": "uint256",
+        "internalType": "uint8",
         "name": "_for",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "to",
-        "type": "address"
+        "type": "uint8"
       },
       {
         "internalType": "bytes32",

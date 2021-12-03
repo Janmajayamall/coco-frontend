@@ -79,6 +79,8 @@ import {
 	getTradeWinningsArr,
 	getStakeWinArr,
 	ONE_BN,
+	getAvgPriceBN,
+	getDecStrAvgPriceBN,
 } from "../utils";
 import PostDisplay from "../components/PostDisplay";
 import TwoColTitleInfo from "../components/TwoColTitleInfo";
@@ -102,6 +104,10 @@ function TradingInterface({ market, tradePosition, tokenApproval }) {
 		send: sendSell,
 	} = useSellExactTokensForMinCTokens();
 
+	/**
+	 * tabIndex == 0 -> BUY
+	 * tabIndex == 1 -> SELL
+	 */
 	const [tabIndex, setTabIndex] = useState(0);
 	const [tokenActionIndex, setTokenActionIndex] = useState(1);
 
@@ -112,12 +118,13 @@ function TradingInterface({ market, tradePosition, tokenApproval }) {
 		input: inputBuyAmount,
 		bnValue: inputBuyAmountBn,
 		setInput: setInputBuyAmount,
-		err: inputBuyAmountErr,
+		err: inputBuyAmountErr, // TODO supply validation function
 	} = useBNInput();
 	const [tokenOutAmountBn, setTokenOutAmountBn] = useState(BigNumber.from(0));
 
 	/**
 	 * Sell side states
+	 * @TODO You are missing token approval button for selling tokens
 	 */
 	const {
 		input: inputSellAmount,
@@ -140,8 +147,8 @@ function TradingInterface({ market, tradePosition, tokenApproval }) {
 		}
 
 		let { amount, err } = getTokenAmountToBuyWithAmountC(
-			parseDecimalToBN(market.outcomeReserve0),
-			parseDecimalToBN(market.outcomeReserve1),
+			market.outcomeReserve0,
+			market.outcomeReserve1,
 			inputBuyAmountBn,
 			tokenActionIndex
 		);
@@ -165,8 +172,8 @@ function TradingInterface({ market, tradePosition, tokenApproval }) {
 		}
 
 		let { amount, err } = getAmountCBySellTokenAmount(
-			parseDecimalToBN(market.outcomeReserve0),
-			parseDecimalToBN(market.outcomeReserve1),
+			market.outcomeReserve0,
+			market.outcomeReserve1,
 			inputSellAmountBn,
 			tokenActionIndex
 		);
@@ -216,7 +223,7 @@ function TradingInterface({ market, tradePosition, tokenApproval }) {
 						/>
 						<TwoColTitleInfo
 							title="Avg. Price per share"
-							info={getAvgPrice(
+							info={getDecStrAvgPriceBN(
 								inputBuyAmountBn,
 								tokenOutAmountBn
 							)}
@@ -296,7 +303,10 @@ function TradingInterface({ market, tradePosition, tokenApproval }) {
 						/>
 						<TwoColTitleInfo
 							title="Avg. sell price"
-							info={getAvgPrice(amountCOutBn, inputSellAmountBn)}
+							info={getDecStrAvgPriceBN(
+								amountCOutBn,
+								inputSellAmountBn
+							)}
 						/>
 
 						<Button

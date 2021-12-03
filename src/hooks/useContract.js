@@ -78,6 +78,22 @@ export function useRedeemWinningBothOutcomes() {
 	return { state, send };
 }
 
+export function useRedeemMaxWinning() {
+	const { state, send } = useContractFunction(
+		marketRouterContract,
+		"redeemMaxWinning"
+	);
+	return { state, send };
+}
+
+export function useRedeemMaxWinningAndStake() {
+	const { state, send } = useContractFunction(
+		marketRouterContract,
+		"redeemMaxWinningAndStake"
+	);
+	return { state, send };
+}
+
 export function useRedeemStake(oracleAddress) {
 	const oracleContract = new Contract(
 		oracleAddress,

@@ -2,36 +2,12 @@ import {} from "./auth";
 import { BigNumber, ethers, utils } from "ethers";
 import { useState } from "react";
 import { useEffect } from "react";
+import { parse } from "graphql";
 export const ZERO_BN = BigNumber.from("0");
 export const ONE_BN = BigNumber.from("1");
 export const TWO_BN = BigNumber.from("2");
 export const FOUR_BN = BigNumber.from("4");
 export const ZERO_DECIMAL_STR = "0";
-
-/**
- * Filters oracle ids from market schema returns by Graph index
- * @note Oracle ids are oracle addresses, thus the value returned
- * is checksummed
- */
-export function filterOracleIdsFromMarketsGraph(markets) {
-	const oracleIds = [];
-	markets.forEach((market) => {
-		if (market.oracle && market.oracle.id) {
-			oracleIds.push(market.oracle.id);
-		}
-	});
-	return oracleIds;
-}
-
-export function filterMarketIdentifiersFromMarketsGraph(markets) {
-	const identifiers = [];
-	markets.forEach((market) => {
-		if (market.marketIdentifier) {
-			identifiers.push(market.marketIdentifier);
-		}
-	});
-	return identifiers;
-}
 
 export function populateMarketWithMetadata(
 	market,
@@ -40,26 +16,49 @@ export function populateMarketWithMetadata(
 	groupsFollowed,
 	latestBlockNumber
 ) {
-	const { stage, blocksLeft } = determineMarketState(
-		getMarketStateDetails(market),
+	let _market = {
+		...market,
+
+		outcomeReserve0: parseDecimalToBN(market.outcomeReserve0),
+		outcomeReserve1: parseDecimalToBN(market.outcomeReserve1),
+		probability0: Number(market.probability0),
+		probability1: Number(market.probability1),
+		stakingReserve0: parseDecimalToBN(market.stakingReserve0),
+		stakingReserve1: parseDecimalToBN(market.stakingReserve1),
+
+		feeNumerator: Number(market.feeNumerator),
+		feeDenominator: Number(market.feeDenominator),
+		fee: Number(market.fee),
+		expireAtBlock: Number(market.expireAtBlock),
+		donBufferEndsAtBlock: Number(market.donBufferEndsAtBlock),
+		resolutionEndsAtBlock: Number(market.resolutionEndsAtBlock),
+		donBufferBlocks: Number(market.donBufferBlocks),
+		resolutionBufferBlocks: Number(market.resolutionBufferBlocks),
+		donEscalationCount: Number(market.donEscalationCount),
+		donEscalationLimit: Number(market.donEscalationLimit),
+		outcome: Number(market.outcome),
+		stage: Number(market.stage),
+
+		lastAmountStaked: parseDecimalToBN(market.lastAmountStaked),
+		lastOutcomeStaked: Number(market.lastOutcomeStaked),
+
+		oracleInfo: oraclesInfo[market.oracle.id],
+		marketMetadata: marketsMetadata[market.marketIdentifier],
+		following: groupsFollowed[market.oracle.id] ? true : false,
+	};
+
+	let optimisticState = determineOptimisticMarketState(
+		_market,
 		latestBlockNumber
 	);
 
 	return {
-		...market,
-		oracleInfo: oraclesInfo[market.oracle.id],
-		imageUrl: marketsMetadata[market.marketIdentifier]
-			? marketsMetadata[market.marketIdentifier].eventIdentifierStr
-			: undefined,
-		follow: groupsFollowed[market.oracle.id] ? true : false,
-		stateMetadata: {
-			stage,
-			blocksLeft,
-		},
+		..._market,
+		optimisticState,
 	};
 }
 
-export function roundValueTwoDP(value) {
+export function roundDecimalStr(value, dp = 2) {
 	let _value = value;
 	try {
 		if (typeof _value == "string") {
@@ -69,8 +68,7 @@ export function roundValueTwoDP(value) {
 		return 0;
 	}
 
-	// TODO finish this
-	return _value.toFixed(2);
+	return _value.toFixed(dp);
 }
 
 export function numStrFormatter(value, digits = 1) {
@@ -102,170 +100,7 @@ export function formatBNToDecimal(val, base = 18, dp = 2) {
 	return parseFloat(val).toFixed(2);
 }
 
-export function convertBigNumberToDecimalStr(value, base = 18) {}
-
-export function isValidTradeEq(r0, r1, a0, a1, a, isBuy) {
-	if (typeof isBuy !== "boolean") {
-		return false;
-	}
-
-	if (
-		!BigNumber.isBigNumber(r0) ||
-		!BigNumber.isBigNumber(r1) ||
-		!BigNumber.isBigNumber(a) ||
-		!BigNumber.isBigNumber(a0) ||
-		!BigNumber.isBigNumber(a1)
-	) {
-		return false;
-	}
-
-	if (
-		isBuy &&
-		r0.add(a).sub(a0).gte(ZERO_BN) &&
-		r1.add(a).sub(a1).gte(ZERO_BN)
-	) {
-		return true;
-	} else if (
-		!isBuy &&
-		r0.add(a0).sub(a).gte(ZERO_BN) &&
-		r1.add(a1).sub(a).gte(ZERO_BN)
-	) {
-		return true;
-	}
-	return false;
-}
-
-export function getTokenAmountToBuyWithAmountC(r0, r1, a, tokenIndex) {
-	if (
-		!BigNumber.isBigNumber(r0) ||
-		!BigNumber.isBigNumber(r1) ||
-		!BigNumber.isBigNumber(a)
-	) {
-		return { amount: 0, err: true };
-	}
-
-	if (tokenIndex > 1 || tokenIndex < 0) {
-		return { amount: 0, err: true };
-	}
-	let tokenAmount = BigNumber.from(0);
-	if (tokenIndex === 0) {
-		tokenAmount = r0.add(a).sub(r0.mul(r1).div(r1.add(a)));
-	} else {
-		tokenAmount = r1.add(a).sub(r0.mul(r1).div(r0.add(a)));
-	}
-	tokenAmount = tokenAmount.sub(ONE_BN);
-
-	return {
-		amount: tokenAmount,
-		err: false,
-	};
-}
-
-/**
- * @ref https://github.com/Uniswap/sdk-core/blob/76b41d349ef7f9e0555383b1b11f95872e91e975/src/utils/sqrt.ts#L14
- */
-export function sqrtBn(value) {
-	if (!BigNumber.isBigNumber(value) || value.lte(ZERO_BN)) {
-		return 0;
-	}
-
-	if (value.lte(BigNumber.from(Number.MAX_SAFE_INTEGER - 1))) {
-		return BigNumber.from(Math.sqrt(Number(value.toString())));
-	}
-
-	let z;
-	let x;
-	z = value;
-	x = value.div(TWO_BN).add(ONE_BN);
-	while (x.lt(z)) {
-		z = x;
-		x = value.div(x).add(x).div(TWO_BN);
-	}
-	return z;
-}
-
-export function getAmountCBySellTokenAmount(r0, r1, tA, tokenIndex) {
-	if (tokenIndex > 1 || tokenIndex < 0) {
-		return { amount: ZERO_BN, err: true };
-	}
-
-	if (
-		!BigNumber.isBigNumber(r0) ||
-		!BigNumber.isBigNumber(r1) ||
-		!BigNumber.isBigNumber(tA)
-	) {
-		return { amount: ZERO_BN, err: true };
-	}
-
-	let a0 = tokenIndex == 0 ? tA : ZERO_BN;
-	let a1 = tokenIndex == 1 ? tA : ZERO_BN;
-
-	let b = r0.add(a0).add(r1).add(a1);
-	let c = r0.mul(a1).add(a1.mul(a0)).add(r1.mul(a0));
-	let root = sqrtBn(b.pow(TWO_BN).sub(c.mul(FOUR_BN)));
-
-	let a = b.add(root).div(TWO_BN);
-	if (isValidTradeEq(r0, r1, a0, a1, a, false)) {
-		return {
-			amount: a.sub(ONE_BN),
-			err: false,
-		};
-	}
-
-	a = b.sub(root).div(TWO_BN);
-	if (isValidTradeEq(r0, r1, a0, a1, a, false)) {
-		return {
-			amount: a.sub(ONE_BN),
-			err: false,
-		};
-	}
-	return {
-		amount: ZERO_BN,
-		err: true,
-	};
-}
-
-export function getAmountCToBuyTokens(r0, r1, a0, a1) {
-	let b = r0 + r1 - (a0 + a1);
-	let c = a0 * a1 - r0 * a1 - r1 * a0;
-
-	let root = b ** 2 - 4 * c;
-
-	if (root < 0) {
-		return { amount: 0, err: true };
-	}
-	root = Math.sqrt(root);
-
-	let a = (-1 * b + root) / 2;
-
-	if (isValidTradeEq(r0, r1, a0, a1, a, true)) {
-		return { amount: a + 1, err: false };
-	}
-
-	a = (-1 * b - root) / 2;
-
-	if (isValidTradeEq(r0, r1, a0, a1, a, true)) {
-		return { amount: a + 1, err: false };
-	}
-
-	return 0, true;
-}
-
-export function getMarketStateDetails(market) {
-	return {
-		expireAtBlock: Number(market.expireAtBlock),
-		donBufferEndsAtBlock: Number(market.donBufferEndsAtBlock),
-		resolutionEndsAtBlock: Number(market.resolutionEndsAtBlock),
-		donBufferBlocks: Number(market.donBufferBlocks),
-		resolutionBufferBlocks: Number(market.resolutionBufferBlocks),
-		donEscalationCount: Number(market.donEscalationCount),
-		donEscalationLimit: Number(market.donEscalationLimit),
-		outcome: Number(market.outcome),
-		stage: Number(market.stage),
-	};
-}
-
-export function getAvgPrice(amountIn, amountOut) {
+export function getDecStrAvgPriceBN(amountIn, amountOut) {
 	if (!BigNumber.isBigNumber(amountIn) || !BigNumber.isBigNumber(amountOut)) {
 		return "0.00";
 	}
@@ -277,18 +112,6 @@ export function getAvgPrice(amountIn, amountOut) {
 		return "0." + val;
 	}
 	return val.slice(0, val.length - 3) + "." + val.slice(val.length - 3);
-}
-
-export function getAvgPriceOfAmountC(tokenAmountIn, AmountCOut) {
-	return AmountCOut / tokenAmountIn;
-}
-
-export function convertDecimalStrToInt(value, base = 10 ** 18) {
-	return parseFloat(value) * base;
-}
-
-export function convertIntToDecimalStr(value, base = 10 ** 18) {
-	return `${value / 10 ** 18}`;
 }
 
 export function useBNInput() {
@@ -315,201 +138,105 @@ export function useBNInput() {
 	};
 }
 
-export function getTradeWinAmount(tradePosition, finalOutcome) {
+export function determineTradeWinAmount(tradePosition, finalOutcome) {
 	if (tradePosition == undefined || finalOutcome == undefined) {
-		return "0";
+		return ZERO_BN;
 	}
-	if (finalOutcome == 0) {
-		return roundValueTwoDP(tradePosition.amount0);
+	if (finalOutcome === 0) {
+		return tradePosition.amount0;
 	} else if (finalOutcome == 1) {
-		return roundValueTwoDP(tradePosition.amount1);
+		return tradePosition.amount1;
 	} else if (finalOutcome == 2) {
-		return formatBNToDecimal(
-			parseDecimalToBN(tradePosition.amount0)
-				.div(TWO_BN)
-				.add(parseDecimalToBN(tradePosition.amount1).div(TWO_BN))
-		);
+		return tradePosition.amount0
+			.div(TWO_BN)
+			.add(tradePosition.amount1.div(TWO_BN));
 	}
 
-	return 0;
+	return ZERO_BN;
 }
 
-export function getTradeWinningsArr(tradePosition, finalOutcome) {
-	if (!tradePosition || !finalOutcome) {
-		return [];
-	}
-
-	let amountT;
-	let outcome;
-
-	if (finalOutcome == 0) {
-		amountT = parseDecimalToBN(tradePosition.amount0);
-		outcome = 0;
-	} else if (finalOutcome == 1) {
-		amountT = parseDecimalToBN(tradePosition.amount1);
-		outcome = 1;
-	} else if (finalOutcome == 2) {
-		let amountT0 = parseDecimalToBN(tradePosition.amount0);
-		let amountT1 = parseDecimalToBN(tradePosition.amount1);
-		return [
-			{
-				outcome: 0,
-				amountT: amountT0,
-				amountC: amountT0.div(TWO_BN),
-			},
-			{
-				outcome: 1,
-				amountT: amountT1,
-				amountC: amountT1.div(TWO_BN),
-			},
-		];
-	}
-
-	if (amountT.isZero()) {
-		return [];
-	}
-
-	return [
-		{
-			outcome,
-			amountT,
-			amountC: amountT,
-		},
-	];
-}
-
-export function getStakeWinArr(stakePosition, finalOutcome) {
-	if (!stakePosition || !finalOutcome) {
-		return [];
-	}
-	let stake0 = parseDecimalToBN(stakePosition.amount0);
-	let stake1 = parseDecimalToBN(stakePosition.amount1);
-	let arr = [];
-	if (finalOutcome == 0) {
-		arr.push({
-			outcome: 0,
-			amountS: stake0,
-			amountSR: stake0,
-		});
-	} else if (finalOutcome == 1) {
-		arr.push({ outcome: 1, amountS: stake1, amountSR: stake1 });
-	} else if (finalOutcome == 2) {
-		arr.push({
-			outcome: 0,
-			amountS: stake0,
-			amountSR: stake0.div(TWO_BN),
-		});
-		arr.push({
-			outcome: 1,
-			amountS: stake1,
-			amountSR: stake1.div(TWO_BN),
-		});
-	}
-	return arr;
-}
-
-/**
- * Assumes that it's called at optimistic stage == 4 only
- */
-export function determineOutcome(market) {
-	let stateDetails = getMarketStateDetails(market);
-
-	if (stateDetails.stage == 4) {
-		return Number(market.outcome);
-	}
-
-	if (!parseDecimalToBN(market.lastAmountStaked).isZero()) {
-		return Number(market.lastOutcomeStaked);
-	} else {
-		return determineFavoredOutcome(market);
-	}
-
-	// // resolution period expired & moderator was supposed to resolve, thus market resolves to last outcome staked
-	// // OR
-	// // buffer period expired, thus market resolves to last staked outcome.
-	// if (
-	// 	(blockNumber >= stateDetails.resolutionEndsAtBlock &&
-	// 		stateDetails.stage == 3) ||
-	// 	blockNumber >= stateDetails.donBufferEndsAtBlock
-	// ) {
-	// 	// if last amount staked > 0, then resolve to last outcome staked. Otherwise resolve to favored outcome.
-	// 	if (!parseDecimalToBN(market.lastAmountStaked).isZero()) {
-	// 		return Number(market.lastOutcomeStaked);
-	// 	} else {
-	// 		return determineFavoredOutcome(market);
-	// 	}
-	// }
-}
-
-export function determineFavoredOutcome(market) {
-	if (Number(market.outcomeReserve0) < Number(market.outcomeReserve1)) {
-		return 0;
-	} else if (
-		Number(market.outcomeReserve0) > Number(market.outcomeReserve1)
-	) {
-		return 1;
-	}
-	return 2;
-}
-
-// export function
-
-export function determineMarketState(stateDetails, blockNumber) {
+export function determineOptimisticMarketState(market, blockNumber) {
 	let stage = 0;
 	let blocksLeft = 0;
+	let outcome = 2;
 
 	// market stage = closed
-	if (stateDetails.stage == 4) {
+	if (market.stage == 4) {
 		stage = 4;
 		blocksLeft = 0;
+		outcome = market.outcome;
 	}
 
 	// resolution period expired, thus market expires
-	if (
-		stateDetails.stage == 3 &&
-		blockNumber >= stateDetails.resolutionEndsAtBlock
-	) {
+	if (market.stage == 3 && blockNumber >= market.resolutionEndsAtBlock) {
 		stage = 4;
 		blocksLeft = 0;
+		outcome = determineOutcomeInExpiry(market);
 	}
 
-	// Escalation limit reached, in market resolve
-	if (
-		stateDetails.stage == 3 &&
-		blockNumber < stateDetails.resolutionEndsAtBlock
-	) {
+	// in market resolve stage
+	if (market.stage == 3 && blockNumber < market.resolutionEndsAtBlock) {
 		stage = 3;
-		blocksLeft = stateDetails.resolutionEndsAtBlock - blockNumber;
+		blocksLeft = market.resolutionEndsAtBlock - blockNumber;
 	}
 
 	// buffer period expired before reaching escalation limit, thus market closes
 	if (
-		blockNumber >= stateDetails.donBufferEndsAtBlock &&
-		stateDetails.donEscalationLimit > stateDetails.donEscalationCount
+		blockNumber >= market.donBufferEndsAtBlock &&
+		market.donEscalationLimit > market.donEscalationCount
 	) {
 		stage = 4;
 		blocksLeft = 0;
+		outcome = determineOutcomeInExpiry(market);
 	}
 
 	// in buffer period, when buffer period is > 0 and escalation limit > 0
 	if (
-		blockNumber >= stateDetails.expireAtBlock &&
-		blockNumber < stateDetails.donBufferEndsAtBlock &&
-		stateDetails.donEscalationLimit > 0 &&
-		stateDetails.donEscalationLimit > stateDetails.donEscalationCount
+		blockNumber >= market.expireAtBlock &&
+		blockNumber < market.donBufferEndsAtBlock &&
+		market.donEscalationLimit > 0 &&
+		market.donEscalationLimit > market.donEscalationCount
 	) {
 		stage = 2;
-		blocksLeft = stateDetails.donBufferEndsAtBlock - blockNumber;
+		blocksLeft = market.donBufferEndsAtBlock - blockNumber;
 	}
 
-	// active trading period
-	if (blockNumber < stateDetails.expireAtBlock && stateDetails.stage == 1) {
+	// market expired and escalation limit == 0, thus market is in resolve stage
+	if (
+		blockNumber >= market.expireAtBlock &&
+		market.donEscalationLimit === 0 &&
+		blockNumber < market.resolutionEndsAtBlock
+	) {
+		stage = 3;
+		blocksLeft = market.resolutionEndsAtBlock - blockNumber;
+	}
+
+	// market expired and escalation limit == 0 and resolution period expired, thus market closes
+	if (
+		blockNumber >= market.expireAtBlock &&
+		market.donEscalationLimit === 0 &&
+		blockNumber >= market.resolutionEndsAtBlock
+	) {
+		stage = 4;
+		blocksLeft = 0;
+		outcome = determineOutcomeInExpiry(market);
+	}
+
+	// market expired and donBufferBufferBlocks == 0, thus market closes
+	if (blockNumber >= market.expireAtBlock && market.donBufferBlocks == 0) {
+		stage = 4;
+		blocksLeft = 0;
+		outcome = determineOutcomeInExpiry(market);
+	}
+
+	if (blockNumber < market.expireAtBlock && market.stage == 1) {
+		// active trading period
 		stage = 1;
-		blocksLeft = stateDetails.expireAtBlock - blockNumber;
+		blocksLeft = market.expireAtBlock - blockNumber;
 	}
 
 	// market hasn't been funded
-	if (stateDetails.stage == 0) {
+	if (market.stage == 0) {
 		stage = 0;
 		blocksLeft = 0;
 	}
@@ -517,7 +244,24 @@ export function determineMarketState(stateDetails, blockNumber) {
 	return {
 		stage,
 		blocksLeft,
+		outcome,
 	};
+}
+
+/**
+ * Assumes that it's only called when market closed by expiry
+ */
+export function determineOutcomeInExpiry(market) {
+	if (!market.lastAmountStaked.isZero()) {
+		return market.lastOutcomeStaked;
+	} else {
+		if (market.outcomeReserve0.gt(market.outcomeReserve1)) {
+			return 1;
+		} else if (market.outcomeReserve1.gt(market.outcomeReserve0)) {
+			return 0;
+		}
+		return 2;
+	}
 }
 
 export function getMarketStageName(stage) {
@@ -543,24 +287,8 @@ export function convertBlocksToSeconds(blocks) {
 	return blocks * 15;
 }
 
-
-
 export function formatTimeInSeconds(seconds) {
 	return `${seconds} seconds`;
-}
-
-export function getTempOutcomeInChallengePeriod(market) {
-	if (parseDecimalToBN(market.lastAmountStaked).isZero()) {
-		if (Number(market.outcomeReserve0) < Number(market.outcomeReserve1)) {
-			return 0;
-		} else if (
-			Number(market.outcomeReserve0) > Number(market.outcomeReserve1)
-		) {
-			return 1;
-		}
-		return 2;
-	}
-	return Number(market.lastOutcomeStaked);
 }
 
 export function outcomeDisplayName(outcome) {
@@ -586,130 +314,108 @@ export function marketStageDisplayName(stage) {
 	return "";
 }
 
-export function totalAmountReceivedInStakeRedeem(
+export function determineTotalAmountStakeRedeem(
 	market,
-	finalOutcome,
 	stakePosition,
 	account
 ) {
-	let stakeWinnings = parseDecimalToBN(
-		determineStakeWinnings(market, finalOutcome, account)
-	);
-
+	let stakeWinnings = determineStakeWinnings(market, account);
+	let finalOutcome = market.optimisticState.outcome;
 	let stake;
 	if (finalOutcome == 0) {
-		stake = parseDecimalToBN(stakePosition ? stakePosition.amount0 : "0");
+		stake = stakePosition ? stakePosition.amount0 : ZERO_BN;
 	} else if (finalOutcome == 1) {
-		stake = parseDecimalToBN(stakePosition ? stakePosition.amount1 : "0");
+		stake = stakePosition ? stakePosition.amount1 : ZERO_BN;
 	} else if (finalOutcome == 2) {
-		stake = parseDecimalToBN(stakePosition ? stakePosition.amount0 : "0");
-		stake.add(
-			parseDecimalToBN(stakePosition ? stakePosition.amount1 : "0")
-		);
+		stake = stakePosition ? stakePosition.amount0 : ZERO_BN;
+		stake.add(stakePosition ? stakePosition.amount1 : ZERO_BN);
 	}
-
 	return stake.add(stakeWinnings);
 }
 
-export function determineStakeWinnings(market, finalOutcome, account) {
-	if (
-		market == undefined ||
-		finalOutcome == undefined ||
-		account == undefined
-	) {
-		return "0";
+export function determineStakeWinnings(market, account) {
+	if (market == undefined || account == undefined) {
+		return ZERO_BN;
 	}
 	if (
-		finalOutcome != 2 &&
+		market.optimisticState.outcome != 2 &&
 		account.toLowerCase() ==
-			(finalOutcome == 0 ? market.staker0 : market.staker1)
+			(market.optimisticState.outcome === 0
+				? market.staker0
+				: market.staker1)
 	) {
-		return finalOutcome == 0
+		return market.optimisticState.outcome === 0
 			? market.stakingReserve1
 			: market.stakingReserve0;
 	}
-	return "0";
-	// 	) ? (
-	// 	<Text>
-	// 		{`${
-	// 			finalOutcome == 0
-	// 				? market.stakingReserve0
-	// 				: market.stakingReserve1
-	// 		} from loser's stake`}
-	// 	</Text>
-	// ) : undefined;
+	return ZERO_BN;
 }
 
-export function tokenIdBalance(tokenObjArr, tokenId) {
+export function findTokenIdBalanceInTokenArr(tokenObjArr, tokenId) {
 	if (!tokenObjArr || !Array.isArray(tokenObjArr) || !tokenId) {
-		return ZERO_DECIMAL_STR;
+		return ZERO_BN;
 	}
 
 	let tokenObj = tokenObjArr.find((obj) => obj.tokenId == tokenId);
 	if (!tokenObj) {
-		return ZERO_DECIMAL_STR;
+		return ZERO_BN;
 	}
-	return tokenObj.balance;
+	return parseDecimalToBN(tokenObj.balance);
 }
 
-export function calculateResolveFee(market, outcome) {
-	if (market == undefined || outcome == undefined || outcome > 1) {
-		return ZERO_DECIMAL_STR;
+export function calculateResolveFee(market, setOutcomeTo) {
+	if (market == undefined || setOutcomeTo > 1) {
+		return ZERO_BN;
 	}
 
 	let fee = ZERO_BN;
-	const feeRatio = parseDecimalToBN(market.feeNumerator).div(
-		market.feeDenominator
-	);
-	if (outcome == 0) {
-		fee = parseDecimalToBN(market.stakingReserve1).mul(feeRatio);
+	if (setOutcomeTo === 0) {
+		fee = market.stakingReserve1
+			.mul(BigNumber.from(market.feeNumerator))
+			.div(BigNumber.from(market.feeDenominator));
 	} else {
-		fee = parseDecimalToBN(market.stakingReserve0).mul(feeRatio);
+		fee = market.stakingReserve0
+			.mul(BigNumber.from(market.feeNumerator))
+			.div(BigNumber.from(market.feeDenominator));
 	}
-	return formatBNToDecimal(fee);
+	return fee;
 }
 
 export function filterMarketsByStage(markets, stage) {
-	return markets.filter((market) => market.stateMetadata.stage == stage);
+	return markets.filter((market) => market.optimisticState.stage == stage);
 }
 
 export function filterMarketsByClaim(markets, tokenBalancesObj) {
 	let res = [];
 	markets.forEach((market) => {
-		if (market.stateMetadata.stage == 4) {
-			let outcome = determineOutcome(market);
+		if (market.optimisticState.stage === 4) {
+			let outcome = market.optimisticState.outcome;
 			let oAmount0 = tokenBalancesObj[market.oToken0Id]
 				? tokenBalancesObj[market.oToken0Id].balance
-				: ZERO_DECIMAL_STR;
+				: ZERO_BN;
 			let oAmount1 = tokenBalancesObj[market.oToken1Id]
 				? tokenBalancesObj[market.oToken1Id].balance
-				: ZERO_DECIMAL_STR;
+				: ZERO_BN;
 			let sAmount0 = tokenBalancesObj[market.sToken0Id]
 				? tokenBalancesObj[market.sToken0Id].balance
-				: ZERO_DECIMAL_STR;
+				: ZERO_BN;
 			let sAmount1 = tokenBalancesObj[market.sToken1Id]
 				? tokenBalancesObj[market.sToken1Id].balance
-				: ZERO_DECIMAL_STR;
-			if (
-				outcome == 0 &&
-				(!parseDecimalToBN(oAmount0).isZero() ||
-					!parseDecimalToBN(sAmount0))
-			) {
+				: ZERO_BN;
+
+			if (outcome == 0 && (!oAmount0.isZero() || !sAmount0.isZero())) {
 				res.push(market);
-			}
-			if (
+			} else if (
 				outcome == 1 &&
-				(!parseDecimalToBN(oAmount1).isZero() ||
-					!parseDecimalToBN(sAmount1))
+				(!oAmount1.isZero() || !sAmount1.isZero())
 			) {
 				res.push(market);
-			}
-			if (
+			} else if (
 				outcome == 2 &&
-				(!parseDecimalToBN(oAmount1).isZero() ||
-					!parseDecimalToBN(sAmount1) ||
-					!parseDecimalToBN(oAmount0).isZero() ||
-					!parseDecimalToBN(sAmount0))
+				(!oAmount1.isZero() ||
+					!sAmount1.isZero() ||
+					!oAmount0.isZero() ||
+					!sAmount0.isZero())
 			) {
 				res.push(market);
 			}
@@ -723,4 +429,29 @@ export function filterMarketsByCreator(markets, account) {
 		return [];
 	}
 	return markets.filter((market) => market.creator == account.toLowerCase());
+}
+
+/**
+ * Filters oracle ids from market schema returns by Graph index
+ * @note Oracle ids are oracle addresses, thus the value returned
+ * is checksummed
+ */
+export function filterOracleIdsFromMarketsGraph(markets) {
+	const oracleIds = [];
+	markets.forEach((market) => {
+		if (market.oracle && market.oracle.id) {
+			oracleIds.push(market.oracle.id);
+		}
+	});
+	return oracleIds;
+}
+
+export function filterMarketIdentifiersFromMarketsGraph(markets) {
+	const identifiers = [];
+	markets.forEach((market) => {
+		if (market.marketIdentifier) {
+			identifiers.push(market.marketIdentifier);
+		}
+	});
+	return identifiers;
 }

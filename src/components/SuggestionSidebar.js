@@ -107,7 +107,7 @@ function SuggestionSidebar() {
 									}}
 									size="sm"
 								>
-									Follow
+									Join
 								</Button>
 							) : (
 								<Button
@@ -126,7 +126,7 @@ function SuggestionSidebar() {
 									}}
 									size="sm"
 								>
-									Unfollow
+									Leave
 								</Button>
 							)}
 						</Flex>

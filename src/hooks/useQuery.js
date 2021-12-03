@@ -166,7 +166,7 @@ const QueryMarketsAtStage3ByOracles = `
 `;
 
 const QueryMarketTradeAndStakeInfoByUser = `
-	query ($user: Bytes!, $marketIdentifier: Bytes!, $positionIdentifier: Bytes!){
+	query ($user: Bytes!, $marketIdentifier: Bytes!){
 			tradeHistories(where:{user: $user, market: $marketIdentifier}, orderBy: tradeIndex, orderDirection: desc){
 				id
 				amount0
@@ -194,19 +194,6 @@ const QueryMarketTradeAndStakeInfoByUser = `
 				market
 				tokenId
 				balance
-			}
-
-			tradePosition(id: $positionIdentifier) {
-				id
-				amount0
-				amount1
-				timestamp
-			}
-			stakePosition(id: $positionIdentifier){
-				id
-				amountStaked0
-				amountStaked1
-				timestamp
 			}
 		}
 `;
@@ -394,7 +381,10 @@ export function useQueryMarketsOrderedByLatest() {
 	};
 }
 
-export function useQueryMarketByMarketIdentifier(marketIdentifier, pause) {
+export function useQueryMarketByMarketIdentifier(
+	marketIdentifier,
+	pause = false
+) {
 	const [result, reexecuteQuery] = useQuery({
 		query: QueryMarketByMarketIdentifier,
 		variables: {
@@ -411,14 +401,13 @@ export function useQueryMarketByMarketIdentifier(marketIdentifier, pause) {
 export function useQueryMarketTradeAndStakeInfoByUser(
 	marketIdentifier,
 	user,
-	pause
+	pause = false
 ) {
 	const [result, reexecuteQuery] = useQuery({
 		query: QueryMarketTradeAndStakeInfoByUser,
 		variables: {
 			user,
 			marketIdentifier,
-			positionIdentifier: `${user}-${marketIdentifier}`,
 		},
 		pause,
 	});
@@ -428,7 +417,11 @@ export function useQueryMarketTradeAndStakeInfoByUser(
 	};
 }
 
-export function useQueryTokenApprovalsByUserAndOracle(user, oracle, pause) {
+export function useQueryTokenApprovalsByUserAndOracle(
+	user,
+	oracle,
+	pause = false
+) {
 	const [result, reexecuteQuery] = useQuery({
 		query: QueryTokenApprovalsByUserAndOracle,
 		variables: {

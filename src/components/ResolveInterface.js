@@ -11,33 +11,7 @@ import {
 	selectRinkebyLatestBlockNumber,
 	selectUserProfile,
 } from "../redux/reducers";
-import {
-	Button,
-	Box,
-	Text,
-	Flex,
-	Tabs,
-	TabList,
-	TabPanel,
-	TabPanels,
-	Tab,
-	NumberInput,
-	NumberInputField,
-	Table,
-	TableCaption,
-	Thead,
-	Tr,
-	Th,
-	Tbody,
-	Td,
-	Tfoot,
-	Spacer,
-	SliderTrack,
-	SliderFilledTrack,
-	SliderThumb,
-	Slider,
-	Select,
-} from "@chakra-ui/react";
+import { Button, Text, Flex, Select } from "@chakra-ui/react";
 import { useEthers } from "@usedapp/core/packages/core";
 import { CloseIcon } from "@chakra-ui/icons";
 import { useEffect } from "react";
@@ -115,7 +89,9 @@ function ResolveInterface({ market, stakeHistories }) {
 				<>
 					<TwoColTitleInfo
 						title="Fee"
-						info={calculateResolveFee(market, chosenOutcome)}
+						info={formatBNToDecimal(
+							calculateResolveFee(market, chosenOutcome)
+						)}
 					/>
 					<Select
 						value={chosenOutcome}

@@ -11,32 +11,7 @@ import {
 	selectRinkebyLatestBlockNumber,
 	selectUserProfile,
 } from "../redux/reducers";
-import {
-	Button,
-	Box,
-	Text,
-	Flex,
-	Tabs,
-	TabList,
-	TabPanel,
-	TabPanels,
-	Tab,
-	NumberInput,
-	NumberInputField,
-	Table,
-	TableCaption,
-	Thead,
-	Tr,
-	Th,
-	Tbody,
-	Td,
-	Tfoot,
-	Spacer,
-	SliderTrack,
-	SliderFilledTrack,
-	SliderThumb,
-	Slider,
-} from "@chakra-ui/react";
+import { Button, Text, Flex } from "@chakra-ui/react";
 import { useEthers } from "@usedapp/core/packages/core";
 import { CloseIcon } from "@chakra-ui/icons";
 import { useEffect } from "react";
@@ -51,6 +26,7 @@ import {
 	useRedeemWinningBothOutcomes,
 	useRedeemStake,
 	useERC1155SetApprovalForAll,
+	useRedeemMaxWinning,
 } from "../hooks";
 import {
 	formatBNToDecimal,
@@ -69,6 +45,10 @@ import {
 	getTradeWinAmount,
 	determineStakeWinnings,
 	totalAmountReceivedInStakeRedeem,
+	roundDecimalStr,
+	ZERO_DECIMAL_STR,
+	determineTotalAmountStakeRedeem,
+	determineTradeWinAmount,
 } from "../utils";
 import PostDisplay from "../components/PostDisplay";
 import TwoColTitleInfo from "../components/TwoColTitleInfo";
@@ -90,164 +70,140 @@ function RedeemWinsInterface({
 	const { account } = useEthers();
 	const userProfile = useSelector(selectUserProfile);
 	const isAuthenticated = userProfile && account;
-	const { state: stateRW, send: sendRW } = useRedeemWinning();
-	const { state: stateRWB, send: sendRWB } = useRedeemWinningBothOutcomes;
-	const { state: stateRS, send: sendRS } = useRedeemStake(market.oracle.id);
+
+	const { state: stateRMaxW, send: sendRMaxW } = useRedeemMaxWinning();
+	const { state: stateRMaxWS, send: sendRMaxWS } = useRedeemMaxWinning();
 	const {
 		state: stateSetApproval,
 		send: sendSetApproval,
 	} = useERC1155SetApprovalForAll(market.oracle.id);
 
-	const finalOutcome = determineOutcome(market);
+	function determineWinLevel() {
+		let tradeWinnings = determineTradeWinAmount(
+			tradePosition,
+			market.optimisticState.outcome
+		);
+
+		let stakeWinnings = determineTotalAmountStakeRedeem(
+			market,
+			stakePosition,
+			account
+		);
+
+		if (tradeWinnings.isZero() && stakeWinnings.isZero()) {
+			return 0;
+		}
+
+		if (stakeWinnings.isZero()) {
+			return 1;
+		}
+
+		return 2;
+	}
+
 	return (
 		<Flex flexDirection="column">
 			<TradePriceBoxes market={market} tradePosition={tradePosition} />
 			<Text>Outcome resolved</Text>
-			<Text>Trades</Text>
-
 			<TwoColTitleInfo
 				title={"Yes shares"}
 				info={
-					tradePosition ? roundValueTwoDP(tradePosition.amount1) : "0"
+					tradePosition
+						? formatBNToDecimal(tradePosition.amount1)
+						: ZERO_DECIMAL_STR
 				}
 			/>
 			<TwoColTitleInfo
 				title={"No shares"}
 				info={
-					tradePosition ? roundValueTwoDP(tradePosition.amount0) : "0"
+					tradePosition
+						? formatBNToDecimal(tradePosition.amount0)
+						: ZERO_DECIMAL_STR
 				}
 			/>
 			<TwoColTitleInfo
 				title={"Declared outcome"}
-				info={outcomeDisplayName(finalOutcome)}
+				info={outcomeDisplayName(market.optimisticState.outcome)}
 			/>
+
 			<TwoColTitleInfo
-				title={"You receive"}
-				info={getTradeWinAmount(tradePosition, finalOutcome)}
+				title={"You Win"}
+				info={formatBNToDecimal(
+					determineTradeWinAmount(
+						tradePosition,
+						market.optimisticState.outcome
+					)
+				)}
 			/>
-			<Button
-				disabled={!tokenApproval || !isAuthenticated}
-				onClick={() => {
-					if (
-						!tradePosition ||
-						!market ||
-						!tokenApproval ||
-						!isAuthenticated
-					) {
-						return;
-					}
-					let amount0 = parseDecimalToBN(tradePosition.amount0);
-					let amount1 = parseDecimalToBN(tradePosition.amount1);
 
-					if (
-						finalOutcome == 2 &&
-						!amount0.isZero() &&
-						!amount1.isZero()
-					) {
-						sendRWB(
-							amount0,
-							amount1,
-							market.oracle.id,
-							market.marketIdentifier
-						);
-					}
-
-					if (finalOutcome == 2) {
-						if (!amount0.isZero()) {
-							sendRW(
-								2,
-								amount0,
-								market.oracle.id,
-								market.marketIdentifier
-							);
-						} else if (!amount1.isZero()) {
-							sendRW(
-								2,
-								amount1,
-								market.oracle.id,
-								market.marketIdentifier
-							);
-						}
-					}
-
-					if (finalOutcome == 0 && !amount0.isZero()) {
-						sendRW(
-							0,
-							amount0,
-							market.oracle.id,
-							market.marketIdentifier
-						);
-					}
-
-					if (finalOutcome == 1 && !amount1.isZero()) {
-						sendRW(
-							1,
-							amount1,
-							market.oracle.id,
-							market.marketIdentifier
-						);
-					}
-				}}
-			>
-				<Text>Claim trade winnings</Text>
-			</Button>
-			<Text>Challenges</Text>
-			<TwoColTitleInfo
-				title={"Your stake for YES"}
-				info={
-					stakePosition ? roundValueTwoDP(stakePosition.amount1) : "0"
-				}
-			/>
-			<TwoColTitleInfo
-				title={"Your stake for NO"}
-				info={
-					stakePosition ? roundValueTwoDP(stakePosition.amount0) : "0"
-				}
-			/>
+			<Text>Your Challenges</Text>
+			{stakePosition.amount0.isZero() &&
+			stakePosition.amount1.isZero() ? (
+				<Text>You didn't challenge</Text>
+			) : undefined}
+			{!stakePosition.amount1.isZero() ? (
+				<TwoColTitleInfo
+					title={"Amount challenged for YES"}
+					info={formatBNToDecimal(stakePosition.amount1)}
+				/>
+			) : undefined}
+			{!stakePosition.amount0.isZero() ? (
+				<TwoColTitleInfo
+					title={"Amount challenged for NO"}
+					info={formatBNToDecimal(stakePosition.amount0)}
+				/>
+			) : undefined}
 			<TwoColTitleInfo
 				title={"Your challenge winnings"}
-				info={roundValueTwoDP(
-					determineStakeWinnings(market, finalOutcome, account)
+				info={formatBNToDecimal(
+					determineStakeWinnings(market, account)
 				)}
 			/>
 			<TwoColTitleInfo
 				title={"Your receive"}
 				info={formatBNToDecimal(
-					totalAmountReceivedInStakeRedeem(
+					determineTotalAmountStakeRedeem(
 						market,
-						finalOutcome,
 						stakePosition,
 						account
 					)
 				)}
 			/>
 
+			<TwoColTitleInfo
+				title={"You receive in total"}
+				info={formatBNToDecimal(
+					determineTradeWinAmount(
+						tradePosition,
+						market.optimisticState.outcome
+					).add(
+						determineTotalAmountStakeRedeem(
+							market,
+
+							stakePosition,
+							account
+						)
+					)
+				)}
+			/>
+
 			<Button
-				disabled={!stakePosition || !market || !isAuthenticated}
+				disabled={!isAuthenticated || determineWinLevel() === 0}
 				onClick={() => {
-					if (!stakePosition || !market || !isAuthenticated) {
+					let winLevel = determineWinLevel();
+					console.log(winLevel, "djaio");
+					if (winLevel === 0) {
 						return;
 					}
 
-					let amountS0 = parseDecimalToBN(stakePosition.amount0);
-					let amountS1 = parseDecimalToBN(stakePosition.amount1);
-
-					if (amountS0.isZero() && amountS1.isZero()) {
-						return;
+					if (winLevel === 1) {
+						sendRMaxW(market.oracle.id, market.marketIdentifier);
+					} else {
+						sendRMaxWS(market.oracle.id, market.marketIdentifier);
 					}
-
-					if (finalOutcome == 0 && amountS0.isZero()) {
-						return;
-					}
-
-					if (finalOutcome == 1 && amountS1.isZero()) {
-						return;
-					}
-
-					sendRS(market.marketIdentifier);
 				}}
 			>
-				<Text>Claim stake winnings</Text>
+				<Text>Claim reward</Text>
 			</Button>
 			<ChallengeHistoryTable stakeHistories={stakeHistories} />
 			<Button

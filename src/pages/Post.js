@@ -88,7 +88,7 @@ import {
 	totalAmountReceivedInStakeRedeem,
 	marketStageDisplayName,
 	ZERO_DECIMAL_STR,
-	tokenIdBalance,
+	findTokenIdBalanceInTokenArr,
 	stateSetupOraclesInfo,
 	stateSetupMarketsMetadata,
 } from "../utils";
@@ -107,10 +107,6 @@ import ResolveInterface from "../components/ResolveInterface";
 import { makeErrorResult } from "@urql/core";
 import Loader from "../components/Loader";
 
-/**
- * You haven't checked errors returned on graph queries. (For example when postId is wrong)
- * Try putting in some validation check for postId (i.e. marketIdentifier)?
- */
 function Page() {
 	const urlParams = useParams();
 	const postId = urlParams.postId;
@@ -126,22 +122,20 @@ function Page() {
 		selectRinkebyLatestBlockNumber
 	);
 
-	const { result } = useQueryMarketByMarketIdentifier(postId, false);
+	const { result } = useQueryMarketByMarketIdentifier(postId);
 	const { result: mSATResult } = useQueryMarketTradeAndStakeInfoByUser(
 		postId,
-		account ? account.toLowerCase() : "",
-		false
+		account ? account.toLowerCase() : ""
 	);
-
-	const [market, setMarket] = useState(undefined);
-	const [loadingMarket, setLoadingMarket] = useState(true);
-
 	const {
 		result: tokenApprovalsResult,
 	} = useQueryTokenApprovalsByUserAndOracle(
 		account ? account.toLocaleLowerCase() : "",
-		market ? market.oracle.id : ""
+		result.data && result.data.market ? result.data.market.oracle.id : ""
 	);
+
+	const [market, setMarket] = useState(undefined);
+	const [loadingMarket, setLoadingMarket] = useState(true);
 
 	const tradeHistories =
 		mSATResult.data && mSATResult.data.tradeHistories
@@ -153,21 +147,21 @@ function Page() {
 			: [];
 	const tokenBalances = mSATResult.data ? mSATResult.data.tokenBalances : [];
 	const tradePosition = {
-		amount0: tokenIdBalance(
+		amount0: findTokenIdBalanceInTokenArr(
 			tokenBalances,
 			market ? market.oToken0Id : undefined
 		),
-		amount1: tokenIdBalance(
+		amount1: findTokenIdBalanceInTokenArr(
 			tokenBalances,
 			market ? market.oToken1Id : undefined
 		),
 	};
 	const stakePosition = {
-		amount0: tokenIdBalance(
+		amount0: findTokenIdBalanceInTokenArr(
 			tokenBalances,
 			market ? market.sToken0Id : undefined
 		),
-		amount1: tokenIdBalance(
+		amount1: findTokenIdBalanceInTokenArr(
 			tokenBalances,
 			market ? market.sToken1Id : undefined
 		),
@@ -291,30 +285,28 @@ function Page() {
 			</Flex>
 
 			<Flex width="20%" marginLeft={5} flexDirection="column">
-				{loadingMarket == false ? (
+				{loadingMarket == false && market ? (
 					<>
 						<Heading>
 							{marketStageDisplayName(
-								market ? market.stateMetadata.stage : 0
+								market.optimisticState.stage
 							)}
 						</Heading>
-						{market && market.stateMetadata.blocksLeft ? (
-							<Text>
-								{`Expires in ${formatTimeInSeconds(
-									convertBlocksToSeconds(
-										market.stateMetadata.blocksLeft
-									)
-								)}`}
-							</Text>
-						) : undefined}
-						{market && market.stateMetadata.stage == 1 ? (
+						<Text>
+							{`Expires in ${formatTimeInSeconds(
+								convertBlocksToSeconds(
+									market.optimisticState.blocksLeft
+								)
+							)}`}
+						</Text>
+						{market.optimisticState.stage === 1 ? (
 							<TradingInterface
 								market={market}
 								tradePosition={tradePosition}
 								tokenApproval={tokenApproval}
 							/>
 						) : undefined}
-						{market && market.stateMetadata.stage == 2 ? (
+						{market.optimisticState.stage === 2 ? (
 							<StakingInterface
 								market={market}
 								tradePosition={tradePosition}
@@ -322,7 +314,7 @@ function Page() {
 								stakePosition={stakePosition}
 							/>
 						) : undefined}
-						{market && market.stateMetadata.stage == 4 ? (
+						{market.optimisticState.stage === 4 ? (
 							<RedeemWinsInterface
 								market={market}
 								tradePosition={tradePosition}
@@ -331,7 +323,7 @@ function Page() {
 								tokenApproval={tokenApproval}
 							/>
 						) : undefined}
-						{market && market.stateMetadata.stage == 3 ? (
+						{market && market.optimisticState.stage === 3 ? (
 							<ResolveInterface
 								market={market}
 								stakeHistories={stakeHistories}

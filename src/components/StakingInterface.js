@@ -13,29 +13,10 @@ import {
 } from "../redux/reducers";
 import {
 	Button,
-	Box,
 	Text,
 	Flex,
-	Tabs,
-	TabList,
-	TabPanel,
-	TabPanels,
-	Tab,
 	NumberInput,
 	NumberInputField,
-	Table,
-	TableCaption,
-	Thead,
-	Tr,
-	Th,
-	Tbody,
-	Td,
-	Tfoot,
-	Spacer,
-	SliderTrack,
-	SliderFilledTrack,
-	SliderThumb,
-	Slider,
 } from "@chakra-ui/react";
 import { useEthers } from "@usedapp/core/packages/core";
 import { CloseIcon } from "@chakra-ui/icons";
@@ -80,6 +61,7 @@ import {
 	getTradeWinningsArr,
 	getStakeWinArr,
 	ONE_BN,
+	determineOutcomeInExpiry,
 } from "../utils";
 import PostDisplay from "../components/PostDisplay";
 import TwoColTitleInfo from "../components/TwoColTitleInfo";
@@ -90,12 +72,7 @@ import TradingInput from "./TradingInput";
 import TradePriceBoxes from "./TradePriceBoxes";
 import ChallengeHistoryTable from "./ChallengeHistoryTable";
 
-function StakingInterface({
-	market,
-	tradePosition,
-	stakePosition,
-	stakeHistories,
-}) {
+function StakingInterface({ market, stakeHistories }) {
 	const { account } = useEthers();
 	const userProfile = useSelector(selectUserProfile);
 	const isAuthenticated = account && userProfile;
@@ -109,9 +86,9 @@ function StakingInterface({
 	function setInputToMinStakeReq() {
 		setInput(
 			ethers.utils.formatUnits(
-				parseDecimalToBN(market.lastAmountStaked).isZero()
-					? parseDecimalToBN("1")
-					: parseDecimalToBN(market.lastAmountStaked).mul(TWO_BN),
+				market.lastAmountStaked.isZero()
+					? ONE_BN
+					: market.lastAmountStaked.mul(TWO_BN),
 				18
 			)
 		);
@@ -123,10 +100,10 @@ function StakingInterface({
 		}
 		setInputToMinStakeReq();
 
-		let _tempOutcome = getTempOutcomeInChallengePeriod(market);
+		let _tempOutcome = determineOutcomeInExpiry(market);
 		setTempOutcome(_tempOutcome);
 		setFavoredOutcome(_tempOutcome == 2 ? 2 : 1 - _tempOutcome);
-	}, [market]);
+	}, []);
 
 	return (
 		<Flex flexDirection="column">
@@ -137,14 +114,13 @@ function StakingInterface({
 			<TwoColTitleInfo
 				title={"Time left to challenge"}
 				info={`${formatTimeInSeconds(
-					convertBlocksToSeconds(market.stateMetadata.blocksLeft)
+					convertBlocksToSeconds(market.optimisticState.blocksLeft)
 				)}`}
 			/>
 			<TwoColTitleInfo
 				title={"Challenges left"}
 				info={`${
-					Number(market.donEscalationLimit) -
-					Number(market.donEscalationCount)
+					market.donEscalationLimit - market.donEscalationCount
 				}`}
 			/>
 			<TwoColTitleInfo
@@ -156,7 +132,7 @@ function StakingInterface({
 			<Text marginTop={5}>Challenge temp outcome</Text>
 
 			<TwoColTitleInfo
-				title={"You favor outcome"}
+				title={"Your chosen outcome"}
 				info={`${outcomeDisplayName(favoredOutcome)}`}
 			/>
 			<NumberInput
@@ -184,7 +160,7 @@ function StakingInterface({
 
 					send(
 						favoredOutcome,
-						bnValue.toString(),
+						bnValue,
 						market.oracle.id,
 						market.marketIdentifier
 					);
