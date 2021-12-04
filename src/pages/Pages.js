@@ -8,6 +8,7 @@ import {
 	Image,
 	Text,
 	Flex,
+	Spacer,
 } from "@chakra-ui/react";
 import { FiFile } from "react-icons/fi";
 import FileUpload from "../components/FileUpload";
@@ -34,9 +35,11 @@ import {
 	selectGroupsFollowed,
 	selectMarketsMetadata,
 	selectOracleInfoObj,
+	selectRinkebyLatestBlockNumber,
 } from "../redux/reducers";
 import PostDisplay from "../components/PostDisplay";
 import { useNavigate } from "react-router";
+import Loader from "../components/Loader";
 
 /**
  * Shows two things
@@ -49,11 +52,16 @@ function Page() {
 	const navigate = useNavigate();
 
 	const oraclesInfoObj = useSelector(selectOracleInfoObj);
-
 	const marketsMetadata = useSelector(selectMarketsMetadata);
 	const groupsFollowed = useSelector(selectGroupsFollowed);
+	const rinkebyLatestBlockNumber = useSelector(
+		selectRinkebyLatestBlockNumber
+	);
 
 	const [oracleIds, setOracleIds] = useState([]);
+	const [markets, setMarkets] = useState([]);
+	const [oraclesLoading, setOraclesLoading] = useState(true);
+	const [marketsLoading, setMarketsLoading] = useState(true);
 
 	const { result: oraclesResult } = useQueryOraclesByManager(account);
 	const {
@@ -65,13 +73,14 @@ function Page() {
 		if (oraclesResult.data == undefined) {
 			return;
 		}
+		setOraclesLoading(true);
 
 		const oracleIds = oraclesResult.data.oracles.map((obj) => {
 			return obj.id;
 		});
 		await stateSetupOraclesInfo(oracleIds, dispatch);
-		const d = oracleIds.map((id) => id.toLowerCase());
-		setOracleIds(d);
+		setOracleIds(oracleIds);
+		setOraclesLoading(false);
 	}, [oraclesResult]);
 
 	useEffect(async () => {
@@ -94,35 +103,95 @@ function Page() {
 		);
 	}, [marketsToResolveResult]);
 
+	useEffect(() => {
+		if (marketsToResolveResult.data == undefined) {
+			return;
+		}
+
+		setMarketsLoading(true);
+		console.log(
+			marketsToResolveResult.data.markets,
+			oraclesInfoObj,
+			marketsMetadata,
+			groupsFollowed,
+			rinkebyLatestBlockNumber
+		);
+		const populatedMarkets = marketsToResolveResult.data.markets.map(
+			(market) => {
+				return populateMarketWithMetadata(
+					market,
+					oraclesInfoObj,
+					marketsMetadata,
+					groupsFollowed,
+					rinkebyLatestBlockNumber
+				);
+			}
+		);
+
+		setMarkets(populatedMarkets);
+		setMarketsLoading(false);
+	}, [
+		marketsToResolveResult,
+		oraclesInfoObj,
+		groupsFollowed,
+		rinkebyLatestBlockNumber,
+		marketsMetadata,
+	]);
+
+	/**
+	 * @warning The posts shown under "Need attention" don't include
+	 * the markets that didn't transition to Stage 3 by reaching
+	 * escalation limit (that are, the ones with 0 escalation limit)
+	 */
 	return (
 		<Flex flexDirection="row">
-			<Flex flexDirection="column">
-				{marketsToResolveResult.data
-					? marketsToResolveResult.data.markets.map((market) => {
-							const populatedMarket = populateMarketWithMetadata(
-								market,
-								oraclesInfoObj,
-								marketsMetadata,
-								groupsFollowed
-							);
+			<Spacer />
 
-							return (
-								<PostDisplay
-									market={populatedMarket}
-									onImageClick={(marketIdentifier) => {
-										navigate(`/post/${marketIdentifier}`);
-									}}
-								/>
-							);
-					  })
-					: undefined}
-			</Flex>
-			<Flex flexDirection="column">
-				<Text>Groups you manage or delegate</Text>
-				{oracleIds.map((id) => {
-					return <Text>{id}</Text>;
+			<Flex flexDirection="column" width={"40%"}>
+				<Flex>
+					<Text>Posts that need attention</Text>
+				</Flex>
+				{marketsLoading === true ? <Loader /> : undefined}
+				{marketsLoading === false && markets.length === 0 ? (
+					<Flex>
+						<Text>No posts to resolve</Text>
+					</Flex>
+				) : undefined}
+				{markets.map((market) => {
+					return (
+						<PostDisplay
+							market={market}
+							onImageClick={(marketIdentifier) => {
+								navigate(`/post/${marketIdentifier}`);
+							}}
+						/>
+					);
 				})}
 			</Flex>
+			<Flex flexDirection="column" width={"30%"} ml={5}>
+				<Text>Groups you manage</Text>
+				{oraclesLoading === true ? <Loader /> : undefined}
+				{oracleIds.map((id) => {
+					const details = oraclesInfoObj[id];
+					if (details == undefined) {
+						return;
+					}
+					return (
+						<Flex
+							m={2}
+							p={2}
+							backgroundColor="red.200"
+							onClick={() => {
+								navigate(`/settings/pages/${id}`);
+							}}
+						>
+							<Text>{`${details.name}`}</Text>
+						</Flex>
+					);
+				})}
+			</Flex>
+
+			<Spacer />
 		</Flex>
 	);
 }
