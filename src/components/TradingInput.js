@@ -31,6 +31,8 @@ function TradingInput({
 	setInput,
 	inputValue,
 	setMaxSell,
+	err,
+	errText,
 }) {
 	return (
 		<Flex marginTop="2" marginBottom="2" flexDirection="column">
@@ -55,6 +57,17 @@ function TradingInput({
 					</Flex>
 				) : undefined}
 			</NumberInput>
+			{err === true ? (
+				<Text
+					marginTop="1"
+					marginBottom="1"
+					fontSize="10"
+					fontWeight="bold"
+					color="red.300"
+				>
+					{errText}
+				</Text>
+			) : undefined}
 			<Text
 				marginTop="1"
 				marginBottom="1"
@@ -76,6 +89,15 @@ function TradingInput({
 				</SliderTrack>
 				<SliderThumb boxSize={4} />
 			</Slider>
+			{slippageValue < 1 ? (
+				<Text
+					marginTop="1"
+					marginBottom="1"
+					fontSize="10"
+					fontWeight="bold"
+					color="red.300"
+				>{`We recommend slippage >= 1%`}</Text>
+			) : undefined}
 		</Flex>
 	);
 }

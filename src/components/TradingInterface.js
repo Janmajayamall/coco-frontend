@@ -134,7 +134,8 @@ function TradingInterface({ market, tradePosition, tokenApproval, refreshFn }) {
 		bnValue: inputSellAmountBn,
 		setInput: setInputSellAmount,
 		err: inputSellAmountErr,
-	} = useBNInput();
+		errText: inputSellAmountErrText,
+	} = useBNInput(sellValidationFn);
 	const [amountCOutBn, setAmountCOutBn] = useState(BigNumber.from(0));
 
 	const [slippage, setSlippage] = useState(0);
@@ -227,6 +228,22 @@ function TradingInterface({ market, tradePosition, tokenApproval, refreshFn }) {
 			status: status,
 			isClosable: true,
 		});
+	}
+
+	function sellValidationFn(bnValue) {
+		if (
+			(tokenActionIndex === 0 && bnValue.gt(tradePosition.amount0)) ||
+			(tokenActionIndex === 1 && bnValue.gt(tradePosition.amount1))
+		) {
+			return {
+				valid: false,
+				expStr: "You don't have enough shares",
+			};
+		}
+		return {
+			valid: true,
+			expStr: "",
+		};
 	}
 
 	return (
@@ -342,6 +359,8 @@ function TradingInterface({ market, tradePosition, tokenApproval, refreshFn }) {
 									setInputSellAmount(tradePosition.amount1);
 								}
 							}}
+							err={inputSellAmountErr}
+							errText={inputSellAmountErrText}
 						/>
 
 						<TwoColTitleInfo

@@ -1,5 +1,10 @@
 import { Button, Box, Text, Flex, Spacer } from "@chakra-ui/react";
-import { determineOutcome, roundDecimalStr, roundValueTwoDP } from "../utils";
+import {
+	determineOutcome,
+	formatBNToDecimal,
+	roundDecimalStr,
+	roundValueTwoDP,
+} from "../utils";
 
 function TradePricesBoxes({
 	market,
@@ -7,77 +12,49 @@ function TradePricesBoxes({
 	outcomeChosen,
 	onOutcomeChosen,
 }) {
-	function OutcomeProbText({ outcome }) {
-		const prob = roundDecimalStr(
-			market.optimisticState.stage === 4
-				? market.optimisticState.outcome === outcome
-					? 1
-					: 0
-				: outcome == 1
-				? market.probability1
-				: market.probability0
-		);
-
+	function Panel({ outcome }) {
 		return (
-			<Text fontSize="15">{`${
-				outcome === 1 ? "YES" : "NO"
-			} ${prob}`}</Text>
+			<Flex
+				margin={2}
+				padding={2}
+				backgroundColor={
+					outcomeChosen === outcome ? "blue.500" : "blue.100"
+				}
+				flexDirection="column"
+				onClick={() => {
+					if (onOutcomeChosen) {
+						onOutcomeChosen(outcome);
+					}
+				}}
+			>
+				<Flex>
+					<Text>{outcome === 1 ? "YES" : "NO"}</Text>
+					<Spacer />
+					<Text>{`${roundDecimalStr(
+						outcome === 1
+							? market.probability1
+							: market.probability0
+					)}`}</Text>
+				</Flex>
+				<Flex>
+					<Text>You own</Text>
+					<Spacer />
+					<Text>
+						{formatBNToDecimal(
+							outcome === 1
+								? tradePosition.amount1
+								: tradePosition.amount0
+						)}
+					</Text>
+				</Flex>
+			</Flex>
 		);
 	}
 
 	return (
-		<Flex marginTop="2" marginBottom="2">
-			<Spacer />
-			<Flex flexDirection="column">
-				<Box
-					onClick={() => {
-						if (onOutcomeChosen) {
-							onOutcomeChosen(1);
-						}
-					}}
-					backgroundColor="#C5E6DD"
-					borderColor="#00EBA9"
-					borderRadius={4}
-					borderWidth={outcomeChosen == 1 ? 6 : 1}
-					paddingLeft={18}
-					paddingRight={18}
-					justifyContent={"space-between"}
-					alignItems={"center"}
-				>
-					<OutcomeProbText outcome={1} />
-					{/* <Text fontSize="12" fontWeight="bold">{`${
-					tradePosition ? roundValueTwoDP(tradePosition.amount1) : "0"
-				} shares`}</Text> */}
-				</Box>
-				<Text>swa</Text>
-			</Flex>
-
-			<Spacer />
-			<Box
-				onClick={() => {
-					if (onOutcomeChosen) {
-						onOutcomeChosen(0);
-					}
-				}}
-				backgroundColor="#E9CFCC"
-				borderColor="#FF523E"
-				borderRadius={4}
-				borderWidth={outcomeChosen == 0 ? 6 : 1}
-				paddingLeft={18}
-				paddingRight={18}
-				justifyContent={"space-between"}
-				alignItems={"center"}
-			>
-				<OutcomeProbText outcome={0} />
-				{/* <Text fontSize="15">{`YES ${roundValueTwoDP(
-					market.stateMetadata.stage == 4
-						? determineOutcome(market) == 1
-							? 1
-							: 0
-						: market.probability1
-				)}`}</Text> */}
-			</Box>
-			<Spacer />
+		<Flex marginTop="2" flexDirection="column" marginBottom="2">
+			<Panel outcome={1} />
+			<Panel outcome={0} />
 		</Flex>
 	);
 }

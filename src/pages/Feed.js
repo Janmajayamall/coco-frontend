@@ -23,6 +23,7 @@ import {
 	useQueryMarketsOrderedByLatest,
 	useQueryExploreMarkets,
 	useQueryMarketByOracles,
+	useQueryMarketTradeAndStakeInfoByUser,
 } from "../hooks";
 
 import Web3 from "web3";
@@ -57,6 +58,7 @@ import {
 	sAddGroupFollow,
 	sDeleteGroupFollow,
 	selectFeedDisplayConfigs,
+	selectUserProfile,
 } from "../redux/reducers";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -75,6 +77,9 @@ import SuggestionSidebar from "../components/SuggestionSidebar";
 function Page() {
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
+	const { account } = useEthers();
+	const userProfile = useSelector(selectUserProfile);
+	const isAuthenticated = userProfile && account;
 
 	const location = useLocation();
 	const urlParams = useParams();
@@ -170,6 +175,7 @@ function Page() {
 		let _result;
 		if (feedType == 0) {
 			_result = result0;
+			// console.log("This is the result, :", _result);
 		} else if (feedType == 1 || feedType == 2) {
 			_result = result1;
 		}
@@ -203,6 +209,27 @@ function Page() {
 			}
 		}
 	}, [groupId]);
+
+	function noPostVisible(markets) {
+		const post = markets.find((obj) => {
+			const pM = populateMarketWithMetadata(
+				obj,
+				oraclesInfoObj,
+				marketsMetadata,
+				groupsFollowed,
+				rinkebyLatestBlockNumber
+			);
+
+			if (
+				pM.oracleInfo != undefined &&
+				pM.probability1 >= Number(Number(feedThreshold) / 100)
+			) {
+				return true;
+			}
+		});
+
+		return post == undefined;
+	}
 
 	return (
 		<Flex
@@ -334,34 +361,46 @@ function Page() {
 					</Flex>
 				) : undefined}
 				{loadingMarkets == true ? <Loader /> : undefined}
-				{markets.map((market) => {
-					const populatedMarket = populateMarketWithMetadata(
-						market,
-						oraclesInfoObj,
-						marketsMetadata,
-						groupsFollowed,
-						rinkebyLatestBlockNumber
-					);
+				{feedType === 1 && !isAuthenticated ? (
+					<Flex justifyContent="center">
+						<Text>Please sign In</Text>
+					</Flex>
+				) : undefined}
+				{loadingMarkets == false && noPostVisible(markets) ? (
+					<Flex justifyContent="center">
+						<Text>No posts</Text>
+					</Flex>
+				) : undefined}
+				{(feedType === 1 && isAuthenticated) || feedType != 1
+					? markets.map((market) => {
+							const populatedMarket = populateMarketWithMetadata(
+								market,
+								oraclesInfoObj,
+								marketsMetadata,
+								groupsFollowed,
+								rinkebyLatestBlockNumber
+							);
 
-					if (!populatedMarket.oracleInfo) {
-						return;
-					}
+							if (!populatedMarket.oracleInfo) {
+								return;
+							}
 
-					if (
-						populatedMarket.probability1 <
-						Number(feedThreshold) / 100
-					) {
-						return;
-					}
-					return (
-						<PostDisplay
-							market={populatedMarket}
-							onImageClick={(marketIdentifier) => {
-								navigate(`/post/${marketIdentifier}`);
-							}}
-						/>
-					);
-				})}
+							if (
+								populatedMarket.probability1 <
+								Number(feedThreshold) / 100
+							) {
+								return;
+							}
+							return (
+								<PostDisplay
+									market={populatedMarket}
+									onImageClick={(marketIdentifier) => {
+										navigate(`/post/${marketIdentifier}`);
+									}}
+								/>
+							);
+					  })
+					: undefined}
 			</Flex>
 			<SuggestionSidebar />
 			<Spacer />

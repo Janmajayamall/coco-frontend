@@ -27,9 +27,11 @@ function LoginModal() {
 	const dispatch = useDispatch();
 
 	const isOpen = useSelector(selectLoginModalState).isOpen;
-	const { activateBrowserWallet, account, chainId } = useEthers();
+	const { activateBrowserWallet, account } = useEthers();
+	console.log(account, " account, diowio");
 
 	const [stage, setStage] = useState(0);
+	const [chainId, setChainId] = useState(null);
 
 	async function login() {
 		if (!account || !window.ethereum) {
@@ -74,6 +76,22 @@ function LoginModal() {
 		}
 	}, [account]);
 
+	useEffect(async () => {
+		const id = await window.ethereum.request({
+			method: "eth_chainId",
+		});
+		setChainId(parseInt(id, 16));
+	}, []);
+
+	useEffect(() => {
+		if (window.ethereum) {
+			window.ethereum.on("chainChanged", (id) => {
+				console.log(chainId, " daiwjsaiojawo");
+				setChainId(parseInt(id, 16));
+			});
+		}
+	}, []);
+
 	return (
 		<Modal
 			isOpen={isOpen}
@@ -95,11 +113,46 @@ function LoginModal() {
 					<Spacer />
 					<CloseIcon marginRight={2} w={3} h={3} color="#0B0B0B" />
 				</Flex>
-				{stage == 1 ? (
-					<Button onClick={login}>Please sign message</Button>
+				{chainId === 421611 ? (
+					stage == 1 ? (
+						<Button onClick={login}>Please sign message</Button>
+					) : (
+						<Button
+							onClick={async () => {
+								activateBrowserWallet();
+							}}
+						>
+							Connect your wallet
+						</Button>
+					)
 				) : (
-					<Button onClick={activateBrowserWallet}>
-						Connect your wallet
+					<Button
+						onClick={async () => {
+							if (window.ethereum) {
+								await window.ethereum.request({
+									method: "wallet_addEthereumChain",
+									params: [
+										{
+											chainId: "0x66EEB",
+											chainName: "Rinkeby-arbitrum",
+											nativeCurrency: {
+												name: "Ethereum",
+												symbol: "ETH",
+												decimals: 18,
+											},
+											rpcUrls: [
+												"https://rinkeby.arbitrum.io/rpc",
+											],
+											blockExplorerUrls: [
+												"https://testnet.arbiscan.io/",
+											],
+										},
+									],
+								});
+							}
+						}}
+					>
+						Switch to Rinkeby Abritum
 					</Button>
 				)}
 				<ModalBody>{/* <Lorem count={2} /> */}</ModalBody>

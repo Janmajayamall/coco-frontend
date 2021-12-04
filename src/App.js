@@ -80,8 +80,6 @@ function App() {
 		selectRinkebyLatestBlockNumber
 	);
 
-	const { result, reexecuteQuery } = useQueryExploreMarkets();
-
 	useEffect(async () => {
 		let res = await getRinkebyLatestBlockNumber();
 		console.log(res);

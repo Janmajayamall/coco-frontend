@@ -106,7 +106,10 @@ function Page() {
 	const [tokenBalancesObj, setTokenBalancesObj] = useState({});
 
 	useEffect(async () => {
-		if (userMarketsResult.data == undefined) {
+		if (
+			userMarketsResult.data == undefined ||
+			userMarketsResult.data.user == undefined
+		) {
 			return;
 		}
 
@@ -124,7 +127,10 @@ function Page() {
 	}, [userMarketsResult]);
 
 	useEffect(() => {
-		if (userMarketsResult.data == undefined) {
+		if (
+			userMarketsResult.data == undefined ||
+			userMarketsResult.data.user == undefined
+		) {
 			return;
 		}
 
@@ -201,7 +207,14 @@ function Page() {
 					<option value={6}>Created by me</option>
 				</Select>
 				{filteredMarkets.map((market) => {
-					return <PostDisplay market={market} />;
+					return (
+						<PostDisplay
+							market={market}
+							onImageClick={() => {
+								navigate(`/post/${market.marketIdentifier}`);
+							}}
+						/>
+					);
 				})}
 			</Flex>
 			<Spacer />

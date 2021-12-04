@@ -373,6 +373,7 @@ function Page() {
 							/>
 						) : undefined}
 						{/* <TradingInterface
+						
 							market={market}
 							tradePosition={tradePosition}
 							tokenApproval={tokenApproval}

@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useEffect } from "react";
 import { parse } from "graphql";
 import { ZERO_BN, TWO_BN } from "./constants";
+import { useTab } from "@chakra-ui/tabs";
 
 export function populateMarketWithMetadata(
 	market,
@@ -37,6 +38,10 @@ export function populateMarketWithMetadata(
 		lastAmountStaked: parseDecimalToBN(market.lastAmountStaked),
 		lastOutcomeStaked: Number(market.lastOutcomeStaked),
 
+		tradeVolume: parseDecimalToBN(market.tradeVolume),
+		stakeVolume: parseDecimalToBN(market.stakeVolume),
+		totalVolume: parseDecimalToBN(market.totalVolume),
+
 		oracleInfo: oraclesInfo[market.oracle.id],
 		marketMetadata: marketsMetadata[market.marketIdentifier],
 		following: groupsFollowed[market.oracle.id] ? true : false,
@@ -50,6 +55,18 @@ export function populateMarketWithMetadata(
 	return {
 		..._market,
 		optimisticState,
+		probability0:
+			optimisticState.stage !== 4
+				? _market.probability0
+				: optimisticState.outcome === 0
+				? 1
+				: 0,
+		probability1:
+			optimisticState.stage !== 4
+				? _market.probability1
+				: optimisticState.outcome === 1
+				? 1
+				: 0,
 	};
 }
 
@@ -91,7 +108,6 @@ export function parseDecimalToBN(val, base = 18) {
 }
 
 export function formatBNToDecimal(val, base = 18, dp = 2) {
-	
 	val = ethers.utils.formatUnits(val, base);
 	return parseFloat(val).toFixed(2);
 }
@@ -110,19 +126,28 @@ export function getDecStrAvgPriceBN(amountIn, amountOut) {
 	return val.slice(0, val.length - 3) + "." + val.slice(val.length - 3);
 }
 
-export function useBNInput() {
+export function useBNInput(validationFn) {
 	const [input, setInput] = useState("0");
 	const [bnValue, setBnValue] = useState(BigNumber.from("0"));
 	const [err, setErr] = useState(false);
+	const [errText, setErrText] = useState("");
 
 	useEffect(() => {
 		try {
 			let bn = parseDecimalToBN(`${input == "" ? "0" : input}`);
+
 			setBnValue(bn);
+			if (validationFn != undefined) {
+				let { valid, expStr } = validationFn(bn);
+				if (!valid) {
+					throw Error(expStr);
+				}
+			}
 			setErr(false);
+			setErrText("");
 		} catch (e) {
-			// TODO set invalid input error
 			setErr(true);
+			setErrText(e.message);
 		}
 	}, [input]);
 
@@ -131,6 +156,7 @@ export function useBNInput() {
 		bnValue,
 		setInput,
 		err,
+		errText,
 	};
 }
 
@@ -378,7 +404,7 @@ export function calculateResolveFee(market, setOutcomeTo) {
 }
 
 export function filterMarketsByStage(markets, stage) {
-	return markets.filter((market) => market.optimisticState.stage == stage);
+	return markets.filter((market) => market.optimisticState.stage === stage);
 }
 
 export function filterMarketsByClaim(markets, tokenBalancesObj) {

@@ -76,6 +76,9 @@ const QueryMarketsByOracles = `
 			oracle{
      			id
     		}
+			tradeVolume
+			stakeVolume
+			totalVolume
 		}
 	}
 `;
@@ -119,6 +122,9 @@ const QueryMarketByMarketIdentifier = `
 			oToken1Id
 			sToken0Id
 			sToken1Id
+			tradeVolume
+			stakeVolume
+			totalVolume
 		}
 	}
 `;
@@ -161,6 +167,9 @@ const QueryMarketsAtStage3ByOracles = `
 			oToken1Id
 			sToken0Id
 			sToken1Id
+			tradeVolume
+			stakeVolume
+			totalVolume
 		}
 	}
 `;
@@ -258,6 +267,9 @@ const QueryMarketsByUserInteraction = `
 				oToken1Id
 				sToken0Id
 				sToken1Id
+				tradeVolume
+				stakeVolume
+				totalVolume
 			}
 		}
 	}

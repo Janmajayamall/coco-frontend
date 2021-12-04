@@ -180,28 +180,10 @@ function RedeemWinsInterface({
 	return (
 		<Flex flexDirection="column">
 			<TradePriceBoxes market={market} tradePosition={tradePosition} />
-			<Text>Outcome resolved</Text>
-			<TwoColTitleInfo
-				title={"Yes shares"}
-				info={
-					tradePosition
-						? formatBNToDecimal(tradePosition.amount1)
-						: ZERO_DECIMAL_STR
-				}
-			/>
-			<TwoColTitleInfo
-				title={"No shares"}
-				info={
-					tradePosition
-						? formatBNToDecimal(tradePosition.amount0)
-						: ZERO_DECIMAL_STR
-				}
-			/>
 			<TwoColTitleInfo
 				title={"Declared outcome"}
 				info={outcomeDisplayName(market.optimisticState.outcome)}
 			/>
-
 			<TwoColTitleInfo
 				title={"You Win"}
 				info={formatBNToDecimal(
@@ -215,36 +197,39 @@ function RedeemWinsInterface({
 			<Text>Your Challenges</Text>
 			{stakePosition.amount0.isZero() &&
 			stakePosition.amount1.isZero() ? (
-				<Text>You didn't challenge</Text>
-			) : undefined}
-			{!stakePosition.amount1.isZero() ? (
-				<TwoColTitleInfo
-					title={"Amount challenged for YES"}
-					info={formatBNToDecimal(stakePosition.amount1)}
-				/>
-			) : undefined}
-			{!stakePosition.amount0.isZero() ? (
-				<TwoColTitleInfo
-					title={"Amount challenged for NO"}
-					info={formatBNToDecimal(stakePosition.amount0)}
-				/>
-			) : undefined}
-			<TwoColTitleInfo
-				title={"Your challenge winnings"}
-				info={formatBNToDecimal(
-					determineStakeWinnings(market, account)
-				)}
-			/>
-			<TwoColTitleInfo
-				title={"Your receive"}
-				info={formatBNToDecimal(
-					determineTotalAmountStakeRedeem(
-						market,
-						stakePosition,
-						account
-					)
-				)}
-			/>
+				<Text fontSize={10}>You didn't challenge</Text>
+			) : (
+				<>
+					{!stakePosition.amount1.isZero() ? (
+						<TwoColTitleInfo
+							title={"Amount challenged for YES"}
+							info={formatBNToDecimal(stakePosition.amount1)}
+						/>
+					) : undefined}
+					{!stakePosition.amount0.isZero() ? (
+						<TwoColTitleInfo
+							title={"Amount challenged for NO"}
+							info={formatBNToDecimal(stakePosition.amount0)}
+						/>
+					) : undefined}
+					<TwoColTitleInfo
+						title={"Your challenge winnings"}
+						info={formatBNToDecimal(
+							determineStakeWinnings(market, account)
+						)}
+					/>
+					<TwoColTitleInfo
+						title={"Your receive"}
+						info={formatBNToDecimal(
+							determineTotalAmountStakeRedeem(
+								market,
+								stakePosition,
+								account
+							)
+						)}
+					/>
+				</>
+			)}
 
 			<TwoColTitleInfo
 				title={"You receive in total"}

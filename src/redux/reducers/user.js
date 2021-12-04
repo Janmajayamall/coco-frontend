@@ -46,11 +46,7 @@ const slice = createSlice({
 			}
 		},
 		sUpdateThresholdOfFeedDisplayConfigs(state, action) {
-			if (
-				action.payload &&
-				typeof action.payload == "number" &&
-				action.payload <= 100
-			) {
+			if (action.payload <= 100) {
 				state.feedDisplayConfigs = {
 					...state.feedDisplayConfigs,
 					threshold: action.payload,

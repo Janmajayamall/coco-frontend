@@ -6,6 +6,7 @@ import {
 	SliderTrack,
 	SliderFilledTrack,
 	SliderThumb,
+	Spacer,
 } from "@chakra-ui/react";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -35,6 +36,28 @@ function ConfigSidebar() {
 				</SliderTrack>
 				<SliderThumb />
 			</Slider>
+			{/* <Flex>
+				<Text
+					onClick={() => {
+						dispatch(sUpdateThresholdOfFeedDisplayConfigs(0));
+					}}
+					fontSize={12}
+					textDecoration="underline"
+				>
+					Min
+				</Text>
+				<Spacer />
+
+				<Text
+					onClick={() => {
+						dispatch(sUpdateThresholdOfFeedDisplayConfigs(100));
+					}}
+					fontSize={12}
+					textDecoration="underline"
+				>
+					Max
+				</Text>
+			</Flex> */}
 			<Text>{`${feedThreshold}%`}</Text>
 		</Flex>
 	);

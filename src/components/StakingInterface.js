@@ -53,7 +53,9 @@ function StakingInterface({ market, stakeHistories, refreshFn }) {
 
 	const { state, send } = useStakeForOutcome();
 
-	const { input, bnValue, setInput, err } = useBNInput();
+	const { input, bnValue, setInput, err, errText } = useBNInput(
+		validateInput
+	);
 	const [tempOutcome, setTempOutcome] = useState(0);
 	const [favoredOutcome, setFavoredOutcome] = useState();
 	const [stakeLoading, setStakeLoading] = useState(false);
@@ -111,6 +113,29 @@ function StakingInterface({ market, stakeHistories, refreshFn }) {
 		}
 	}, [state]);
 
+	function validateInput(bnValue) {
+		if (market.lastAmountStaked.isZero() && bnValue.isZero()) {
+			return {
+				valid: false,
+				expStr: "Amount should be greater than 0",
+			};
+		}
+
+		if (bnValue.gte(market.lastAmountStaked.mul(TWO_BN))) {
+			return {
+				valid: true,
+				expStr: "",
+			};
+		}
+
+		return {
+			valid: false,
+			expStr: `Amount should be min ${formatBNToDecimal(
+				market.lastAmountStaked.mul(TWO_BN).toString()
+			)}`,
+		};
+	}
+
 	return (
 		<Flex flexDirection="column">
 			<TwoColTitleInfo
@@ -150,6 +175,17 @@ function StakingInterface({ market, stakeHistories, refreshFn }) {
 			>
 				<NumberInputField />
 			</NumberInput>
+			{err === true ? (
+				<Text
+					marginTop="1"
+					marginBottom="1"
+					fontSize="10"
+					fontWeight="bold"
+					color="red.300"
+				>
+					{errText}
+				</Text>
+			) : undefined}
 			<Button
 				loadingText="Processing..."
 				isLoading={stakeLoading}
