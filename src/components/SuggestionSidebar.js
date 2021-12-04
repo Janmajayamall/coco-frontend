@@ -46,6 +46,7 @@ import {
 	stateSetupOraclesInfo,
 	stateSetupMarketsMetadata,
 	unfollowModerator,
+	findAllModerators,
 } from "../utils";
 import {
 	selectGroupsFollowed,
@@ -65,14 +66,14 @@ function SuggestionSidebar() {
 		if (initialized == true) {
 			return;
 		}
-		const ignoreList = Object.keys(groupsFollowed);
-		let res = await findPopularModerators(ignoreList);
+		// const ignoreList = Object.keys(groupsFollowed);
+		let res = await findAllModerators();
 		if (res == undefined) {
 			return;
 		}
 		setPopularGroups(res.moderators);
 		setInitialized(true);
-	}, [groupsFollowed]);
+	}, []);
 
 	return (
 		<Flex

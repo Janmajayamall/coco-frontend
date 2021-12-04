@@ -227,6 +227,18 @@ export async function findPopularModerators(ignoreList) {
 	} catch (e) {}
 }
 
+export async function findAllModerators() {
+	try {
+		const { data } = await baseInstance.request({
+			url: "/moderator/all",
+			method: "POST",
+			data: {},
+		});
+
+		return data.response;
+	} catch (e) {}
+}
+
 export async function findModeratorsDetails(moderatorIds) {
 	try {
 		const { data } = await baseInstance.request({
