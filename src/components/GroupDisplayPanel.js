@@ -2,7 +2,6 @@ import ConnectButton from "../components/ConnectButton";
 import LoginButton from "../components/LoginButton";
 import PostDisplay from "../components/PostDisplay";
 import Loader from "../components/Loader";
-import GroupDisplayName from "./GroupDisplayPanel";
 import {
 	Button,
 	Box,
@@ -55,51 +54,64 @@ import {
 	sDeleteGroupFollow,
 } from "../redux/reducers";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router";
 
-function SuggestionSidebar() {
+function GroupDisplayName({ group, followStatusVisible }) {
+	const navigate = useNavigate();
 	const groupsFollowed = useSelector(selectGroupsFollowed);
 	const dispatch = useDispatch();
 
-	const [popularGroups, setPopularGroups] = useState([]);
-	const [initialized, setInitialized] = useState(false);
-
-	useEffect(async () => {
-		if (initialized == true) {
-			return;
-		}
-		// const ignoreList = Object.keys(groupsFollowed);
-		let res = await findAllModerators();
-		if (res == undefined) {
-			return;
-		}
-		setPopularGroups(res.moderators);
-		setInitialized(true);
-	}, []);
-
 	return (
-		<Flex
-			width={"20%"}
-			paddingRight={6}
-			paddingLeft={6}
-			paddingTop={5}
-			flexDirection="column"
-		>
-			<Heading size="md" marginBottom={5}>
-				Explore Groups
-			</Heading>
-			<Flex flexDirection={"column"}>
-				{initialized == false ? <Loader /> : undefined}
-				{popularGroups.map((group) => {
-					return (
-						<GroupDisplayName
-							group={group}
-							followStatusVisible={true}
-						/>
-					);
-				})}
-			</Flex>
+		<Flex marginTop={2} marginBottom={2}>
+			<Avatar
+				size="sm"
+				name="Dan Abrahmov"
+				src="https://bit.ly/dan-abramov"
+			/>
+
+			<Text
+				onClick={() => {
+					navigate(`/group/${group.oracleAddress}`);
+				}}
+			>
+				{group.name}
+			</Text>
+			<Spacer />
+			{followStatusVisible === true ? (
+				groupsFollowed[group.oracleAddress] !== true ? (
+					<Button
+						onClick={async () => {
+							const res = await followModerator(
+								group.oracleAddress
+							);
+							if (res == undefined) {
+								return;
+							}
+							dispatch(sAddGroupFollow(group.oracleAddress));
+						}}
+						size="sm"
+					>
+						Join
+					</Button>
+				) : (
+					<Button
+						onClick={async () => {
+							const res = await unfollowModerator(
+								group.oracleAddress
+							);
+							if (res == undefined) {
+								return;
+							}
+							dispatch(sDeleteGroupFollow(group.oracleAddress));
+						}}
+						size="sm"
+					>
+						Leave
+					</Button>
+				)
+			) : undefined}
 		</Flex>
 	);
 }
 
-export default SuggestionSidebar;
+export default GroupDisplayName;

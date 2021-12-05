@@ -11,6 +11,7 @@ import {
 	Input,
 	Spacer,
 	Avatar,
+	useToast,
 } from "@chakra-ui/react";
 import { FiFile } from "react-icons/fi";
 import FileUpload from "../components/FileUpload";
@@ -44,21 +45,22 @@ import {
 	selectGroupsFollowed,
 	selectMarketsMetadata,
 	selectOracleInfoObj,
+	selectUserProfile,
 } from "../redux/reducers";
 import PostDisplay from "../components/PostDisplay";
 import { useNavigate, useParams } from "react-router";
 import Loader from "../components/Loader";
 
-/**
- * Things left -
- * 1. Upload & set image
- * 2. Loading & error handling of inputs
- */
 function Page() {
 	const { account, chainId } = useEthers();
+	const userProfile = useSelector(selectUserProfile);
+	const isAuthenticated = account && userProfile;
+
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
+	const toast = useToast();
 	const urlParams = useParams();
+	const toast = useToast();
 	const oracleId = urlParams.pageId;
 
 	const oraclesInfoObj = useSelector(selectOracleInfoObj);
@@ -66,15 +68,19 @@ function Page() {
 	const { send, state } = useUpdateMarketConfig(oracleId);
 
 	const [oracleData, setOracleData] = useState({});
+
+	// loading states
 	const [loadingOracleData, setLoadingOracleData] = useState(true);
+	const [loadingUpdateMetadata, setLoadingUpdateMetadata] = useState(false);
+	const [loadingUpdateOracle, setLoadingUpdateOracle] = useState(false);
 
 	/**
 	 * Meta data states
 	 */
 	const [name, setName] = useState("");
 	const [description, setDescription] = useState("");
-	const [image, setImage] = useState(null);
-	const [imageS3Url, setImageS3Url] = useState(null);
+	const [groupImageUrl, setGroupImageUrl] = useState(null);
+	const [uploadedImage, setUploadedImage] = useState(null);
 
 	/**
 	 * Oracle config states
@@ -93,7 +99,28 @@ function Page() {
 	}, [oracleResult]);
 
 	useEffect(() => {
-		if (oracleResult.data == undefined) {
+		if (state.status === "Exception" || state.status === "Fail") {
+			toast({
+				title: "Metamask err!",
+				status: "error",
+				isClosable: true,
+			});
+		}
+		if (state.receipt != undefined) {
+			toast({
+				title: "Success!",
+				status: "success",
+				isClosable: true,
+			});
+		}
+		setLoadingUpdateOracle(false);
+	}, [state]);
+
+	useEffect(() => {
+		if (
+			oracleResult.data == undefined ||
+			oracleResult.data.oracle == undefined
+		) {
 			return;
 		}
 		setOracleData({
@@ -107,10 +134,9 @@ function Page() {
 	}, [oracleResult, oraclesInfoObj]);
 
 	useEffect(() => {
-		console.log(oracleData, " oracleData");
 		setName(oracleData.name);
 		setDescription(oracleData.description);
-		setImage(oracleData.image);
+		setGroupImageUrl(oracleData.groupImageUrl);
 		setFee(oracleData.fee);
 		setEscalationLimit(oracleData.donEscalationLimit);
 		setExpireHours(
@@ -123,10 +149,6 @@ function Page() {
 			convertBlocksToHours(chainId, oracleData.resolutionBufferBlocks)
 		);
 	}, [oracleData]);
-
-	if (oracleData == undefined) {
-		return <div />;
-	}
 
 	function validateFile(file) {
 		const fsMb = file.size / (1024 * 1024);
@@ -143,43 +165,51 @@ function Page() {
 			<Spacer />
 			<Flex width="40%" flexDirection="column">
 				<Flex justifyContent="center" alignItems="center">
-					{imageS3Url == null && image == null ? (
-						<FileUpload
-							accept={"image/*"}
-							onFileUpload={(file) => {
-								if (!validateFile(file)) {
-									//TODO throw mmax file size error
-									return;
-								}
-								setImage(file);
-							}}
-						>
-							<Button leftIcon={<Icon as={FiFile} />}>
-								Choose Image
-							</Button>
-						</FileUpload>
-					) : (
-						<Flex flexDirection="column">
-							<Avatar
-								size="2xl"
-								name="Chosen Pic"
-								src={
-									imageS3Url == null
-										? URL.createObjectURL(image)
-										: imageS3Url
-								}
-							/>
+					<Flex flexDirection="column" marginTo="5" marginBottom="5">
+						<Avatar
+							size="2xl"
+							name="Chosen Pic"
+							src={
+								groupImageUrl == undefined
+									? uploadImage == undefined
+										? "https://bit.ly/dan-abramov"
+										: URL.createObjectURL(uploadImage)
+									: groupImageUrl
+							}
+						/>
 
+						{groupImageUrl == undefined &&
+						uploadImage == undefined ? (
+							<FileUpload
+								accept={"image/*"}
+								onFileUpload={(file) => {
+									if (!validateFile(file)) {
+										toast({
+											title:
+												"File size limit (10MB) exceeded",
+											status: "error",
+											isClosable: true,
+										});
+										return;
+									}
+									setUploadedImage(file);
+								}}
+							>
+								<Button leftIcon={<Icon as={FiFile} />}>
+									Choose Image
+								</Button>
+							</FileUpload>
+						) : (
 							<Button
 								onClick={() => {
-									setImageS3Url(null);
-									setImage(null);
+									setGroupImageUrl(null);
+									setUploadedImage(null);
 								}}
 							>
 								Remove
 							</Button>
-						</Flex>
-					)}
+						)}
+					</Flex>
 				</Flex>
 				<Input
 					placeholder="Name"
@@ -200,17 +230,54 @@ function Page() {
 						account == undefined ||
 						account.toLowerCase() != oracleData.manager
 					}
+					isLoading={loadingUpdateMetadata}
+					loadingText={"Processing..."}
 					onClick={async () => {
+						setLoadingUpdateMetadata(true);
+
+						// validate rights
 						if (
-							account == undefined ||
+							!isAuthenticated ||
 							account.toLowerCase() != oracleData.manager
 						) {
+							toast({
+								title: "Unauthenticated!",
+								error: "error",
+								isClosable: true,
+							});
 							return;
 						}
-						const res = await updateModerator(oracleData.id, {
+
+						let updates = {
 							name,
 							description,
-						});
+						};
+
+						// check whether to upload image
+						if (image != undefined) {
+							// TODO upload image
+							console.log("image uploaded");
+						}
+
+						const res = await updateModerator(
+							oracleData.id,
+							updates
+						);
+
+						if (res) {
+							toast({
+								title: "Info updated!",
+								status: "success",
+								isClosable: true,
+							});
+						} else {
+							toast({
+								title: "Unknown err!",
+								status: "error",
+								isClosable: true,
+							});
+						}
+						setLoadingUpdateMetadata(false);
 					}}
 				>
 					<Text>Update Metadata</Text>
@@ -279,11 +346,21 @@ function Page() {
 							account == undefined ||
 							account.toLowerCase() != oracleData.delegate
 						}
+						loadingText={"Processing..."}
+						isLoading={loadingUpdateOracle}
 						onClick={() => {
+							setLoadingUpdateOracle(true);
+
+							// validate access rights
 							if (
-								account == undefined ||
+								!isAuthenticated ||
 								account.toLowerCase() != oracleData.delegate
 							) {
+								toast({
+									title: "Unauthenticated!",
+									error: "error",
+									isClosable: true,
+								});
 								return;
 							}
 

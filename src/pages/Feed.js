@@ -145,7 +145,7 @@ function Page() {
 			setPagination({ first: 10, skip: 0 });
 			setQueryOracles([groupId.toLowerCase()]);
 		}
-	}, [groupsFollowed, feedType]);
+	}, [groupsFollowed, feedType, groupId]);
 
 	useEffect(() => {
 		if (feedType == 0 && pagination.first > 0) {

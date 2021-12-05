@@ -40,6 +40,7 @@ import {
 import PostDisplay from "../components/PostDisplay";
 import { useNavigate } from "react-router";
 import Loader from "../components/Loader";
+import GroupDisplayName from "../components/GroupDisplayPanel";
 
 /**
  * Shows two things
@@ -75,11 +76,11 @@ function Page() {
 		}
 		setOraclesLoading(true);
 
-		const oracleIds = oraclesResult.data.oracles.map((obj) => {
+		const _oracleIds = oraclesResult.data.oracles.map((obj) => {
 			return obj.id;
 		});
-		await stateSetupOraclesInfo(oracleIds, dispatch);
-		setOracleIds(oracleIds);
+		await stateSetupOraclesInfo(_oracleIds, dispatch);
+		setOracleIds(_oracleIds);
 		setOraclesLoading(false);
 	}, [oraclesResult]);
 
@@ -172,21 +173,16 @@ function Page() {
 				<Text>Groups you manage</Text>
 				{oraclesLoading === true ? <Loader /> : undefined}
 				{oracleIds.map((id) => {
-					const details = oraclesInfoObj[id];
-					if (details == undefined) {
+					const group = oraclesInfoObj[id];
+					if (group == undefined) {
 						return;
 					}
+
 					return (
-						<Flex
-							m={2}
-							p={2}
-							backgroundColor="red.200"
-							onClick={() => {
-								navigate(`/settings/pages/${id}`);
-							}}
-						>
-							<Text>{`${details.name}`}</Text>
-						</Flex>
+						<GroupDisplayName
+							group={group}
+							followStatusVisible={false}
+						/>
 					);
 				})}
 			</Flex>

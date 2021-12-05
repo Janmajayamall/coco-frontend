@@ -249,10 +249,6 @@ function Page() {
 	}, [tokenApprovalsResult]);
 
 	function refreshPost() {
-		// console.log("daiowjaiosja");
-		// reexecuteQuery();
-		// mSATReexecuteQuery();
-		// tokenApprovalsReexecuteQuery();
 		window.location.reload();
 	}
 
