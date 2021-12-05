@@ -17,6 +17,13 @@ import {
 	retrieveOracleAddressFormLogs,
 	updateModerator,
 	stateSetupOraclesInfo,
+	validateEscalationLimit,
+	validateExpireHours,
+	validateBufferHours,
+	validateResolutionHours,
+	validateFee,
+	validateGroupName,
+	validateUpdateMarketConfigTxInputs,
 } from "./../utils";
 import { useCreateNewOracle } from "./../hooks";
 import { useEthers } from "@usedapp/core/packages/core";
@@ -31,7 +38,7 @@ import Loader from "../components/Loader";
 import GroupDisplayName from "../components/GroupDisplayPanel";
 
 /**
- * @note For the sake of simplicity, during the initial days, oracles from UI have following constraints
+ * @note For the sake of simplicity, at least for now, oracles from UI have following constraints
  * 1. manager == delegate.
  * 2. Buffer blocks cannot be smaller than an hour
  * 3. Escalation limit cannot be zero
@@ -58,13 +65,6 @@ function Page() {
 	const [bufferHours, setBufferHours] = useState(1);
 	const [resolutionHours, setResolutionHours] = useState(1);
 	const [name, setName] = useState("");
-
-	// input error states
-	const [feeErr, setFeeErr] = useState("");
-	const [escalationLimitErr, setEscalationLimitErr] = useState("");
-	const [expireHoursErr, setExpireHoursErr] = useState("");
-	const [bufferHoursErr, setBufferHoursErr] = useState("");
-	const [resolutionHoursErr, setResolutionHoursErr] = useState("");
 
 	//	loading states
 	const [createLoading, setCreateLoading] = useState(false);
@@ -123,42 +123,6 @@ function Page() {
 		}
 	}, [state]);
 
-	// validate inputs
-	useEffect(() => {
-		validateInput();
-	}, [fee, escalationLimit, expireHours, bufferHours, resolutionHours, name]);
-
-	function validateInput() {
-		let valid = true;
-		if (escalationLimit == 0) {
-			setEscalationLimitErr("We recommend Escalation limit >= 1");
-			valid = false;
-		} else {
-			setEscalationLimitErr("");
-		}
-		if (expireHours < 1) {
-			setExpireHoursErr("We recommend Trading period to be >= 1 hour");
-			valid = false;
-		} else {
-			setExpireHoursErr("");
-		}
-		if (bufferHours < 1) {
-			setBufferHoursErr("We recommend Challenge period to be >= 1 hour");
-			valid = false;
-		} else {
-			setBufferHoursErr("");
-		}
-		if (resolutionHours < 1) {
-			setResolutionHoursErr(
-				"We recommend Resolution period to be >= 1 hour"
-			);
-			valid = false;
-		} else {
-			setResolutionHoursErr("");
-		}
-		return valid;
-	}
-
 	async function createModeratorHelper() {
 		if (!isAuthenticated) {
 			toast({
@@ -169,11 +133,7 @@ function Page() {
 			return;
 		}
 
-		// fee calc
-		const feeNumerator = Number(fee) * 1000;
-		const feeDenominator = 1000;
-
-		if (!validateInput()) {
+		if (!validateUpdateMarketConfigTxInputs().valid) {
 			toast({
 				title: "Invalid Input!",
 				status: "error",
@@ -181,6 +141,10 @@ function Page() {
 			});
 			return;
 		}
+
+		// fee calc
+		const feeNumerator = Number(fee) * 1000;
+		const feeDenominator = 1000;
 
 		setCreateLoading(true);
 
@@ -198,6 +162,71 @@ function Page() {
 		);
 	}
 
+	function InputWithTitle(
+		title,
+		isText,
+		value,
+		setValue,
+		validationFn,
+		inputOptions = {}
+	) {
+		const { valid, expText } = validationFn(value);
+
+		return (
+			<Flex
+				style={{
+					flexDirection: "column",
+					width: "100%",
+				}}
+			>
+				<Text
+					style={{
+						width: "100%",
+						marginTop: 5,
+					}}
+				>
+					{title}
+				</Text>
+				{isText === true ? (
+					<Input
+						{...inputOptions}
+						style={{
+							...styles.inputsValue,
+						}}
+						placeholder={title}
+						onChange={(e) => {
+							setValue(e.target.value);
+						}}
+						value={name}
+					/>
+				) : (
+					<NumberInput
+						{...inputOptions}
+						style={{
+							width: "100%",
+							marginTop: 5,
+						}}
+						onChange={(val) => {
+							setValue(val);
+						}}
+						value={value}
+					>
+						<NumberInputField />
+					</NumberInput>
+				)}
+				{valid === false ? (
+					<Text
+						style={{
+							fontSize: 12,
+						}}
+					>
+						{expText}
+					</Text>
+				) : undefined}
+			</Flex>
+		);
+	}
+
 	return (
 		<Flex justifyContent="center" paddingTop="10">
 			<Flex
@@ -209,134 +238,62 @@ function Page() {
 				paddingLeft={20}
 			>
 				<Heading>New Group</Heading>
-				<Flex style={{ ...styles.inputsFlex }}>
-					<Text style={{ ...styles.inputsText }}>{"Name"}</Text>
-					<Input
-						style={{
-							...styles.inputsValue,
-						}}
-						placeholder="Name"
-						onChange={(e) => {
-							setName(e.target.value);
-						}}
-						value={name}
-					/>
-				</Flex>
-				<Flex style={{ ...styles.inputsFlex }}>
-					<Text style={{ ...styles.inputsText }}>Fee</Text>
-					<NumberInput
-						style={{
-							...styles.inputsValue,
-						}}
-						onChange={(val) => {
-							setFee(val);
-						}}
-						defaultValue={0.05}
-						precision={3}
-						value={fee}
-						max={1}
-						placeholder="Fee"
-					>
-						<NumberInputField />
-					</NumberInput>
-					{feeErr !== "" ? (
-						<Text style={{ ...styles.inputsErr }}>{feeErr}</Text>
-					) : undefined}
-				</Flex>
-
-				<Flex style={{ ...styles.inputsFlex }}>
-					<Text style={{ ...styles.inputsText }}>
-						Escalation Limit
-					</Text>
-					<NumberInput
-						style={{
-							...styles.inputsValue,
-						}}
-						onChange={(val) => {
-							setEscalationLimit(val);
-						}}
-						defaultValue={1}
-						precision={0}
-						value={escalationLimit}
-					>
-						<NumberInputField />
-					</NumberInput>
-					{escalationLimitErr !== "" ? (
-						<Text style={{ ...styles.inputsErr }}>
-							{escalationLimitErr}
-						</Text>
-					) : undefined}
-				</Flex>
-				<Flex style={{ ...styles.inputsFlex }}>
-					<Text style={{ ...styles.inputsText }}>
-						Trading period (in hr)
-					</Text>
-					<NumberInput
-						style={{
-							...styles.inputsValue,
-						}}
-						onChange={(val) => {
-							setExpireHours(val);
-						}}
-						defaultValue={1}
-						value={expireHours}
-						precision={0}
-					>
-						<NumberInputField />
-					</NumberInput>
-					{expireHoursErr !== "" ? (
-						<Text style={{ ...styles.inputsErr }}>
-							{expireHoursErr}
-						</Text>
-					) : undefined}
-				</Flex>
-				<Flex style={{ ...styles.inputsFlex }}>
-					<Text style={{ ...styles.inputsText }}>
-						Challenge period (in hr)
-					</Text>
-					<NumberInput
-						style={{
-							...styles.inputsValue,
-						}}
-						onChange={(val) => {
-							setBufferHours(val);
-						}}
-						defaultValue={1}
-						precision={0}
-						value={bufferHours}
-					>
-						<NumberInputField />
-					</NumberInput>
-					{bufferHoursErr !== "" ? (
-						<Text style={{ ...styles.inputsErr }}>
-							{bufferHoursErr}
-						</Text>
-					) : undefined}
-				</Flex>
-
-				<Flex style={{ ...styles.inputsFlex }}>
-					<Text style={{ ...styles.inputsText }}>
-						Resolution period (in hr)
-					</Text>
-					<NumberInput
-						style={{
-							...styles.inputsValue,
-						}}
-						onChange={(val) => {
-							setResolutionHours(val);
-						}}
-						defaultValue={1}
-						precision={0}
-						value={resolutionHours}
-					>
-						<NumberInputField />
-					</NumberInput>
-					{resolutionHoursErr !== "" ? (
-						<Text style={{ ...styles.inputsErr }}>
-							{resolutionHoursErr}
-						</Text>
-					) : undefined}
-				</Flex>
+				{InputWithTitle(
+					"Name",
+					true,
+					name,
+					setName,
+					validateGroupName,
+					{}
+				)}
+				{InputWithTitle("Fee", false, fee, setFee, validateFee, {
+					defaultValue: 0.05,
+					precision: 3,
+				})}
+				{InputWithTitle(
+					"Escalation Limit",
+					false,
+					escalationLimit,
+					setEscalationLimit,
+					validateEscalationLimit,
+					{
+						defaultValue: 1,
+						precision: 0,
+					}
+				)}
+				{InputWithTitle(
+					"Trading Period (in hrs)",
+					false,
+					expireHours,
+					setExpireHours,
+					validateExpireHours,
+					{
+						defaultValue: 1,
+						precision: 0,
+					}
+				)}
+				{InputWithTitle(
+					"Challenge period (in hrs)",
+					false,
+					bufferHours,
+					setBufferHours,
+					validateBufferHours,
+					{
+						defaultValue: 1,
+						precision: 0,
+					}
+				)}
+				{InputWithTitle(
+					"Resolution period (in hrs)",
+					false,
+					resolutionHours,
+					setResolutionHours,
+					validateResolutionHours,
+					{
+						defaultValue: 1,
+						precision: 0,
+					}
+				)}
 
 				<Button
 					loadingText="Processing..."
@@ -380,9 +337,7 @@ const styles = {
 		flexDirection: "column",
 		width: "100%",
 	},
-	inputsErr: {
-		fontSize: 12,
-	},
+	inputsErr: {},
 };
 
 export default Page;

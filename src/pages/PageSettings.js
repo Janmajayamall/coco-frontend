@@ -60,7 +60,6 @@ function Page() {
 	const navigate = useNavigate();
 	const toast = useToast();
 	const urlParams = useParams();
-	const toast = useToast();
 	const oracleId = urlParams.pageId;
 
 	const oraclesInfoObj = useSelector(selectOracleInfoObj);
@@ -171,15 +170,15 @@ function Page() {
 							name="Chosen Pic"
 							src={
 								groupImageUrl == undefined
-									? uploadImage == undefined
+									? uploadedImage == undefined
 										? "https://bit.ly/dan-abramov"
-										: URL.createObjectURL(uploadImage)
+										: URL.createObjectURL(uploadedImage)
 									: groupImageUrl
 							}
 						/>
 
 						{groupImageUrl == undefined &&
-						uploadImage == undefined ? (
+						uploadedImage == undefined ? (
 							<FileUpload
 								accept={"image/*"}
 								onFileUpload={(file) => {
@@ -254,7 +253,7 @@ function Page() {
 						};
 
 						// check whether to upload image
-						if (image != undefined) {
+						if (uploadedImage != undefined) {
 							// TODO upload image
 							console.log("image uploaded");
 						}
