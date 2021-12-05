@@ -148,7 +148,7 @@ function Page() {
 		<Flex flexDirection="row">
 			<Spacer />
 
-			<Flex flexDirection="column" width={"40%"}>
+			<Flex flexDirection="column" width={"50%"}>
 				<Flex>
 					<Text>Posts that need attention</Text>
 				</Flex>
@@ -169,25 +169,26 @@ function Page() {
 					);
 				})}
 			</Flex>
-			<Flex flexDirection="column" width={"30%"} ml={5}>
-				<Text>Groups you manage</Text>
-				{oraclesLoading === true ? <Loader /> : undefined}
-				{oracleIds.map((id) => {
-					const group = oraclesInfoObj[id];
-					if (group == undefined) {
-						return;
-					}
+			<Flex paddingLeft={10} width={"30%"}>
+				<Flex flexDirection="column">
+					<Text>Groups you manage</Text>
+					{oraclesLoading === true ? <Loader /> : undefined}
+					{oracleIds.map((id) => {
+						const group = oraclesInfoObj[id];
+						if (group == undefined) {
+							return;
+						}
 
-					return (
-						<GroupDisplayName
-							group={group}
-							followStatusVisible={false}
-						/>
-					);
-				})}
+						return (
+							<GroupDisplayName
+								group={group}
+								followStatusVisible={false}
+							/>
+						);
+					})}
+				</Flex>
+				<Spacer />
 			</Flex>
-
-			<Spacer />
 		</Flex>
 	);
 }
