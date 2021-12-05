@@ -36,6 +36,7 @@ import { selectOracleInfoObj, selectUserProfile } from "../redux/reducers";
 import { addScaleCorrection } from "framer-motion";
 import Loader from "../components/Loader";
 import GroupDisplayName from "../components/GroupDisplayPanel";
+import InputWithTitle from "../components/InputWithTitle";
 
 /**
  * @note For the sake of simplicity, at least for now, oracles from UI have following constraints
@@ -133,7 +134,13 @@ function Page() {
 			return;
 		}
 
-		if (!validateUpdateMarketConfigTxInputs().valid) {
+		if (!validateUpdateMarketConfigTxInputs(
+			fee,
+			escalationLimit,
+			expireHours,
+			bufferHours,
+			resolutionHours
+		).valid) {
 			toast({
 				title: "Invalid Input!",
 				status: "error",
@@ -159,71 +166,6 @@ function Page() {
 			convertHoursToBlocks(chainId, Number(expireHours)),
 			convertHoursToBlocks(chainId, Number(bufferHours)),
 			convertHoursToBlocks(chainId, Number(resolutionHours))
-		);
-	}
-
-	function InputWithTitle(
-		title,
-		isText,
-		value,
-		setValue,
-		validationFn,
-		inputOptions = {}
-	) {
-		const { valid, expText } = validationFn(value);
-
-		return (
-			<Flex
-				style={{
-					flexDirection: "column",
-					width: "100%",
-				}}
-			>
-				<Text
-					style={{
-						width: "100%",
-						marginTop: 5,
-					}}
-				>
-					{title}
-				</Text>
-				{isText === true ? (
-					<Input
-						{...inputOptions}
-						style={{
-							...styles.inputsValue,
-						}}
-						placeholder={title}
-						onChange={(e) => {
-							setValue(e.target.value);
-						}}
-						value={name}
-					/>
-				) : (
-					<NumberInput
-						{...inputOptions}
-						style={{
-							width: "100%",
-							marginTop: 5,
-						}}
-						onChange={(val) => {
-							setValue(val);
-						}}
-						value={value}
-					>
-						<NumberInputField />
-					</NumberInput>
-				)}
-				{valid === false ? (
-					<Text
-						style={{
-							fontSize: 12,
-						}}
-					>
-						{expText}
-					</Text>
-				) : undefined}
-			</Flex>
 		);
 	}
 

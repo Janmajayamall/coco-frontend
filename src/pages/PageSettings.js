@@ -12,9 +12,11 @@ import {
 	Spacer,
 	Avatar,
 	useToast,
+	Heading,
 } from "@chakra-ui/react";
 import { FiFile } from "react-icons/fi";
 import FileUpload from "../components/FileUpload";
+import InputWithTitle from "../components/InputWithTitle";
 import {
 	uploadImage,
 	keccak256,
@@ -30,6 +32,14 @@ import {
 	updateModerator,
 	convertHoursToBlocks,
 	convertBlocksToHours,
+	validateEscalationLimit,
+	validateExpireHours,
+	validateBufferHours,
+	validateResolutionHours,
+	validateFee,
+	validateGroupName,
+	validateUpdateMarketConfigTxInputs,
+	GRAPH_BUFFER_MS,
 } from "../utils";
 import {
 	useCreateNewMarket,
@@ -84,11 +94,11 @@ function Page() {
 	/**
 	 * Oracle config states
 	 */
-	const [fee, setFee] = useState(0);
-	const [escalationLimit, setEscalationLimit] = useState(0);
-	const [expireHours, setExpireHours] = useState(0);
-	const [bufferHours, setBufferHours] = useState(0);
-	const [resolutionHours, setResolutionHours] = useState(0);
+	const [fee, setFee] = useState("0.05");
+	const [escalationLimit, setEscalationLimit] = useState(1);
+	const [expireHours, setExpireHours] = useState(1);
+	const [bufferHours, setBufferHours] = useState(1);
+	const [resolutionHours, setResolutionHours] = useState(1);
 
 	useEffect(async () => {
 		if (oracleResult.data == undefined) {
@@ -104,15 +114,19 @@ function Page() {
 				status: "error",
 				isClosable: true,
 			});
+			setLoadingUpdateOracle(false);
 		}
 		if (state.receipt != undefined) {
-			toast({
-				title: "Success!",
-				status: "success",
-				isClosable: true,
-			});
+			setTimeout(() => {
+				setLoadingUpdateOracle(false);
+				toast({
+					title: "Success!",
+					status: "success",
+					isClosable: true,
+				});
+				window.location.reload();
+			}, GRAPH_BUFFER_MS);
 		}
-		setLoadingUpdateOracle(false);
 	}, [state]);
 
 	useEffect(() => {
@@ -162,7 +176,9 @@ function Page() {
 	return (
 		<Flex flexDirection="row" marginTop="20">
 			<Spacer />
-			<Flex width="40%" flexDirection="column">
+
+			<Flex width="30%" flexDirection="column">
+				<Heading>Group data</Heading>
 				<Flex justifyContent="center" alignItems="center">
 					<Flex flexDirection="column" marginTo="5" marginBottom="5">
 						<Avatar
@@ -210,20 +226,28 @@ function Page() {
 						)}
 					</Flex>
 				</Flex>
-				<Input
-					placeholder="Name"
-					onChange={(e) => {
-						setName(e.target.value);
-					}}
-					value={name}
-				/>
-				<Input
-					placeholder="Description"
-					onChange={(e) => {
-						setDescription(e.target.value);
-					}}
-					value={description}
-				/>
+				{InputWithTitle(
+					"Name",
+					true,
+					name,
+					setName,
+					validateGroupName,
+					{}
+				)}
+				{InputWithTitle(
+					"Description",
+					true,
+					description,
+					setDescription,
+					(val) => {
+						return {
+							valid: true,
+							exp: "",
+						};
+					},
+					{}
+				)}
+
 				<Button
 					disabled={
 						account == undefined ||
@@ -232,8 +256,6 @@ function Page() {
 					isLoading={loadingUpdateMetadata}
 					loadingText={"Processing..."}
 					onClick={async () => {
-						setLoadingUpdateMetadata(true);
-
 						// validate rights
 						if (
 							!isAuthenticated ||
@@ -246,6 +268,8 @@ function Page() {
 							});
 							return;
 						}
+
+						setLoadingUpdateMetadata(true);
 
 						let updates = {
 							name,
@@ -283,63 +307,57 @@ function Page() {
 				</Button>
 			</Flex>
 			<Spacer />
-			<Flex width="40%" flexDirection="column">
+			<Flex width="30%" flexDirection="column">
+				<Heading>Market Config</Heading>
 				<Flex flexDirection="column">
-					<NumberInput
-						onChange={(val) => {
-							setFee(val);
-						}}
-						defaultValue={0}
-						precision={3}
-						value={fee}
-						max={1}
-					>
-						<NumberInputField />
-					</NumberInput>
-
-					<NumberInput
-						onChange={(val) => {
-							setEscalationLimit(val);
-						}}
-						defaultValue={0}
-						precision={0}
-						value={escalationLimit}
-					>
-						<NumberInputField />
-					</NumberInput>
-
-					<NumberInput
-						onChange={(val) => {
-							setExpireHours(val);
-						}}
-						defaultValue={0}
-						precision={2}
-						value={expireHours}
-					>
-						<NumberInputField />
-					</NumberInput>
-
-					<NumberInput
-						onChange={(val) => {
-							setBufferHours(val);
-						}}
-						defaultValue={0}
-						precision={2}
-						value={bufferHours}
-					>
-						<NumberInputField />
-					</NumberInput>
-
-					<NumberInput
-						onChange={(val) => {
-							setResolutionHours(val);
-						}}
-						defaultValue={0}
-						precision={2}
-						value={resolutionHours}
-					>
-						<NumberInputField />
-					</NumberInput>
+					{InputWithTitle("Fee", false, fee, setFee, validateFee, {
+						defaultValue: 0.05,
+						precision: 3,
+					})}
+					{InputWithTitle(
+						"Escalation Limit",
+						false,
+						escalationLimit,
+						setEscalationLimit,
+						validateEscalationLimit,
+						{
+							defaultValue: 1,
+							precision: 0,
+						}
+					)}
+					{InputWithTitle(
+						"Trading Period (in hrs)",
+						false,
+						expireHours,
+						setExpireHours,
+						validateExpireHours,
+						{
+							defaultValue: 1,
+							precision: 0,
+						}
+					)}
+					{InputWithTitle(
+						"Challenge period (in hrs)",
+						false,
+						bufferHours,
+						setBufferHours,
+						validateBufferHours,
+						{
+							defaultValue: 1,
+							precision: 0,
+						}
+					)}
+					{InputWithTitle(
+						"Resolution period (in hrs)",
+						false,
+						resolutionHours,
+						setResolutionHours,
+						validateResolutionHours,
+						{
+							defaultValue: 1,
+							precision: 0,
+						}
+					)}
 					<Button
 						disabled={
 							account == undefined ||
@@ -348,8 +366,6 @@ function Page() {
 						loadingText={"Processing..."}
 						isLoading={loadingUpdateOracle}
 						onClick={() => {
-							setLoadingUpdateOracle(true);
-
 							// validate access rights
 							if (
 								!isAuthenticated ||
@@ -363,6 +379,27 @@ function Page() {
 								return;
 							}
 
+							// validate inputs
+							if (
+								!validateUpdateMarketConfigTxInputs(
+									fee,
+									escalationLimit,
+									expireHours,
+									bufferHours,
+									resolutionHours
+								).valid
+							) {
+								toast({
+									title: "Invalid Input!",
+									status: "error",
+									isClosable: true,
+								});
+								return;
+							}
+
+							setLoadingUpdateOracle(true);
+
+							// fee calc
 							const feeNumerator = Number(fee) * 1000;
 							const feeDenominator = 1000;
 

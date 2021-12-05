@@ -108,10 +108,10 @@ export function validateUpdateMarketConfigTxInputs(
 ) {
 	if (
 		validateFee(fee).valid &&
-		validateEscalationLimit(escalationLimit) &&
-		validateBufferHours(bufferHours) &&
-		validateExpireHours(expireHours) &&
-		validateResolutionHours(resolutionHours)
+		validateEscalationLimit(escalationLimit).valid &&
+		validateBufferHours(bufferHours).valid &&
+		validateExpireHours(expireHours).valid &&
+		validateResolutionHours(resolutionHours).valid
 	) {
 		return {
 			valid: true,
