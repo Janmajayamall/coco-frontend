@@ -41,6 +41,7 @@ import {
 	validateUpdateMarketConfigTxInputs,
 	GRAPH_BUFFER_MS,
 	validateGroupDescription,
+	uploadImageFileCloudinary,
 } from "../utils";
 import {
 	useCreateNewMarket,
@@ -185,11 +186,11 @@ function Page() {
 					<Flex flexDirection="column" marginTo="5" marginBottom="5">
 						<Avatar
 							size="2xl"
-							name="Chosen Pic"
+							name="G"
 							src={
 								groupImageUrl == undefined
 									? uploadedImage == undefined
-										? "https://bit.ly/dan-abramov"
+										? undefined
 										: URL.createObjectURL(uploadedImage)
 									: groupImageUrl
 							}
@@ -271,8 +272,11 @@ function Page() {
 						// validate input
 						if (
 							!validateGroupName(name).valid ||
-							!validateGroupDescription.apply(description).valid
+							!validateGroupDescription(description).valid
 						) {
+							console.log(validateGroupName(name));
+							console.log(validateGroupDescription(description));
+							console.log("bro!");
 							toast({
 								title: "Invalid input!",
 								error: "error",
@@ -290,10 +294,18 @@ function Page() {
 
 						// check whether to upload image
 						if (uploadedImage != undefined) {
-							// TODO upload image
-							console.log("image uploaded");
+							const formData = new FormData();
+							formData.append("file", uploadedImage);
+							formData.append("upload_preset", "yow5vd7c");
+							const s3Url = await uploadImageFileCloudinary(
+								formData
+							);
+							updates = {
+								...updates,
+								groupImageUrl: s3Url,
+							};
 						}
-
+						console.log("updated data, ", updates);
 						const res = await updateModerator(
 							oracleData.id,
 							updates

@@ -75,6 +75,7 @@ import ConfigSidebar from "../components/ConfigSiderbar";
 import { FireIcon } from "../components/FireIcon";
 import { HomeIcon } from "../components/HomeIcon";
 import { ArrowBackIcon } from "@chakra-ui/icons";
+import Loader from "../components/Loader";
 
 /**
  * Shows different posts user has interacted with in any form.
@@ -105,6 +106,8 @@ function Page() {
 	const [filter, setFilter] = useState(0);
 	const [tokenBalancesObj, setTokenBalancesObj] = useState({});
 
+	const [loading, setLoading] = useState(true);
+
 	useEffect(async () => {
 		if (
 			userMarketsResult.data == undefined ||
@@ -134,6 +137,8 @@ function Page() {
 			return;
 		}
 
+		setLoading(true);
+
 		const _populatedMarkets = userMarketsResult.data.user.markets.map(
 			(obj) =>
 				populateMarketWithMetadata(
@@ -145,6 +150,7 @@ function Page() {
 				)
 		);
 		setMarkets(_populatedMarkets);
+		setLoading(false);
 	}, [oraclesInfoObj, marketsMetadata, groupsFollowed, userMarketsResult]);
 
 	useEffect(() => {
@@ -163,6 +169,11 @@ function Page() {
 	}, [tokenBalancesResult]);
 
 	useEffect(() => {
+		if (filter == "" || filter == undefined) {
+			setFilteredMarkets(markets);
+			return;
+		}
+
 		let _markets = [];
 		if (filter == 0) {
 			_markets = markets;
@@ -191,24 +202,42 @@ function Page() {
 	return (
 		<Flex>
 			<Spacer />
-			<Flex flexDirection={"column"}>
+			<Flex width={"50%"} flexDirection={"column"}>
 				<Select
+					marginTop={5}
+					marginBottom={5}
 					onChange={(e) => {
 						setFilter(e.target.value);
 					}}
 					placeholder="Select Filter"
 				>
-					<option value={0}>No</option>
-					<option value={1}>Trading</option>
-					<option value={2}>Challenge</option>
-					<option value={3}>Resolve</option>
+					<option value={1}>In Trading Period</option>
+					<option value={2}>In Challenge Period</option>
+					<option value={3}>In Resolve</option>
 					<option value={4}>Finalized</option>
 					<option value={5}>Claim</option>
-					<option value={6}>Created by me</option>
+					<option value={6}>Created by you</option>
 				</Select>
+				{
+					loading === true ? <Loader/> : undefined
+				}
+				{loading === false &&  filteredMarkets.length === 0 ? (
+					<Flex
+						marginTop={5}
+						justifyContent="center"
+						alignItems="center"
+					>
+						<Text fontSize="xl" fontWeight="bold">
+							No Posts
+						</Text>
+					</Flex>
+				) : undefined}
 				{filteredMarkets.map((market) => {
 					return (
 						<PostDisplay
+							style={{
+								marginBottom: 20,
+							}}
 							market={market}
 							onImageClick={() => {
 								navigate(`/post/${market.marketIdentifier}`);

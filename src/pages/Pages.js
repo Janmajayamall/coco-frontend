@@ -9,6 +9,7 @@ import {
 	Text,
 	Flex,
 	Spacer,
+	Heading,
 } from "@chakra-ui/react";
 import { FiFile } from "react-icons/fi";
 import FileUpload from "../components/FileUpload";
@@ -41,6 +42,7 @@ import PostDisplay from "../components/PostDisplay";
 import { useNavigate } from "react-router";
 import Loader from "../components/Loader";
 import GroupDisplayName from "../components/GroupDisplayPanel";
+import NoPostsTag from "../components/NoPostsTag";
 
 /**
  * Shows two things
@@ -143,14 +145,19 @@ function Page() {
 			<Spacer />
 
 			<Flex flexDirection="column" width={"50%"}>
-				<Flex>
-					<Text>Posts that need attention</Text>
+				<Flex justifyContent="center" marginTop={5}>
+					<Heading fontSize={25}>
+						Posts that need your attention
+					</Heading>
 				</Flex>
 				{marketsLoading === true ? <Loader /> : undefined}
 				{marketsLoading === false && markets.length === 0 ? (
-					<Flex>
-						<Text>No posts to resolve</Text>
-					</Flex>
+					<NoPostsTag
+						style={{
+							marginTop: 20,
+							marginBottom: 20,
+						}}
+					/>
 				) : undefined}
 				{markets.map((market) => {
 					return (
@@ -165,7 +172,11 @@ function Page() {
 			</Flex>
 			<Flex paddingLeft={10} width={"30%"}>
 				<Flex flexDirection="column">
-					<Text>Groups you manage</Text>
+					<Flex justifyContent="center" marginTop={5}>
+						<Text fontSize={20} fontWeight={"bold"}>
+							Your groups
+						</Text>
+					</Flex>
 					{oraclesLoading === true ? <Loader /> : undefined}
 					{oracleIds.map((id) => {
 						const group = oraclesInfoObj[id];
@@ -177,6 +188,7 @@ function Page() {
 							<GroupDisplayName
 								group={group}
 								followStatusVisible={false}
+								settingsVisible={true}
 							/>
 						);
 					})}

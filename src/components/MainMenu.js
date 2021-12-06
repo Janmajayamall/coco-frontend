@@ -72,7 +72,7 @@ function MainMenu() {
 						oraclesResult.data.oracles.length !== 0 ? (
 							<Item
 								onClick={() => {
-									navigate("/settings/pages");
+									navigate("/groups");
 								}}
 								title={"Your groups"}
 							/>
@@ -85,7 +85,7 @@ function MainMenu() {
 						/>
 						<Item
 							onClick={() => {
-								navigate("/personal");
+								navigate("/activity");
 							}}
 							title={"Your activity"}
 						/>

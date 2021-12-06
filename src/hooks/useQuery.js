@@ -131,7 +131,7 @@ const QueryMarketByMarketIdentifier = `
 
 const QueryMarketsAtStage3ByOracles = `
 	query ($oracles: [Bytes!]!) {
-		markets(where: {oracle_in: $oracles}) {
+		markets(where: {oracle_in: $oracles, stage: 3}) {
 			id
 			creator
 			eventIdentifier

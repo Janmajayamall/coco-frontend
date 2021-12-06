@@ -35,8 +35,8 @@ function PostDisplay({ market, onImageClick, ...children }) {
 				<Flex alignItems="center">
 					<Avatar
 						size="sm"
-						name="Dan Abrahmov"
-						src="https://bit.ly/dan-abramov"
+						name={market.oracleInfo.name[0]}
+						src={market.oracleInfo.groupImageUrl}
 					/>
 					<Heading
 						onClick={() => {
@@ -84,16 +84,28 @@ function PostDisplay({ market, onImageClick, ...children }) {
 					</Text>
 				</Flex>
 			</Flex>
-			<Flex width={"100%"} minHeight={400} justifyContent="center">
+			<Flex
+				onClick={() => {
+					if (onImageClick != undefined) {
+						onImageClick(market.marketIdentifier);
+					}
+				}}
+				width={"100%"}
+				minHeight={400}
+				justifyContent="center"
+			>
 				<Image
-					onClick={() => {
-						if (onImageClick != undefined) {
-							onImageClick(market.marketIdentifier);
-						}
-					}}
 					loading={"eager"}
-					src={`https://eskipaper.com/images/hi-res-wallpaper-6.jpg?id=${id}`}
-					alt="diowa"
+					src={
+						market.marketMetadata &&
+						market.marketMetadata.eventIdentifierStr
+							? market.marketMetadata.eventIdentifierStr
+							: ""
+					}
+					fallbackSrc={
+						"https://www.aroged.com/wp-content/uploads/2021/08/Where-to-Find-Good-Wallpapers-for-Xbox-One-or-Xbox.jpg"
+					}
+					alt="Failed to load image"
 				/>
 			</Flex>
 			<Flex marginTop={5}>

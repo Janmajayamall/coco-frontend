@@ -11,6 +11,7 @@ import {
 	Text,
 	Box,
 	useToast,
+	Spacer,
 } from "@chakra-ui/react";
 import {
 	convertHoursToBlocks,
@@ -37,6 +38,7 @@ import { addScaleCorrection } from "framer-motion";
 import Loader from "../components/Loader";
 import GroupDisplayName from "../components/GroupDisplayPanel";
 import InputWithTitle from "../components/InputWithTitle";
+import PrimaryButton from "../components/PrimaryButton";
 
 /**
  * @note For the sake of simplicity, at least for now, oracles from UI have following constraints
@@ -174,6 +176,7 @@ function Page() {
 
 	return (
 		<Flex justifyContent="center" paddingTop="10">
+			<Spacer />
 			<Flex
 				width="50%"
 				justifyContent="center"
@@ -182,7 +185,7 @@ function Page() {
 				paddingRight={20}
 				paddingLeft={20}
 			>
-				<Heading>New Group</Heading>
+				<Heading size="lg">New Group</Heading>
 				{InputWithTitle(
 					"Name",
 					true,
@@ -239,17 +242,21 @@ function Page() {
 						precision: 0,
 					}
 				)}
-
-				<Button
+				<PrimaryButton
+					style={{
+						marginTop: 20,
+					}}
 					loadingText="Processing..."
 					isLoading={createLoading}
 					onClick={createModeratorHelper}
-				>
-					Submit
-				</Button>
+					title="Submit"
+				/>
 			</Flex>
-			<Flex width="20%" flexDirection="column">
-				<Heading>Your existing groups</Heading>
+			<Spacer />
+			<Flex width="30%" flexDirection="column">
+				<Heading marginBottom={5} size="lg">
+					Your groups
+				</Heading>
 				{oraclesLoading === true ? <Loader /> : undefined}
 				{oracleIds.map((id) => {
 					const group = oraclesInfoObj[id];

@@ -5,7 +5,7 @@ import PostDisplay from "./components/PostDisplay";
 import NewPost from "./pages/NewPost";
 import NewModerator from "./pages/NewModerator";
 import OracleConfig from "./pages/OracleConfig";
-import Personal from "./pages/Personal";
+import Activity from "./pages/Activity";
 
 import Feed from "./pages/Feed";
 import Post from "./pages/Post";
@@ -153,7 +153,13 @@ function App() {
 							paddingRight: 5,
 						}}
 					>
-						<Heading>Mimi</Heading>
+						<Heading
+							onClick={() => {
+								navigate("/");
+							}}
+						>
+							Mimi
+						</Heading>
 						<Spacer />
 						<ConnectButton />
 						<MainMenu />
@@ -170,12 +176,9 @@ function App() {
 				<Route path="/group/:groupId" element={<Feed />} />
 				<Route path="/" element={<Feed />} />
 				<Route path="/post/:postId" element={<Post />} />
-				<Route path="/settings/pages" element={<Pages />} />
-				<Route
-					path="/settings/pages/:pageId"
-					element={<PageSettings />}
-				/>
-				<Route path="/personal" element={<Personal />} />
+				<Route path="/groups" element={<Pages />} />
+				<Route path="/settings/:pageId" element={<PageSettings />} />
+				<Route path="/activity" element={<Activity />} />
 			</Routes>
 		</div>
 	);

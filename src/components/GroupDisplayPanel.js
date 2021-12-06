@@ -18,6 +18,7 @@ import {
 	SliderThumb,
 	IconButton,
 } from "@chakra-ui/react";
+import { SettingsIcon } from "@chakra-ui/icons";
 
 import { useEthers } from "@usedapp/core/packages/core";
 import {
@@ -56,18 +57,14 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 
-function GroupDisplayName({ group, followStatusVisible }) {
+function GroupDisplayName({ group, followStatusVisible, settingsVisible }) {
 	const navigate = useNavigate();
 	const groupsFollowed = useSelector(selectGroupsFollowed);
 	const dispatch = useDispatch();
 
 	return (
 		<Flex marginTop={2} marginBottom={2} alignItems="center">
-			<Avatar
-				size="sm"
-				name="Dan Abrahmov"
-				src="https://bit.ly/dan-abramov"
-			/>
+			<Avatar size="sm" name={group.name[0]} src={group.groupImageUrl} />
 
 			<Text
 				onClick={() => {
@@ -112,6 +109,17 @@ function GroupDisplayName({ group, followStatusVisible }) {
 						<Text fontSize={12}>Leave</Text>
 					</Button>
 				)
+			) : undefined}
+			{settingsVisible === true ? (
+				<IconButton
+					onClick={() => {
+						navigate(`/settings/${group.oracleAddress}`);
+					}}
+					backgroundColor="#0B0B0B"
+					size={"sm"}
+					aria-label="Search database"
+					icon={<SettingsIcon color="#FDFDFD" />}
+				/>
 			) : undefined}
 		</Flex>
 	);

@@ -19,6 +19,8 @@ import {
 	newPostTrial,
 	findModerators,
 	getPresignedUrl,
+	uploadImageFileCloudinary,
+	toBase64,
 } from "./../utils";
 import { useCreateNewMarket } from "./../hooks";
 import { useEthers } from "@usedapp/core/packages/core";
@@ -124,9 +126,13 @@ function Page() {
 
 		// const presignedUrl = await getPresignedUrl();
 		// const s3Url = await uploadImageFile(presignedUrl);
-		const s3Url = "ht7cfvgybuhj16730";
+
+		const formData = new FormData();
+		formData.append("file", imageFile);
+		formData.append("upload_preset", "yow5vd7c");
+		const s3Url = await uploadImageFileCloudinary(formData);
+		// const s3Url = "ht7cfvgybuhj16730";
 		if (s3Url == undefined) {
-			// TODO give error
 			displayToast("Something went wrong!", "error");
 			setNewPostLoading(false);
 		}
