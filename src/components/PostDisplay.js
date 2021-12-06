@@ -19,7 +19,7 @@ import { useDispatch } from "react-redux";
 import { sUpdatePostTradeModal, sAddGroupFollow } from "./../redux/reducers";
 import { useNavigate } from "react-router";
 
-function PostDisplay({ market, onImageClick }) {
+function PostDisplay({ market, onImageClick, ...children }) {
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
 
@@ -30,7 +30,7 @@ function PostDisplay({ market, onImageClick }) {
 	let id = new Date().getTime();
 
 	return (
-		<Box>
+		<Box {...children}>
 			<Flex paddingBottom={3} paddingTop={4}>
 				<Flex alignItems="center">
 					<Avatar
@@ -72,9 +72,17 @@ function PostDisplay({ market, onImageClick }) {
 					) : undefined}
 				</Flex>
 				<Spacer />
-				<Text>
-					{marketStageDisplayName(market.optimisticState.stage)}
-				</Text>
+				<Flex
+					backgroundColor="#F3F5F7"
+					alignItems="center"
+					paddingLeft={3}
+					paddingRight={3}
+					borderRadius={5}
+				>
+					<Text>
+						{marketStageDisplayName(market.optimisticState.stage)}
+					</Text>
+				</Flex>
 			</Flex>
 			<Flex width={"100%"} minHeight={400} justifyContent="center">
 				<Image

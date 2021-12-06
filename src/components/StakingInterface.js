@@ -37,6 +37,7 @@ import {
 } from "../utils";
 import PostDisplay from "../components/PostDisplay";
 import TwoColTitleInfo from "../components/TwoColTitleInfo";
+import PrimaryButton from "./PrimaryButton";
 import { useParams } from "react-router";
 
 import { BigNumber, ethers, utils } from "ethers";
@@ -137,7 +138,7 @@ function StakingInterface({ market, stakeHistories, refreshFn }) {
 	}
 
 	return (
-		<Flex flexDirection="column">
+		<Flex marginTop={5} flexDirection="column">
 			<TwoColTitleInfo
 				title={"Temp outcome"}
 				info={`${outcomeDisplayName(tempOutcome)}`}
@@ -160,7 +161,9 @@ function StakingInterface({ market, stakeHistories, refreshFn }) {
 					market.lastAmountStaked.mul(TWO_BN)
 				)}`}
 			/>
-			<Text marginTop={5}>Challenge temp outcome</Text>
+			<Text fontSize={12} fontWeight={"bold"} marginTop={5}>
+				Challenge outcome
+			</Text>
 
 			<TwoColTitleInfo
 				title={"Your chosen outcome"}
@@ -186,7 +189,7 @@ function StakingInterface({ market, stakeHistories, refreshFn }) {
 					{errText}
 				</Text>
 			) : undefined}
-			<Button
+			<PrimaryButton
 				loadingText="Processing..."
 				isLoading={stakeLoading}
 				disabled={!isAuthenticated}
@@ -211,11 +214,11 @@ function StakingInterface({ market, stakeHistories, refreshFn }) {
 						market.marketIdentifier
 					);
 				}}
-			>
-				<Text color="white" fontSize="md" fontWeight="medium" mr="2">
-					Challenge
-				</Text>
-			</Button>
+				title="Challenge"
+				style={{
+					marginTop: 5,
+				}}
+			/>
 
 			<ChallengeHistoryTable stakeHistories={stakeHistories} />
 		</Flex>

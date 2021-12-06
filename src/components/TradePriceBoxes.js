@@ -26,6 +26,7 @@ function TradePricesBoxes({
 						onOutcomeChosen(outcome);
 					}
 				}}
+				borderRadius={5}
 			>
 				<Flex>
 					<Text>{outcome === 1 ? "YES" : "NO"}</Text>
@@ -37,9 +38,11 @@ function TradePricesBoxes({
 					)}`}</Text>
 				</Flex>
 				<Flex>
-					<Text>You own</Text>
+					<Text fontSize={12} fontWeight={"bold"}>
+						You own
+					</Text>
 					<Spacer />
-					<Text>
+					<Text fontSize={12} fontWeight={"bold"}>
 						{formatBNToDecimal(
 							outcome === 1
 								? tradePosition.amount1

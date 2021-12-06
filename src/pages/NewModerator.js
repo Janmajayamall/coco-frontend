@@ -134,13 +134,16 @@ function Page() {
 			return;
 		}
 
-		if (!validateUpdateMarketConfigTxInputs(
-			fee,
-			escalationLimit,
-			expireHours,
-			bufferHours,
-			resolutionHours
-		).valid) {
+		if (
+			!validateUpdateMarketConfigTxInputs(
+				fee,
+				escalationLimit,
+				expireHours,
+				bufferHours,
+				resolutionHours
+			).valid ||
+			!validateGroupName(name).valid
+		) {
 			toast({
 				title: "Invalid Input!",
 				status: "error",

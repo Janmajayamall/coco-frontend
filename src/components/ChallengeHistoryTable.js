@@ -1,9 +1,12 @@
 import { Text, Flex, Table, Thead, Tr, Th, Td } from "@chakra-ui/react";
+import { sliceAddress } from "../utils";
 
 function ChallengeHistoryTable({ stakeHistories }) {
 	return (
 		<Flex marginTop={5} flexDirection="column">
-			<Text>Past Challenges</Text>
+			<Text fontSize={12} fontWeight={"bold"}>
+				Past Challenges
+			</Text>
 			<Table size="sm">
 				<Thead>
 					<Tr>
@@ -14,9 +17,9 @@ function ChallengeHistoryTable({ stakeHistories }) {
 				</Thead>
 				{stakeHistories.map((obj) => (
 					<Tr>
-						<Td>{obj.user.id}</Td>
+						<Td>{sliceAddress(obj.user.id)}</Td>
 						<Td>{obj.amountC}</Td>
-						<Td>{obj.outcomeStaked}</Td>
+						<Td>{obj.outcomeStaked === "1" ? "Yes" : "No"}</Td>
 					</Tr>
 				))}
 			</Table>

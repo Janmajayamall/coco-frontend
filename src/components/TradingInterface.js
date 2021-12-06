@@ -47,6 +47,7 @@ import {
 	useQueryMarketByMarketIdentifier,
 	useQueryMarketTradeAndStakeInfoByUser,
 	useSellExactTokensForMinCTokens,
+	useERC1155SetApprovalForAll,
 } from "../hooks";
 import {
 	convertBlocksToSeconds,
@@ -86,18 +87,28 @@ import {
 } from "../utils";
 import PostDisplay from "../components/PostDisplay";
 import TwoColTitleInfo from "../components/TwoColTitleInfo";
+import PrimaryButton from "./PrimaryButton";
 import { useParams } from "react-router";
-
 import { BigNumber, ethers, utils } from "ethers";
 import TradingInput from "./TradingInput";
 import TradePriceBoxes from "./TradePriceBoxes";
+import addresses from "./../contracts/addresses.json";
+import { __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED } from "react-dom/cjs/react-dom.development";
 
-function TradingInterface({ market, tradePosition, tokenApproval, refreshFn }) {
+function TradingInterface({
+	market,
+	tradePosition,
+	erc1155ApprovalForAll,
+	refreshFn,
+}) {
 	const { account } = useEthers();
 	const userProfile = useSelector(selectUserProfile);
 	const isAuthenticated = userProfile && account;
 	const toast = useToast();
-
+	console.log(
+		erc1155ApprovalForAll,
+		"erc1155ApprovalForAll erc1155ApprovalForAll"
+	);
 	/**
 	 * Contract calls
 	 */
@@ -106,6 +117,10 @@ function TradingInterface({ market, tradePosition, tokenApproval, refreshFn }) {
 		state: stateSell,
 		send: sendSell,
 	} = useSellExactTokensForMinCTokens();
+	const {
+		state: stateSetApproval,
+		send: sendSetApproval,
+	} = useERC1155SetApprovalForAll(market.oracle.id);
 
 	/**
 	 * tabIndex == 0 -> BUY
@@ -138,11 +153,12 @@ function TradingInterface({ market, tradePosition, tokenApproval, refreshFn }) {
 	} = useBNInput(sellValidationFn);
 	const [amountCOutBn, setAmountCOutBn] = useState(BigNumber.from(0));
 
-	const [slippage, setSlippage] = useState(0);
+	const [slippage, setSlippage] = useState(1);
 
 	// tx loading
 	const [buyLoading, setBuyLoading] = useState(false);
 	const [sellLoading, setSellLoading] = useState(false);
+	const [approvalLoading, setApprovalLoading] = useState(false);
 
 	useEffect(() => {
 		if (
@@ -208,6 +224,22 @@ function TradingInterface({ market, tradePosition, tokenApproval, refreshFn }) {
 		}
 	}, [stateSell, stateBuy]);
 
+	useEffect(() => {
+		if (stateSetApproval.status === "Success") {
+			setTimeout(() => {
+				setApprovalLoading(false);
+				toast({
+					title: "Success!",
+					status: "success",
+					isClosable: true,
+				});
+				if (refreshFn) {
+					refreshFn();
+				}
+			}, GRAPH_BUFFER_MS);
+		}
+	}, [stateSetApproval]);
+
 	// handle tx error
 	useEffect(() => {
 		if (
@@ -221,6 +253,20 @@ function TradingInterface({ market, tradePosition, tokenApproval, refreshFn }) {
 			setSellLoading(false);
 		}
 	}, [stateBuy, stateSell]);
+
+	useEffect(() => {
+		if (
+			stateSetApproval.status === "Exception" ||
+			stateSetApproval.status === "Fail"
+		) {
+			setApprovalLoading(false);
+			toast({
+				title: "Metamask Err!",
+				status: "error",
+				isClosable: true,
+			});
+		}
+	}, [stateSetApproval]);
 
 	function displayToast(title, status) {
 		toast({
@@ -276,6 +322,10 @@ function TradingInterface({ market, tradePosition, tokenApproval, refreshFn }) {
 							slippageValue={slippage}
 							setInput={setInputBuyAmount}
 							inputValue={inputBuyAmount}
+						/>
+						<TwoColTitleInfo
+							title="Your choice"
+							info={tokenActionIndex === 0 ? "NO" : "YES"}
 						/>
 						<TwoColTitleInfo
 							title="Estimated shares bought"
@@ -362,7 +412,10 @@ function TradingInterface({ market, tradePosition, tokenApproval, refreshFn }) {
 							err={inputSellAmountErr}
 							errText={inputSellAmountErrText}
 						/>
-
+						<TwoColTitleInfo
+							title="Your choice"
+							info={tokenActionIndex === 0 ? "NO" : "YES"}
+						/>
 						<TwoColTitleInfo
 							title="Estimated amount received"
 							info={formatBNToDecimal(amountCOutBn)}
@@ -376,7 +429,9 @@ function TradingInterface({ market, tradePosition, tokenApproval, refreshFn }) {
 						/>
 
 						<Button
-							disabled={!isAuthenticated}
+							disabled={
+								!isAuthenticated || !erc1155ApprovalForAll
+							}
 							backgroundColor="red.100"
 							marginTop="2"
 							width="100%"
@@ -416,6 +471,38 @@ function TradingInterface({ market, tradePosition, tokenApproval, refreshFn }) {
 								Sell
 							</Text>
 						</Button>
+
+						{erc1155ApprovalForAll === false ? (
+							<Flex flexDirection={"column"} marginTop={5}>
+								<Box
+									padding={2}
+									backgroundColor="red.300"
+									borderRadius={20}
+								>
+									<Text fontSize={12}>
+										To sell, you will have to first give
+										token approval to the app. This is only
+										needed once per group.
+									</Text>
+								</Box>
+								<PrimaryButton
+									style={{ marginTop: 5 }}
+									disabled={erc1155ApprovalForAll !== false}
+									loadingText="Processing..."
+									isLoading={approvalLoading}
+									onClick={() => {
+										if (erc1155ApprovalForAll === false) {
+											setApprovalLoading(true);
+											sendSetApproval(
+												addresses.MarketRouter,
+												true
+											);
+										}
+									}}
+									title={"Set approval"}
+								/>
+							</Flex>
+						) : undefined}
 					</TabPanel>
 				</TabPanels>
 			</Tabs>

@@ -46,6 +46,7 @@ import { useEffect } from "react";
 import { useState } from "react";
 import {
 	useBuyMinTokensForExactCTokens,
+	useERC1155ApprovalForAll,
 	useQueryMarketByMarketIdentifier,
 	useQueryMarketTradeAndStakeInfoByUser,
 	useQueryTokenApprovalsByUserAndOracle,
@@ -153,7 +154,11 @@ function Page() {
 		amount0: ZERO_BN,
 		amount1: ZERO_BN,
 	});
-	const [tokenApproval, setTokenApproval] = useState(false);
+
+	const erc1155ApprovalForAll = useERC1155ApprovalForAll(
+		market ? market.oracle.id : undefined,
+		account
+	);
 
 	useEffect(async () => {
 		if (!result.data || !result.data.market) {
@@ -234,19 +239,19 @@ function Page() {
 		});
 	}, [mSATResult, market]);
 
-	useEffect(() => {
-		const tokenApprovals =
-			tokenApprovalsResult.data &&
-			tokenApprovalsResult.data.tokenApprovals
-				? tokenApprovalsResult.data.tokenApprovals
-				: [];
-		const obj = tokenApprovals.find(
-			(obj) =>
-				obj.operator == addresses.MarketRouter.toLowerCase() &&
-				obj.approved == true
-		);
-		setTokenApproval(obj != undefined);
-	}, [tokenApprovalsResult]);
+	// useEffect(() => {
+	// 	const tokenApprovals =
+	// 		tokenApprovalsResult.data &&
+	// 		tokenApprovalsResult.data.tokenApprovals
+	// 			? tokenApprovalsResult.data.tokenApprovals
+	// 			: [];
+	// 	const obj = tokenApprovals.find(
+	// 		(obj) =>
+	// 			obj.operator == addresses.MarketRouter.toLowerCase() &&
+	// 			obj.approved == true
+	// 	);
+	// 	setTokenApproval(obj != undefined);
+	// }, [tokenApprovalsResult]);
 
 	function refreshPost() {
 		window.location.reload();
@@ -258,31 +263,7 @@ function Page() {
 			<Flex width="50%" flexDirection={"column"} marginRight={5}>
 				{loadingMarket == true ? <Loader /> : undefined}
 				{market && market.oracleInfo != undefined ? (
-					<Flex flexDirection="column">
-						<Flex paddingBottom={3} paddingTop={4}>
-							<Flex alignItems="center">
-								<Avatar
-									size="sm"
-									name="Dan Abrahmov"
-									src="https://bit.ly/dan-abramov"
-								/>
-								<Heading marginLeft={2} size="xs">
-									{market.oracleInfo
-										? market.oracleInfo.name
-										: ""}
-								</Heading>
-
-								{market.follow != true ? (
-									<Heading marginLeft={2} size="xs">
-										Join
-									</Heading>
-								) : undefined}
-							</Flex>
-							<Spacer />
-						</Flex>
-						{/* TODO check image exists here or not */}
-						<Image src={"https://bit.ly/2Z4KKcF"} />
-					</Flex>
+					<PostDisplay market={market} />
 				) : undefined}
 
 				{/* {loadingMarket == false ? (
@@ -323,23 +304,34 @@ function Page() {
 			<Flex width="20%" marginLeft={5} flexDirection="column">
 				{loadingMarket == false && market ? (
 					<>
-						<Heading>
-							{marketStageDisplayName(
-								market.optimisticState.stage
-							)}
-						</Heading>
-						<Text>
-							{`Expires in ${formatTimeInSeconds(
-								convertBlocksToSeconds(
-									market.optimisticState.blocksLeft
-								)
-							)}`}
-						</Text>
-						{market.optimisticState.stage === 1 ? (
+						<Flex
+							flexDirection="column"
+							backgroundColor="#F3F5F7"
+							padding={5}
+							borderRadius={10}
+							alignItems="center"
+						>
+							<Heading size="md">
+								{marketStageDisplayName(
+									market.optimisticState.stage
+								)}
+							</Heading>
+							{market.optimisticState.blocksLeft !== 0 ? (
+								<Text>
+									{`expires in ${formatTimeInSeconds(
+										convertBlocksToSeconds(
+											market.optimisticState.blocksLeft
+										)
+									)}`}
+								</Text>
+							) : undefined}
+						</Flex>
+
+						{/* {market.optimisticState.stage === 1 ? (
 							<TradingInterface
 								market={market}
 								tradePosition={tradePosition}
-								tokenApproval={tokenApproval}
+								erc1155ApprovalForAll={erc1155ApprovalForAll}
 								refreshFn={refreshPost}
 							/>
 						) : undefined}
@@ -358,7 +350,7 @@ function Page() {
 								tradePosition={tradePosition}
 								stakeHistories={stakeHistories}
 								stakePosition={stakePosition}
-								tokenApproval={tokenApproval}
+								erc1155ApprovalForAll={erc1155ApprovalForAll}
 								refreshFn={refreshPost}
 							/>
 						) : undefined}
@@ -367,13 +359,12 @@ function Page() {
 								market={market}
 								stakeHistories={stakeHistories}
 							/>
-						) : undefined}
-						{/* <TradingInterface
-						
+						) : undefined} */}
+						<TradingInterface
 							market={market}
 							tradePosition={tradePosition}
-							tokenApproval={tokenApproval}
-						/> */}
+							erc1155ApprovalForAll={erc1155ApprovalForAll}
+						/>
 						{/* <StakingInterface
 							market={market}
 							tradePosition={tradePosition}

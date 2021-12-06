@@ -11,7 +11,7 @@ import {
 	selectRinkebyLatestBlockNumber,
 	selectUserProfile,
 } from "../redux/reducers";
-import { Button, Text, Flex, useToast } from "@chakra-ui/react";
+import { Button, Text, Flex, useToast, Box } from "@chakra-ui/react";
 import { useEthers } from "@usedapp/core/packages/core";
 import { CloseIcon } from "@chakra-ui/icons";
 import { useEffect } from "react";
@@ -61,13 +61,14 @@ import TradingInput from "./TradingInput";
 import TradePriceBoxes from "./TradePriceBoxes";
 import ChallengeHistoryTable from "./ChallengeHistoryTable";
 import addresses from "./../contracts/addresses.json";
+import PrimaryButton from "./PrimaryButton";
 
 function RedeemWinsInterface({
 	market,
 	stakeHistories,
 	tradePosition,
 	stakePosition,
-	tokenApproval,
+	erc1155ApprovalForAll,
 	refreshFn,
 }) {
 	const { account } = useEthers();
@@ -193,27 +194,26 @@ function RedeemWinsInterface({
 					)
 				)}
 			/>
-
-			<Text>Your Challenges</Text>
-			{stakePosition.amount0.isZero() &&
-			stakePosition.amount1.isZero() ? (
-				<Text fontSize={10}>You didn't challenge</Text>
-			) : (
-				<>
+			{!stakePosition.amount0.isZero() ||
+			!stakePosition.amount1.isZero() ? (
+				<Flex flexDirection="column" marginTop="5">
+					<Text fontSize={12} fontWeight="bold">
+						Your Challenges
+					</Text>
 					{!stakePosition.amount1.isZero() ? (
 						<TwoColTitleInfo
-							title={"Amount challenged for YES"}
+							title={"Challenge for Yes"}
 							info={formatBNToDecimal(stakePosition.amount1)}
 						/>
 					) : undefined}
 					{!stakePosition.amount0.isZero() ? (
 						<TwoColTitleInfo
-							title={"Amount challenged for NO"}
+							title={"Challenge for No"}
 							info={formatBNToDecimal(stakePosition.amount0)}
 						/>
 					) : undefined}
 					<TwoColTitleInfo
-						title={"Your challenge winnings"}
+						title={"Your win"}
 						info={formatBNToDecimal(
 							determineStakeWinnings(market, account)
 						)}
@@ -228,27 +228,29 @@ function RedeemWinsInterface({
 							)
 						)}
 					/>
-				</>
-			)}
+				</Flex>
+			) : undefined}
 
-			<TwoColTitleInfo
-				title={"You receive in total"}
-				info={formatBNToDecimal(
-					determineTradeWinAmount(
-						tradePosition,
-						market.optimisticState.outcome
-					).add(
-						determineTotalAmountStakeRedeem(
-							market,
+			<Flex flexDirection="column" marginTop="5">
+				<TwoColTitleInfo
+					title={"You receive in total"}
+					info={formatBNToDecimal(
+						determineTradeWinAmount(
+							tradePosition,
+							market.optimisticState.outcome
+						).add(
+							determineTotalAmountStakeRedeem(
+								market,
 
-							stakePosition,
-							account
+								stakePosition,
+								account
+							)
 						)
-					)
-				)}
-			/>
-
-			<Button
+					)}
+					titleBold={true}
+				/>
+			</Flex>
+			<PrimaryButton
 				disabled={!isAuthenticated || determineWinLevel() === 0}
 				loadingText="Processing..."
 				isLoading={redeemLoading}
@@ -266,21 +268,41 @@ function RedeemWinsInterface({
 						sendRMaxWS(market.oracle.id, market.marketIdentifier);
 					}
 				}}
-			>
-				<Text>Claim reward</Text>
-			</Button>
-			<ChallengeHistoryTable stakeHistories={stakeHistories} />
-			<Button
-				disabled={tokenApproval}
-				loadingText="Processing..."
-				isLoading={approvalLoading}
-				onClick={() => {
-					setApprovalLoading(true);
-					sendSetApproval(addresses.MarketRouter, true);
+				title={"Claim reward"}
+				style={{
+					marginTop: 10,
 				}}
-			>
-				<Text>Set approval</Text>
-			</Button>
+			/>
+
+			{erc1155ApprovalForAll === false ? (
+				<Flex flexDirection={"column"} marginTop={5}>
+					<Box
+						padding={2}
+						backgroundColor="red.300"
+						borderRadius={20}
+					>
+						<Text fontSize={12}>
+							To redeem, you will have to first give token
+							approval to the app. This is only needed once per
+							group.
+						</Text>
+					</Box>
+					<PrimaryButton
+						style={{ marginTop: 5 }}
+						disabled={erc1155ApprovalForAll !== false}
+						loadingText="Processing..."
+						isLoading={approvalLoading}
+						onClick={() => {
+							if (erc1155ApprovalForAll === false) {
+								setApprovalLoading(true);
+								sendSetApproval(addresses.MarketRouter, true);
+							}
+						}}
+						title={"Set approval"}
+					/>
+				</Flex>
+			) : undefined}
+			<ChallengeHistoryTable stakeHistories={stakeHistories} />
 		</Flex>
 	);
 }

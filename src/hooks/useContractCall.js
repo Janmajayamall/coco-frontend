@@ -12,6 +12,7 @@ import {
 	memeTokenInterface,
 	tokenDistributorContract,
 	tokenDistributorInterface,
+	oracleInterface,
 } from "../utils";
 
 export function useTokenBalance(account) {
@@ -29,7 +30,7 @@ export function useTokenBalance(account) {
 }
 
 export function useTokenAllowance(account) {
-	const [tokenBalance] =
+	const [allowance] =
 		useContractCall(
 			account &&
 				addresses.MemeToken && {
@@ -39,7 +40,7 @@ export function useTokenAllowance(account) {
 					args: [account, addresses.MarketRouter],
 				}
 		) ?? [];
-	return tokenBalance;
+	return allowance;
 }
 
 export function useClaimedAmount(account) {
@@ -67,4 +68,19 @@ export function useClaimLimit() {
 			}
 		) ?? [];
 	return claimLimit;
+}
+
+export function useERC1155ApprovalForAll(oracleAddress, account) {
+	const [approval] =
+		useContractCall(
+			account &&
+				oracleAddress &&
+				addresses.MarketRouter && {
+					abi: oracleInterface,
+					address: oracleAddress,
+					method: "isApprovedForAll",
+					args: [account, addresses.MarketRouter],
+				}
+		) ?? [];
+	return approval;
 }

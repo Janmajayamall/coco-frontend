@@ -52,6 +52,10 @@ export function getTokenAmountToBuyWithAmountC(r0, r1, a, tokenIndex) {
 	}
 	tokenAmount = tokenAmount.sub(ONE_BN);
 
+	if (tokenAmount.lt(ZERO_BN)) {
+		tokenAmount = ZERO_BN;
+	}
+
 	return {
 		amount: tokenAmount,
 		err: false,
@@ -104,7 +108,7 @@ export function getAmountCBySellTokenAmount(r0, r1, tA, tokenIndex) {
 	let a = b.add(root).div(TWO_BN);
 	if (isValidTradeEq(r0, r1, a0, a1, a, false)) {
 		return {
-			amount: a.sub(ONE_BN),
+			amount: a.lt(ZERO_BN) ? ZERO_BN : a.sub(ONE_BN),
 			err: false,
 		};
 	}
@@ -112,7 +116,7 @@ export function getAmountCBySellTokenAmount(r0, r1, tA, tokenIndex) {
 	a = b.sub(root).div(TWO_BN);
 	if (isValidTradeEq(r0, r1, a0, a1, a, false)) {
 		return {
-			amount: a.sub(ONE_BN),
+			amount: a.lt(ZERO_BN) ? ZERO_BN : a.sub(ONE_BN),
 			err: false,
 		};
 	}

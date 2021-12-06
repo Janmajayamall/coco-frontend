@@ -103,6 +103,13 @@ export function numStrFormatter(value, digits = 1) {
 	return _value;
 }
 
+export function sliceAddress(address) {
+	return `${address.slice(0, 6)}...${address.slice(
+		address.length - 4,
+		address.length
+	)}`;
+}
+
 export function parseDecimalToBN(val, base = 18) {
 	return ethers.utils.parseUnits(val, base);
 }

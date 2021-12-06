@@ -59,6 +59,7 @@ import {
 	sDeleteGroupFollow,
 	selectFeedDisplayConfigs,
 	selectUserProfile,
+	sUpdateLoginModalIsOpen,
 } from "../redux/reducers";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -73,6 +74,7 @@ import { FireIcon } from "../components/FireIcon";
 import { HomeIcon } from "../components/HomeIcon";
 import { ArrowBackIcon } from "@chakra-ui/icons";
 import SuggestionSidebar from "../components/SuggestionSidebar";
+import PrimaryButton from "../components/PrimaryButton";
 
 function Page() {
 	const navigate = useNavigate();
@@ -239,19 +241,7 @@ function Page() {
 			}}
 		>
 			<Spacer />
-			<Flex width={"20%"} flexDirection="column">
-				<ConfigSidebar />
-
-				<Button
-					onClick={() => {
-						navigate("/add");
-					}}
-					marginTop={4}
-				>
-					<Text>Add post</Text>
-				</Button>
-			</Flex>
-
+			<ConfigSidebar />
 			<Flex
 				flexDirection="column"
 				width={"50%"}
@@ -361,14 +351,27 @@ function Page() {
 					</Flex>
 				) : undefined}
 				{loadingMarkets == true ? <Loader /> : undefined}
-				{feedType === 1 && !isAuthenticated ? (
-					<Flex justifyContent="center">
-						<Text>Please sign In</Text>
-					</Flex>
-				) : undefined}
 				{loadingMarkets == false && noPostVisible(markets) ? (
 					<Flex justifyContent="center">
 						<Text>No posts</Text>
+					</Flex>
+				) : undefined}
+				{feedType === 1 && !isAuthenticated ? (
+					<Flex
+						width="100%"
+						alignContent="center"
+						justifyContent="center"
+						marginTop={10}
+					>
+						<PrimaryButton
+							onClick={() => {
+								if (userProfile && account) {
+									return;
+								}
+								dispatch(sUpdateLoginModalIsOpen(true));
+							}}
+							title={"Please sign in"}
+						/>
 					</Flex>
 				) : undefined}
 				{(feedType === 1 && isAuthenticated) || feedType != 1
@@ -393,6 +396,9 @@ function Page() {
 							}
 							return (
 								<PostDisplay
+									style={{
+										marginBottom: 25,
+									}}
 									market={populatedMarket}
 									onImageClick={(marketIdentifier) => {
 										navigate(`/post/${marketIdentifier}`);

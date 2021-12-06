@@ -7,24 +7,37 @@ import {
 	SliderFilledTrack,
 	SliderThumb,
 	Spacer,
+	Button,
 } from "@chakra-ui/react";
 import { useDispatch, useSelector } from "react-redux";
 import {
 	selectFeedDisplayConfigs,
 	sUpdateThresholdOfFeedDisplayConfigs,
 } from "../redux/reducers";
+import { useNavigate } from "react-router";
+import PrimaryButton from "./PrimaryButton";
 
 function ConfigSidebar() {
 	const dispatch = useDispatch();
+	const navigate = useNavigate();
 
 	const feedDisplayConfigs = useSelector(selectFeedDisplayConfigs);
 	const feedThreshold = feedDisplayConfigs.threshold;
 
 	return (
-		<Flex flexDirection="column">
-			<Heading size="sm">Display</Heading>
-			<Text>Slide to choose your feed threshold!</Text>
+		<Flex
+			width={"20%"}
+			paddingRight={6}
+			paddingLeft={6}
+			paddingTop={5}
+			flexDirection="column"
+		>
+			<Heading size="md">Display</Heading>
+			<Text marginTop={5} fontSize={14}>
+				Slide to set your minimum YES threshold to filter posts on feed
+			</Text>
 			<Slider
+				marginTop={2}
 				aria-label="slider-ex-1"
 				defaultValue={feedThreshold}
 				onChange={(val) => {
@@ -32,33 +45,20 @@ function ConfigSidebar() {
 				}}
 			>
 				<SliderTrack>
-					<SliderFilledTrack />
+					<SliderFilledTrack backgroundColor="#828282" />
 				</SliderTrack>
-				<SliderThumb />
+				<SliderThumb backgroundColor="#828282" />
 			</Slider>
-			{/* <Flex>
-				<Text
-					onClick={() => {
-						dispatch(sUpdateThresholdOfFeedDisplayConfigs(0));
-					}}
-					fontSize={12}
-					textDecoration="underline"
-				>
-					Min
-				</Text>
-				<Spacer />
-
-				<Text
-					onClick={() => {
-						dispatch(sUpdateThresholdOfFeedDisplayConfigs(100));
-					}}
-					fontSize={12}
-					textDecoration="underline"
-				>
-					Max
-				</Text>
-			</Flex> */}
-			<Text>{`${feedThreshold}%`}</Text>
+			<Text fontSize={14} fontWeight="bold">{`${feedThreshold}%`}</Text>
+			<PrimaryButton
+				title={"New Post"}
+				onClick={() => {
+					navigate("/add");
+				}}
+				style={{
+					marginTop: 50,
+				}}
+			/>
 		</Flex>
 	);
 }

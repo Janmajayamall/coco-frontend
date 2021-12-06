@@ -25,10 +25,12 @@ import {
 	Slider,
 } from "@chakra-ui/react";
 
-function TwoColTitleInfo({ title, info }) {
+function TwoColTitleInfo({ title, info, titleBold = false }) {
 	return (
 		<Flex>
-			<Text fontSize="12">{title}</Text>
+			<Text fontSize="12" fontWeight={titleBold ? "bold" : "normal"}>
+				{title}
+			</Text>
 			<Spacer />
 			<Text fontSize="12">{info}</Text>
 		</Flex>

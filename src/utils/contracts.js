@@ -11,6 +11,7 @@ export const memeTokenInterface = new utils.Interface(MemeTokenAbi);
 export const tokenDistributorInterface = new utils.Interface(
 	TokenDistributorAbi
 );
+export const oracleInterface = new utils.Interface(OracleAbi);
 
 export const marketRouterContract = new Contract(
 	addresses.MarketRouter,

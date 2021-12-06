@@ -1,3 +1,5 @@
+import { MAX_LENGTH_DESCRIPTION, MAX_LENGTH_NAME } from ".";
+
 export function validateIsNumber(val) {
 	try {
 		let value = Number(val);
@@ -93,9 +95,45 @@ export function validateGroupName(val) {
 			expText: "Invalid Input!",
 		};
 	}
+
+	if (val.split(" ").length !== 1) {
+		return {
+			valid: false,
+			expText: "Name cannot have spaces!",
+		};
+	}
+
+	if (val.length > MAX_LENGTH_NAME) {
+		return {
+			valid: false,
+			expText: `Char count should be smaller than ${MAX_LENGTH_NAME}`,
+		};
+	}
+
 	return {
 		valid: true,
 		expTex: "",
+	};
+}
+
+export function validateGroupDescription(val) {
+	if (typeof val != "string") {
+		return {
+			valid: false,
+			expText: "Invalid Input!",
+		};
+	}
+
+	if (val.length > MAX_LENGTH_DESCRIPTION) {
+		return {
+			valid: false,
+			expText: `Char count should be smaller than ${MAX_LENGTH_DESCRIPTION}`,
+		};
+	}
+
+	return {
+		valid: true,
+		expText: "",
 	};
 }
 

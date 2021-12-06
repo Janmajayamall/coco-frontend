@@ -40,6 +40,7 @@ import {
 	validateGroupName,
 	validateUpdateMarketConfigTxInputs,
 	GRAPH_BUFFER_MS,
+	validateGroupDescription,
 } from "../utils";
 import {
 	useCreateNewMarket,
@@ -60,6 +61,7 @@ import {
 import PostDisplay from "../components/PostDisplay";
 import { useNavigate, useParams } from "react-router";
 import Loader from "../components/Loader";
+import PrimaryButton from "../components/PrimaryButton";
 
 function Page() {
 	const { account, chainId } = useEthers();
@@ -239,16 +241,13 @@ function Page() {
 					true,
 					description,
 					setDescription,
-					(val) => {
-						return {
-							valid: true,
-							exp: "",
-						};
-					},
+					validateGroupDescription,
 					{}
 				)}
-
-				<Button
+				<PrimaryButton
+					style={{
+						marginTop: 20,
+					}}
 					disabled={
 						account == undefined ||
 						account.toLowerCase() != oracleData.manager
@@ -263,6 +262,19 @@ function Page() {
 						) {
 							toast({
 								title: "Unauthenticated!",
+								error: "error",
+								isClosable: true,
+							});
+							return;
+						}
+
+						// validate input
+						if (
+							!validateGroupName(name).valid ||
+							!validateGroupDescription.apply(description).valid
+						) {
+							toast({
+								title: "Invalid input!",
 								error: "error",
 								isClosable: true,
 							});
@@ -302,9 +314,8 @@ function Page() {
 						}
 						setLoadingUpdateMetadata(false);
 					}}
-				>
-					<Text>Update Metadata</Text>
-				</Button>
+					title={"Update Metadata"}
+				/>
 			</Flex>
 			<Spacer />
 			<Flex width="30%" flexDirection="column">
@@ -358,7 +369,10 @@ function Page() {
 							precision: 0,
 						}
 					)}
-					<Button
+					<PrimaryButton
+						style={{
+							marginTop: 20,
+						}}
 						disabled={
 							account == undefined ||
 							account.toLowerCase() != oracleData.delegate
@@ -413,9 +427,8 @@ function Page() {
 								convertHoursToBlocks(chainId, resolutionHours)
 							);
 						}}
-					>
-						<Text>Update Config</Text>
-					</Button>
+						title={"Update Config"}
+					/>
 				</Flex>
 			</Flex>
 

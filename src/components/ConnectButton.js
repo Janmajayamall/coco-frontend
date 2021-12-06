@@ -9,7 +9,13 @@ import {
 } from "./../redux/reducers";
 import addresses from "./../contracts/addresses.json";
 import { useTokenBalance } from "./../hooks";
-import { formatBNToDecimal, parseDecimalToBN, roundDecimalStr } from "../utils";
+import {
+	formatBNToDecimal,
+	parseDecimalToBN,
+	roundDecimalStr,
+	sliceAddress,
+} from "../utils";
+import PrimaryButton from "./PrimaryButton";
 
 /**
  * Authentication = (userProfile && account (from MM)) != undefined
@@ -30,47 +36,26 @@ function ConnectButton() {
 				borderRadius="xl"
 				py="0"
 			>
-				{account && tokenBalance ? (
+				{account && tokenBalance && userProfile ? (
 					<Box px="3">
 						<Text color="white" fontSize="md">
 							{formatBNToDecimal(tokenBalance)} MEME
 						</Text>
 					</Box>
 				) : undefined}
-				<Button
+				<PrimaryButton
 					onClick={() => {
 						if (userProfile && account) {
 							return;
 						}
 						dispatch(sUpdateLoginModalIsOpen(true));
 					}}
-					bg="gray.800"
-					border="1px solid transparent"
-					_hover={{
-						border: "1px",
-						borderStyle: "solid",
-						borderColor: "blue.400",
-						backgroundColor: "gray.700",
-					}}
-					borderRadius="xl"
-					m="1px"
-					px={3}
-					height="38px"
-				>
-					<Text
-						color="white"
-						fontSize="md"
-						fontWeight="medium"
-						mr="2"
-					>
-						{userProfile && account
-							? `${account.slice(0, 6)}...${account.slice(
-									account.length - 4,
-									account.length
-							  )}`
-							: "Sign In"}
-					</Text>
-				</Button>
+					title={
+						userProfile && account
+							? sliceAddress(account)
+							: "Sign In"
+					}
+				/>
 			</Box>
 		</Flex>
 	);

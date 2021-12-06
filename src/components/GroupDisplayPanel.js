@@ -62,7 +62,7 @@ function GroupDisplayName({ group, followStatusVisible }) {
 	const dispatch = useDispatch();
 
 	return (
-		<Flex marginTop={2} marginBottom={2}>
+		<Flex marginTop={2} marginBottom={2} alignItems="center">
 			<Avatar
 				size="sm"
 				name="Dan Abrahmov"
@@ -73,6 +73,9 @@ function GroupDisplayName({ group, followStatusVisible }) {
 				onClick={() => {
 					navigate(`/group/${group.oracleAddress}`);
 				}}
+				fontSize={14}
+				fontWeight={"bold"}
+				marginLeft={2}
 			>
 				{group.name}
 			</Text>
@@ -89,9 +92,9 @@ function GroupDisplayName({ group, followStatusVisible }) {
 							}
 							dispatch(sAddGroupFollow(group.oracleAddress));
 						}}
-						size="sm"
+						width={12}
 					>
-						Join
+						<Text fontSize={12}>Join</Text>
 					</Button>
 				) : (
 					<Button
@@ -104,9 +107,9 @@ function GroupDisplayName({ group, followStatusVisible }) {
 							}
 							dispatch(sDeleteGroupFollow(group.oracleAddress));
 						}}
-						size="sm"
+						width={12}
 					>
-						Leave
+						<Text fontSize={12}>Leave</Text>
 					</Button>
 				)
 			) : undefined}
