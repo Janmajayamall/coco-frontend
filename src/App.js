@@ -25,7 +25,19 @@ import {
 	SliderTrack,
 	SliderFilledTrack,
 	SliderThumb,
+	Menu,
+	MenuButton,
+	MenuList,
+	MenuItem,
+	IconButton,
 } from "@chakra-ui/react";
+import {
+	AddIcon,
+	ExternalLinkIcon,
+	RepeatIcon,
+	EditIcon,
+	HamburgerIcon,
+} from "@chakra-ui/icons";
 
 import { useEthers } from "@usedapp/core/packages/core";
 import {
@@ -67,6 +79,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Route, Routes, useNavigate } from "react-router";
 import LoginModal from "./components/LoginModal";
 import PostTradeModal from "./components/PostTradeModal";
+import MainMenu from "./components/MainMenu";
 
 const web3 = new Web3();
 
@@ -143,6 +156,7 @@ function App() {
 						<Heading>Mimi</Heading>
 						<Spacer />
 						<ConnectButton />
+						<MainMenu />
 					</Flex>
 				</Flex>
 			</Flex>
