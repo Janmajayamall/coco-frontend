@@ -1,12 +1,15 @@
 import { Button, Box, Text, Flex } from "@chakra-ui/react";
 import { useEthers } from "@usedapp/core/packages/core";
-import { formatEther } from "@ethersproject/units";
+import { formatEther, formatUnits } from "@ethersproject/units";
 import { utils } from "ethers";
 import { useDispatch, useSelector } from "react-redux";
 import {
 	selectUserProfile,
 	sUpdateLoginModalIsOpen,
 } from "./../redux/reducers";
+import addresses from "./../contracts/addresses.json";
+import { useTokenBalance } from "./../hooks";
+import { formatBNToDecimal, parseDecimalToBN, roundDecimalStr } from "../utils";
 
 /**
  * Authentication = (userProfile && account (from MM)) != undefined
@@ -16,6 +19,8 @@ function ConnectButton() {
 	const dispatch = useDispatch();
 
 	const { account } = useEthers();
+	const tokenBalance = useTokenBalance(account);
+
 	return (
 		<Flex m={2}>
 			<Box
@@ -25,6 +30,13 @@ function ConnectButton() {
 				borderRadius="xl"
 				py="0"
 			>
+				{account && tokenBalance ? (
+					<Box px="3">
+						<Text color="white" fontSize="md">
+							{formatBNToDecimal(tokenBalance)} MEME
+						</Text>
+					</Box>
+				) : undefined}
 				<Button
 					onClick={() => {
 						if (userProfile && account) {

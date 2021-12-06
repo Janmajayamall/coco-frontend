@@ -18,6 +18,7 @@ import {
 	SliderFilledTrack,
 	SliderThumb,
 	IconButton,
+	useToast,
 } from "@chakra-ui/react";
 
 import { useEthers } from "@usedapp/core/packages/core";
@@ -26,29 +27,14 @@ import {
 	useQueryMarketsOrderedByLatest,
 	useQueryExploreMarkets,
 	useQueryMarketByOracles,
+	useClaim,
+	useClaimedAmount,
+	useClaimLimit,
 } from "../hooks";
 
 import Web3 from "web3";
 import { useEffect, useState } from "react";
-import {
-	newPost,
-	updateModerator,
-	getUser,
-	findAllFollows,
-	filterOracleIdsFromMarketsGraph,
-	findModeratorsByIdArr,
-	filterMarketIdentifiersFromMarketsGraph,
-	findPostsByMarketIdentifierArr,
-	populateMarketWithMetadata,
-	findPopularModerators,
-	followModerator,
-	findModeratorsDetails,
-	numStrFormatter,
-	stateSetupOraclesInfo,
-	stateSetupMarketsMetadata,
-	unfollowModerator,
-	findAllModerators,
-} from "../utils";
+import { findAllModerators, formatBNToDecimal, ZERO_BN } from "../utils";
 import {
 	selectGroupsFollowed,
 	sAddGroupFollow,
@@ -57,12 +43,38 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 
 function SuggestionSidebar() {
-	const groupsFollowed = useSelector(selectGroupsFollowed);
+	const { account } = useEthers();
 	const dispatch = useDispatch();
+	const toast = useToast();
+
+	const groupsFollowed = useSelector(selectGroupsFollowed);
+	const claimedAmount = useClaimedAmount(account);
+	const claimLimit = useClaimLimit();
+
+	const { state, send } = useClaim();
 
 	const [popularGroups, setPopularGroups] = useState([]);
 	const [initialized, setInitialized] = useState(false);
+	const [claimableAmount, setClaimableAmount] = useState(ZERO_BN);
 
+	const [claimLoading, setClaimLoading] = useState(false);
+
+	useEffect(() => {
+		if (state.receipt) {
+			setClaimLoading("False");
+			toast({
+				title: "Claim Success!",
+				status: "success",
+				isClosable: true,
+			});
+		}
+	});
+
+	useEffect(() => {
+		if (claimLimit && claimedAmount) {
+			setClaimableAmount(claimLimit.sub(claimedAmount));
+		}
+	}, [claimLimit, claimedAmount]);
 	useEffect(async () => {
 		if (initialized == true) {
 			return;
@@ -98,6 +110,30 @@ function SuggestionSidebar() {
 					);
 				})}
 			</Flex>
+			{claimableAmount.gt(ZERO_BN) ? (
+				<Flex
+					marginTop="5"
+					flexDirection="column"
+					padding="5"
+					backgroundColor="gray.100"
+				>
+					<Text fontSize="large" fontWeight="bold">
+						{`Claim ${formatBNToDecimal(
+							claimableAmount
+						)} MEME Tokens now!`}
+					</Text>
+					<Button
+						onClick={() => {
+							if (claimableAmount.gt(ZERO_BN)) {
+								send(account, claimableAmount);
+							}
+						}}
+						backgroundColor="blue.200"
+					>
+						Claim
+					</Button>
+				</Flex>
+			) : undefined}
 		</Flex>
 	);
 }

@@ -110,13 +110,7 @@ function Page() {
 		}
 
 		setMarketsLoading(true);
-		console.log(
-			marketsToResolveResult.data.markets,
-			oraclesInfoObj,
-			marketsMetadata,
-			groupsFollowed,
-			rinkebyLatestBlockNumber
-		);
+
 		const populatedMarkets = marketsToResolveResult.data.markets.map(
 			(market) => {
 				return populateMarketWithMetadata(

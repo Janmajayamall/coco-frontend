@@ -107,9 +107,12 @@ export function parseDecimalToBN(val, base = 18) {
 	return ethers.utils.parseUnits(val, base);
 }
 
-export function formatBNToDecimal(val, base = 18, dp = 2) {
+export function formatBNToDecimal(val, base = 18, round = true, dp = 2) {
 	val = ethers.utils.formatUnits(val, base);
-	return parseFloat(val).toFixed(2);
+	if (round === true) {
+		val = roundDecimalStr(val, dp);
+	}
+	return val;
 }
 
 export function getDecStrAvgPriceBN(amountIn, amountOut) {

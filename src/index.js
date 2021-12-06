@@ -22,8 +22,11 @@ ReactDOM.render(
 				<DAppProvider
 					config={{
 						supportedChains: [421611],
-						multicallAddresses: {
-							421611: "0xed53fa304E7fcbab4E8aCB184F5FC6F69Ed54fF6",
+						// : {
+						// 	421611: "0xed53fa304E7fcbab4E8aCB184F5FC6F69Ed54fF6",
+						// },multicallAddresses
+						readOnlyUrls: {
+							421611: "https://rinkeby.arbitrum.io/rpc",
 						},
 					}}
 				>

@@ -39,7 +39,7 @@ import {
 	useQueryMarketByMarketIdentifier,
 	useQueryMarketTradeAndStakeInfoByUser,
 } from "../hooks";
-import { roundValueTwoDP } from "../utils";
+import { roundDecimalStr, roundValueTwoDP } from "../utils";
 
 function PostTradeModal() {
 	const dispatch = useDispatch();
@@ -106,10 +106,10 @@ function PostTradeModal() {
 							</TabList>
 							<TabPanels>
 								<TabPanel>
-									<p>{`YES ${roundValueTwoDP(
+									<p>{`YES ${roundDecimalStr(
 										result.data.market.probability1
 									)}`}</p>
-									<p>{`NO ${roundValueTwoDP(
+									<p>{`NO ${roundDecimalStr(
 										result.data.market.probability0
 									)}`}</p>
 								</TabPanel>

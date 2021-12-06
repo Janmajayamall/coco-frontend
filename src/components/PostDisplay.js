@@ -27,6 +27,8 @@ function PostDisplay({ market, onImageClick }) {
 		return <div />;
 	}
 
+	let id = new Date().getTime();
+
 	return (
 		<Box>
 			<Flex paddingBottom={3} paddingTop={4}>
@@ -74,14 +76,18 @@ function PostDisplay({ market, onImageClick }) {
 					{marketStageDisplayName(market.optimisticState.stage)}
 				</Text>
 			</Flex>
-			<Image
-				onClick={() => {
-					if (onImageClick != undefined) {
-						onImageClick(market.marketIdentifier);
-					}
-				}}
-				src={"https://bit.ly/2Z4KKcF"}
-			/>
+			<Flex width={"100%"} minHeight={400} justifyContent="center">
+				<Image
+					onClick={() => {
+						if (onImageClick != undefined) {
+							onImageClick(market.marketIdentifier);
+						}
+					}}
+					loading={"eager"}
+					src={`https://eskipaper.com/images/hi-res-wallpaper-6.jpg?id=${id}`}
+					alt="diowa"
+				/>
+			</Flex>
 			<Flex marginTop={5}>
 				<Spacer />
 				<Flex
