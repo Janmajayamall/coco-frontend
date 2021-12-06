@@ -81,7 +81,7 @@ function Page() {
 	const dispatch = useDispatch();
 	const { account } = useEthers();
 	const userProfile = useSelector(selectUserProfile);
-	const isAuthenticated = userProfile && account;
+	const isAuthenticated = account && userProfile ? true : false;
 
 	const location = useLocation();
 	const urlParams = useParams();
@@ -275,8 +275,16 @@ function Page() {
 						<Flex marginBottom={5}>
 							<Avatar
 								size="md"
-								name="Dan Abrahmov"
-								src="https://bit.ly/dan-abramov"
+								name={
+									groupDetails.name
+										? groupDetails.name[0]
+										: ""
+								}
+								src={
+									groupDetails.name
+										? groupDetails.groupImageUrl
+										: ""
+								}
 								marginRight={5}
 							/>
 							<Box marginRight={5}>

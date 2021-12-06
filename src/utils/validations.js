@@ -1,18 +1,17 @@
 import { MAX_LENGTH_DESCRIPTION, MAX_LENGTH_NAME } from ".";
 
 export function validateIsNumber(val) {
-	try {
-		let value = Number(val);
-		return {
-			valid: true,
-			expText: "",
-		};
-	} catch (e) {
+	let value = Number(val);
+	if (Number.isNaN(value)) {
 		return {
 			valid: false,
 			expText: "Invalid value!",
 		};
 	}
+	return {
+		valid: true,
+		expText: "",
+	};
 }
 
 export function validateEscalationLimit(val) {
@@ -120,6 +119,7 @@ export function validateGroupDescription(val) {
 	if (typeof val != "string") {
 		return {
 			valid: false,
+
 			expText: "Invalid Input!",
 		};
 	}
@@ -159,5 +159,45 @@ export function validateUpdateMarketConfigTxInputs(
 	return {
 		valid: false,
 		expText: "Invalid inputs!",
+	};
+}
+
+export function validateFundingAmount(val) {
+	let isNum = validateIsNumber(val);
+	if (!isNum.valid) {
+		return isNum;
+	}
+
+	if (val < 1) {
+		return {
+			valid: false,
+			expText:
+				"We recommend initial liquidity to be at least 1 MEME. This helps attract more users to your post",
+		};
+	}
+
+	return {
+		valid: true,
+		expText: "",
+	};
+}
+
+export function validateInitialBetAmount(val) {
+	let isNum = validateIsNumber(val);
+	if (!isNum.valid) {
+		return isNum;
+	}
+
+	if (val < 1) {
+		return {
+			valid: false,
+			expText:
+				"We recommend initial YES bet amount to be at least 1 MEME. This shows others that you are confident that your post belongs to group's feed.",
+		};
+	}
+
+	return {
+		valid: true,
+		expText: "",
 	};
 }

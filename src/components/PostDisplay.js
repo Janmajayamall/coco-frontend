@@ -90,8 +90,8 @@ function PostDisplay({ market, onImageClick, ...children }) {
 						onImageClick(market.marketIdentifier);
 					}
 				}}
-				width={"100%"}
-				minHeight={400}
+				maxWidth={"100%"}
+				maxHeight={500}
 				justifyContent="center"
 			>
 				<Image
@@ -102,9 +102,9 @@ function PostDisplay({ market, onImageClick, ...children }) {
 							? market.marketMetadata.eventIdentifierStr
 							: ""
 					}
-					fallbackSrc={
-						"https://www.aroged.com/wp-content/uploads/2021/08/Where-to-Find-Good-Wallpapers-for-Xbox-One-or-Xbox.jpg"
-					}
+					// fallbackSrc={
+					// 	"https://www.aroged.com/wp-content/uploads/2021/08/Where-to-Find-Good-Wallpapers-for-Xbox-One-or-Xbox.jpg"
+					// }
 					alt="Failed to load image"
 				/>
 			</Flex>

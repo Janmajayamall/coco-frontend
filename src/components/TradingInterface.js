@@ -103,7 +103,7 @@ function TradingInterface({
 }) {
 	const { account } = useEthers();
 	const userProfile = useSelector(selectUserProfile);
-	const isAuthenticated = userProfile && account;
+	const isAuthenticated = account && userProfile ? true : false;
 	const toast = useToast();
 	console.log(
 		erc1155ApprovalForAll,

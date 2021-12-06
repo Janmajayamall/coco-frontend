@@ -50,7 +50,7 @@ function StakingInterface({ market, stakeHistories, refreshFn }) {
 	const toast = useToast();
 
 	const userProfile = useSelector(selectUserProfile);
-	const isAuthenticated = account && userProfile;
+	const isAuthenticated = account && userProfile ? true : false;
 
 	const { state, send } = useStakeForOutcome();
 

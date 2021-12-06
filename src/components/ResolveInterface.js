@@ -72,7 +72,7 @@ import ChallengeHistoryTable from "./ChallengeHistoryTable";
 function ResolveInterface({ market, stakeHistories }) {
 	const { account } = useEthers();
 	const userProfile = useSelector(selectUserProfile);
-	const isAuthenticated = userProfile && account;
+	const isAuthenticated = account && userProfile ? true : false;
 
 	const { state, send } = useSetOutcome(market ? market.oracle.id : "");
 

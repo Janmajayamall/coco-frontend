@@ -9,6 +9,8 @@ import {
 	useToast,
 	Flex,
 	Spacer,
+	Heading,
+	Text,
 } from "@chakra-ui/react";
 import { FiFile } from "react-icons/fi";
 import FileUpload from "./../components/FileUpload";
@@ -21,26 +23,38 @@ import {
 	getPresignedUrl,
 	uploadImageFileCloudinary,
 	toBase64,
+	validateInitialBetAmount,
+	validateFundingAmount,
 } from "./../utils";
-import { useCreateNewMarket } from "./../hooks";
+import { useCreateNewMarket, useTokenAllowance } from "./../hooks";
 import { useEthers } from "@usedapp/core/packages/core";
 import { utils } from "ethers";
 import { useNavigate } from "react-router";
+import { useDispatch, useSelector } from "react-redux";
+import { selectUserProfile, sUpdateLoginModalIsOpen } from "../redux/reducers";
+import InputWithTitle from "../components/InputWithTitle";
+import PrimaryButton from "../components/PrimaryButton";
 
 function Page() {
+	const { account } = useEthers();
+	const userProfile = useSelector(selectUserProfile);
+	const isAuthenticated = account && userProfile ? true : false;
+
 	const toast = useToast();
 	const navigate = useNavigate();
+	const dispatch = useDispatch();
+
+	const tokenAllowance = useTokenAllowance(account);
 
 	const [imageFile, setImageFile] = useState(null);
 	const [s3ImageUrl, setS3ImageUrl] = useState(null);
 	const [selectModerator, setSelectModerator] = useState(null);
-	const [fundingAmount, setFundingAmount] = useState(0);
-	const [betAmount, setBetAmount] = useState(0);
+	const [fundingAmount, setFundingAmount] = useState(1);
+	const [betAmount, setBetAmount] = useState(1);
+
 	const [loading, setLoading] = useState(false);
 	const [moderators, setModerators] = useState([]);
 	const [newPostLoading, setNewPostLoading] = useState(false);
-
-	const { account } = useEthers();
 
 	const { state, send } = useCreateNewMarket();
 
@@ -54,7 +68,6 @@ function Page() {
 			const res = await newPost(selectModerator, s3ImageUrl);
 
 			setTimeout(() => {
-				// TODO give a success message & navigate to explorer
 				displayToast("Post created", "success");
 
 				// end new post loading
@@ -67,7 +80,6 @@ function Page() {
 
 	useEffect(async () => {
 		if (state.status == "Exception" || state.status == "Fail") {
-			// TODO tell user about the exception
 			displayToast("Metamask error!", "error");
 			setS3ImageUrl("");
 			setNewPostLoading(false);
@@ -113,7 +125,25 @@ function Page() {
 		return true;
 	}
 
+	function approvalGiven() {
+		if (!tokenAllowance) {
+			return true;
+		}
+
+		const totalAmount = utils
+			.parseEther(String(Number(fundingAmount)))
+			.add(utils.parseEther(String(Number(betAmount))));
+		if (totalAmount.gt(tokenAllowance)) {
+			return false;
+		}
+		return true;
+	}
+
 	async function uploadImageHelper() {
+		if (!isAuthenticated) {
+			return;
+		}
+
 		// start new post loading
 		setNewPostLoading(true);
 
@@ -157,99 +187,129 @@ function Page() {
 	}
 
 	return (
-		<Flex>
-			<Spacer />
-			<Flex
-				width="40%"
-				height="100vh"
-				flexDirection="column"
-				justifyContent="center"
-				alignItems="center"
-			>
-				{imageFile == null ? (
-					<Flex>
-						<FileUpload
-							accept={"image/*"}
-							onFileUpload={(file) => {
-								if (!validateFile(file)) {
-									//TODO throw mmax file size error
-									return;
-								}
-								setImageFile(file);
-							}}
-						>
-							<Button leftIcon={<Icon as={FiFile} />}>
-								Choose Image
-							</Button>
-						</FileUpload>
-					</Flex>
-				) : undefined}
-				{imageFile != null ? (
-					<Image src={URL.createObjectURL(imageFile)} width="90%" />
-				) : undefined}
-				{imageFile != null ? (
-					<Button
+		<Flex flexDirection="column">
+			<Flex padding={10} justifyContent="center">
+				<Heading size="lg">Create new post</Heading>
+			</Flex>
+			{isAuthenticated !== true ? (
+				<Flex justifyContent="center">
+					<PrimaryButton
+						title="Please Sign In"
 						onClick={() => {
-							setImageFile(null);
+							dispatch(sUpdateLoginModalIsOpen(true));
 						}}
+					/>
+				</Flex>
+			) : undefined}
+			{isAuthenticated === true ? (
+				<Flex>
+					<Spacer />
+					<Flex
+						width="40%"
+						flexDirection="column"
+						justifyContent="center"
+						alignItems="center"
 					>
-						Remove
-					</Button>
-				) : undefined}
-			</Flex>
-			<Flex
-				width="40%"
-				flexDirection="column"
-				justifyContent="center"
-				alignItems="center"
-				height="100vh"
-			>
-				<Select
-					onChange={(e) => {
-						setSelectModerator(e.target.value);
-					}}
-					placeholder="Select Page"
-				>
-					{moderators.map((obj) => {
-						return (
-							<>
-								<option value={obj.oracleAddress}>
-									{`${obj.name}`}
-								</option>
-							</>
-						);
-					})}
-				</Select>
+						{imageFile == null ? (
+							<Flex>
+								<FileUpload
+									accept={"image/*"}
+									onFileUpload={(file) => {
+										if (!validateFile(file)) {
+											//TODO throw mmax file size error
+											return;
+										}
+										setImageFile(file);
+									}}
+								>
+									<PrimaryButton title={"Choose Image"} />
+								</FileUpload>
+							</Flex>
+						) : undefined}
+						{imageFile != null ? (
+							<Image
+								src={URL.createObjectURL(imageFile)}
+								maxWidth="90%"
+								maxHeight={500}
+							/>
+						) : undefined}
+						{imageFile != null ? (
+							<PrimaryButton
+								onClick={() => {
+									setImageFile(null);
+								}}
+								style={{
+									marginTop: 20,
+								}}
+								title={"Remove"}
+							/>
+						) : undefined}
+					</Flex>
+					<Flex
+						width="40%"
+						flexDirection="column"
+						alignItems="center"
+					>
+						<Select
+							onChange={(e) => {
+								setSelectModerator(e.target.value);
+							}}
+							placeholder="Select Group"
+						>
+							{moderators.map((obj) => {
+								return (
+									<>
+										<option value={obj.oracleAddress}>
+											{`${obj.name}`}
+										</option>
+									</>
+								);
+							})}
+						</Select>
 
-				<NumberInput
-					onChange={(val) => {
-						setFundingAmount(val);
-					}}
-					defaultValue={0}
-					precision={2}
-				>
-					<NumberInputField />
-				</NumberInput>
+						{InputWithTitle(
+							"Liquidity",
+							false,
+							fundingAmount,
+							setFundingAmount,
+							validateFundingAmount,
+							{
+								defaultValue: 1,
+								precision: 3,
+							}
+						)}
 
-				<NumberInput
-					onChange={(val) => {
-						setBetAmount(val);
-					}}
-					defaultValue={0}
-					precision={2}
-				>
-					<NumberInputField />
-				</NumberInput>
+						{InputWithTitle(
+							"Bet for YES",
+							false,
+							betAmount,
+							setBetAmount,
+							validateInitialBetAmount,
+							{
+								defaultValue: 1,
+								precision: 3,
+							}
+						)}
 
-				<Button
-					isLoading={newPostLoading}
-					loadingText="Posting..."
-					onClick={uploadImageHelper}
-				>
-					Submit
-				</Button>
-			</Flex>
-			<Spacer />
+						<PrimaryButton
+							title={"Post"}
+							isLoading={newPostLoading}
+							loadingText="Posting..."
+							onClick={uploadImageHelper}
+							style={{
+								marginTop: 20,
+							}}
+							disabled={!approvalGiven()}
+						/>
+						{approvalGiven() !== true ? (
+							<Flex>
+								<Text>Giver Approvcal</Text>
+							</Flex>
+						) : undefined}
+					</Flex>
+					<Spacer />
+				</Flex>
+			) : undefined}
 		</Flex>
 	);
 }

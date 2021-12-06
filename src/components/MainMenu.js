@@ -48,7 +48,7 @@ function Item({ title, ...children }) {
 function MainMenu() {
 	const { account } = useEthers();
 	const userProfile = useSelector(selectUserProfile);
-	const isAuthenticated = account && userProfile;
+	const isAuthenticated = account && userProfile ? true : false;
 	const navigate = useNavigate();
 
 	const { result: oraclesResult } = useQueryOraclesByManager(account);

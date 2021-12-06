@@ -67,7 +67,7 @@ import PrimaryButton from "../components/PrimaryButton";
 function Page() {
 	const { account, chainId } = useEthers();
 	const userProfile = useSelector(selectUserProfile);
-	const isAuthenticated = account && userProfile;
+	const isAuthenticated = account && userProfile ? true : false;
 
 	const dispatch = useDispatch();
 	const navigate = useNavigate();

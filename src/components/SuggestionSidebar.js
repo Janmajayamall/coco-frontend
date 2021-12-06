@@ -39,12 +39,16 @@ import {
 	selectGroupsFollowed,
 	sAddGroupFollow,
 	sDeleteGroupFollow,
+	selectUserProfile,
 } from "../redux/reducers";
 import { useDispatch, useSelector } from "react-redux";
 import PrimaryButton from "./PrimaryButton";
 
 function SuggestionSidebar() {
 	const { account } = useEthers();
+	const userProfile = useSelector(selectUserProfile);
+	const isAuthenticated = account && userProfile ? true : false;
+
 	const dispatch = useDispatch();
 	const toast = useToast();
 
@@ -102,7 +106,7 @@ function SuggestionSidebar() {
 			paddingTop={5}
 			flexDirection="column"
 		>
-			{claimableAmount.gt(ZERO_BN) ? (
+			{isAuthenticated && claimableAmount.gt(ZERO_BN) ? (
 				<Flex
 					marginBottom="5"
 					flexDirection="column"

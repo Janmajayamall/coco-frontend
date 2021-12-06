@@ -74,7 +74,7 @@ function RedeemWinsInterface({
 	const { account } = useEthers();
 	const toast = useToast();
 	const userProfile = useSelector(selectUserProfile);
-	const isAuthenticated = userProfile && account;
+	const isAuthenticated = account && userProfile ? true : false;
 
 	const { state: stateRMaxW, send: sendRMaxW } = useRedeemMaxWinning();
 	const {
