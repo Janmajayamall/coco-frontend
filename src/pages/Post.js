@@ -304,30 +304,7 @@ function Page() {
 			<Flex width="20%" marginLeft={5} flexDirection="column">
 				{loadingMarket == false && market ? (
 					<>
-						<Flex
-							flexDirection="column"
-							backgroundColor="#F3F5F7"
-							padding={5}
-							borderRadius={10}
-							alignItems="center"
-						>
-							<Heading size="md">
-								{marketStageDisplayName(
-									market.optimisticState.stage
-								)}
-							</Heading>
-							{market.optimisticState.blocksLeft !== 0 ? (
-								<Text>
-									{`expires in ${formatTimeInSeconds(
-										convertBlocksToSeconds(
-											market.optimisticState.blocksLeft
-										)
-									)}`}
-								</Text>
-							) : undefined}
-						</Flex>
-
-						{/* {market.optimisticState.stage === 1 ? (
+						{market.optimisticState.stage === 1 ? (
 							<TradingInterface
 								market={market}
 								tradePosition={tradePosition}
@@ -358,13 +335,19 @@ function Page() {
 							<ResolveInterface
 								market={market}
 								stakeHistories={stakeHistories}
+								tradePosition={tradePosition}
 							/>
-						) : undefined} */}
-						<TradingInterface
+						) : undefined}
+						{/* <ResolveInterface
+							market={market}
+							tradePosition={tradePosition}
+							stakeHistories={stakeHistories}
+						/> */}
+						{/* <TradingInterface
 							market={market}
 							tradePosition={tradePosition}
 							erc1155ApprovalForAll={erc1155ApprovalForAll}
-						/>
+						/> */}
 						{/* <StakingInterface
 							market={market}
 							tradePosition={tradePosition}
@@ -376,8 +359,26 @@ function Page() {
 							tradePosition={tradePosition}
 							stakeHistories={stakeHistories}
 							stakePosition={stakePosition}
-							tokenApproval={tokenApproval}
+							erc1155ApprovalForAll={erc1155ApprovalForAll}
 						/> */}
+						{market.optimisticState.blocksLeft !== 0 ? (
+							<Flex
+								flexDirection="column"
+								backgroundColor="#F3F5F7"
+								padding={2}
+								marginTop={5}
+								borderRadius={10}
+								alignItems="center"
+							>
+								<Text fontSize={14} fontWeight="bold">
+									{`Period ends in ${formatTimeInSeconds(
+										convertBlocksToSeconds(
+											market.optimisticState.blocksLeft
+										)
+									)}`}
+								</Text>
+							</Flex>
+						) : undefined}
 					</>
 				) : (
 					<Loader />

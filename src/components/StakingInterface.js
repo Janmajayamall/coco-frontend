@@ -18,6 +18,7 @@ import {
 	NumberInput,
 	NumberInputField,
 	useToast,
+	HStack,
 } from "@chakra-ui/react";
 import { useEthers } from "@usedapp/core/packages/core";
 
@@ -118,7 +119,7 @@ function StakingInterface({ market, stakeHistories, refreshFn }) {
 		if (market.lastAmountStaked.isZero() && bnValue.isZero()) {
 			return {
 				valid: false,
-				expStr: "Amount should be greater than 0",
+				expStr: "Challenge amount should be greater than 0",
 			};
 		}
 
@@ -131,7 +132,7 @@ function StakingInterface({ market, stakeHistories, refreshFn }) {
 
 		return {
 			valid: false,
-			expStr: `Amount should be min ${formatBNToDecimal(
+			expStr: `Challenge amount should be min ${formatBNToDecimal(
 				market.lastAmountStaked.mul(TWO_BN).toString()
 			)}`,
 		};
@@ -139,8 +140,11 @@ function StakingInterface({ market, stakeHistories, refreshFn }) {
 
 	return (
 		<Flex marginTop={5} flexDirection="column">
+			<Text fontSize={16} fontWeight={"bold"} marginBottom={2}>
+				Challenge outcome
+			</Text>
 			<TwoColTitleInfo
-				title={"Temp outcome"}
+				title={"Temporary outcome"}
 				info={`${outcomeDisplayName(tempOutcome)}`}
 			/>
 			<TwoColTitleInfo
@@ -156,28 +160,30 @@ function StakingInterface({ market, stakeHistories, refreshFn }) {
 				}`}
 			/>
 			<TwoColTitleInfo
-				title={"Min amount to challenge"}
+				title={"Min. amount to challenge"}
 				info={`${formatBNToDecimal(
 					market.lastAmountStaked.mul(TWO_BN)
-				)}`}
+				)} MEME`}
 			/>
-			<Text fontSize={12} fontWeight={"bold"} marginTop={5}>
-				Challenge outcome
-			</Text>
 
 			<TwoColTitleInfo
-				title={"Your chosen outcome"}
+				title={"You think outcome is"}
 				info={`${outcomeDisplayName(favoredOutcome)}`}
 			/>
-			<NumberInput
-				onChange={(val) => {
-					setInput(val);
-				}}
-				placeholder="Amount"
-				value={input}
-			>
-				<NumberInputField />
-			</NumberInput>
+			<HStack>
+				<NumberInput
+					onChange={(val) => {
+						setInput(val);
+					}}
+					placeholder="Amount"
+					fontSize={14}
+					value={input}
+					marginTop={3}
+				>
+					<NumberInputField />
+				</NumberInput>
+				<Text fontSize={14}>Meme</Text>
+			</HStack>
 			{err === true ? (
 				<Text
 					marginTop="1"
@@ -214,7 +220,9 @@ function StakingInterface({ market, stakeHistories, refreshFn }) {
 						market.marketIdentifier
 					);
 				}}
-				title="Challenge"
+				title={`Outcome is ${outcomeDisplayName(
+					favoredOutcome
+				)}, I challenge`}
 				style={{
 					marginTop: 5,
 				}}

@@ -68,8 +68,9 @@ import { BigNumber, ethers, utils } from "ethers";
 import TradingInput from "./TradingInput";
 import TradePriceBoxes from "./TradePriceBoxes";
 import ChallengeHistoryTable from "./ChallengeHistoryTable";
+import PrimaryButton from "./PrimaryButton";
 
-function ResolveInterface({ market, stakeHistories }) {
+function ResolveInterface({ market, tradePosition, stakeHistories }) {
 	const { account } = useEthers();
 	const userProfile = useSelector(selectUserProfile);
 	const isAuthenticated = account && userProfile ? true : false;
@@ -86,35 +87,56 @@ function ResolveInterface({ market, stakeHistories }) {
 		<Flex flexDirection="column">
 			{isAuthenticated &&
 			account.toLowerCase() === market.oracle.delegate ? (
-				<>
+				<Flex marginTop={5} flexDirection="column">
+					<Text fontSize={16} marginBottom={3} fontWeight="bold">
+						Declare Outcome
+					</Text>
 					<TwoColTitleInfo
-						title="Fee"
+						title="Fee received"
 						info={formatBNToDecimal(
-							calculateResolveFee(market, chosenOutcome)
+							chosenOutcome == ""
+								? ZERO_BN
+								: calculateResolveFee(market, chosenOutcome)
 						)}
+						titleBold={true}
 					/>
+
 					<Select
 						value={chosenOutcome}
 						onChange={(e) => {
 							setChosenOutcome(e.target.value);
 						}}
+						marginTop={2}
 						placeholder="Select Outcome"
 					>
-						<option value={0}>NO</option>
+						<option value={0}>No</option>
 
-						<option value={1}>YES</option>
+						<option value={1}>Yes</option>
 
-						<option value={2}>UNDECIDED</option>
+						<option value={2}>Undecided</option>
 					</Select>
-					<Button
+					<Text marginBottom={2} fontSize={12} fontWeight="bold">
+						You are seeing this because you manage the group.
+					</Text>
+					<PrimaryButton
 						onClick={() => {
+							if (
+								chosenOutcome == undefined ||
+								chosenOutcome == ""
+							) {
+								return;
+							}
 							send(chosenOutcome, market.marketIdentifier);
 						}}
-					>
-						<Text>Declare Outcome</Text>
-					</Button>
-				</>
+						title="Declare outcome"
+					/>
+				</Flex>
 			) : undefined}
+			<TradePriceBoxes
+				marginTop={5}
+				market={market}
+				tradePosition={tradePosition}
+			/>
 			<ChallengeHistoryTable stakeHistories={stakeHistories} />
 		</Flex>
 	);

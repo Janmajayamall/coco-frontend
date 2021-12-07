@@ -11,7 +11,7 @@ import {
 	selectRinkebyLatestBlockNumber,
 	selectUserProfile,
 } from "../redux/reducers";
-import { Button, Text, Flex, useToast, Box } from "@chakra-ui/react";
+import { Button, Text, Flex, useToast, Box, Spacer } from "@chakra-ui/react";
 import { useEthers } from "@usedapp/core/packages/core";
 import { CloseIcon } from "@chakra-ui/icons";
 import { useEffect } from "react";
@@ -180,46 +180,66 @@ function RedeemWinsInterface({
 
 	return (
 		<Flex flexDirection="column">
+			<Flex
+				backgroundColor="#F3F5F7"
+				padding={2}
+				marginTop={5}
+				borderRadius={10}
+				alignItems="center"
+			>
+				<Text fontSize={14} fontWeight="bold">
+					Final outcome
+				</Text>
+				<Spacer />
+				<Text fontSize={14} fontWeight="bold">
+					{outcomeDisplayName(market.optimisticState.outcome)}
+				</Text>
+			</Flex>
 			<TradePriceBoxes market={market} tradePosition={tradePosition} />
+			{/* <TwoColTitleInfo
+				title={"Final outcome"}
+				info={}
+			/> */}
 			<TwoColTitleInfo
-				title={"Declared outcome"}
-				info={outcomeDisplayName(market.optimisticState.outcome)}
-			/>
-			<TwoColTitleInfo
-				title={"You Win"}
+				title={"Your trade winnings"}
 				info={formatBNToDecimal(
 					determineTradeWinAmount(
 						tradePosition,
 						market.optimisticState.outcome
 					)
 				)}
+				titleBold={true}
 			/>
 			{!stakePosition.amount0.isZero() ||
 			!stakePosition.amount1.isZero() ? (
 				<Flex flexDirection="column" marginTop="5">
-					<Text fontSize={12} fontWeight="bold">
+					<Text fontSize={14} fontWeight="bold">
 						Your Challenges
 					</Text>
 					{!stakePosition.amount1.isZero() ? (
 						<TwoColTitleInfo
-							title={"Challenge for Yes"}
-							info={formatBNToDecimal(stakePosition.amount1)}
+							title={"In favour of Yes"}
+							info={`${formatBNToDecimal(
+								stakePosition.amount1
+							)} MEME`}
 						/>
 					) : undefined}
 					{!stakePosition.amount0.isZero() ? (
 						<TwoColTitleInfo
-							title={"Challenge for No"}
-							info={formatBNToDecimal(stakePosition.amount0)}
+							title={"In favour of No"}
+							info={`${formatBNToDecimal(
+								stakePosition.amount0
+							)} MEME`}
 						/>
 					) : undefined}
 					<TwoColTitleInfo
-						title={"Your win"}
-						info={formatBNToDecimal(
+						title={"Challenge winnings"}
+						info={`${formatBNToDecimal(
 							determineStakeWinnings(market, account)
-						)}
+						)} MEME`}
 					/>
 					<TwoColTitleInfo
-						title={"Your receive"}
+						title={"Your get back"}
 						info={formatBNToDecimal(
 							determineTotalAmountStakeRedeem(
 								market,
@@ -227,13 +247,14 @@ function RedeemWinsInterface({
 								account
 							)
 						)}
+						titleBold={true}
 					/>
 				</Flex>
 			) : undefined}
 
 			<Flex flexDirection="column" marginTop="5">
 				<TwoColTitleInfo
-					title={"You receive in total"}
+					title={"You get back in total"}
 					info={formatBNToDecimal(
 						determineTradeWinAmount(
 							tradePosition,
@@ -268,7 +289,7 @@ function RedeemWinsInterface({
 						sendRMaxWS(market.oracle.id, market.marketIdentifier);
 					}
 				}}
-				title={"Claim reward"}
+				title={"Claim"}
 				style={{
 					marginTop: 10,
 				}}
@@ -278,13 +299,15 @@ function RedeemWinsInterface({
 				<Flex flexDirection={"column"} marginTop={5}>
 					<Box
 						padding={2}
-						backgroundColor="red.300"
-						borderRadius={20}
+						borderColor="blue.400"
+						borderWidth={1}
+						borderStyle="solid"
+						backgroundColor="#4F4F4F"
+						borderRadius={10}
 					>
-						<Text fontSize={12}>
-							To redeem, you will have to first give token
-							approval to the app. This is only needed once per
-							group.
+						<Text color={"#FDFDFD"} fontWeight="bold" fontSize={12}>
+							To claim, you will have to first give token approval
+							to the app. This is only needed once per group.
 						</Text>
 					</Box>
 					<PrimaryButton

@@ -11,6 +11,7 @@ function TradePricesBoxes({
 	tradePosition,
 	outcomeChosen,
 	onOutcomeChosen,
+	...props
 }) {
 	function Panel({ outcome }) {
 		return (
@@ -55,11 +56,11 @@ function TradePricesBoxes({
 					</Text>
 					<Spacer />
 					<Text fontSize={12} fontWeight={"bold"}>
-						{formatBNToDecimal(
+						{`${formatBNToDecimal(
 							outcome === 1
 								? tradePosition.amount1
 								: tradePosition.amount0
-						)}
+						)} Shares`}
 					</Text>
 				</Flex>
 			</Flex>
@@ -67,7 +68,7 @@ function TradePricesBoxes({
 	}
 
 	return (
-		<Flex marginTop="2" flexDirection="column" marginBottom="2">
+		<Flex marginTop="2" flexDirection="column" marginBottom="2" {...props}>
 			<Panel outcome={1} />
 			<Panel outcome={0} />
 		</Flex>

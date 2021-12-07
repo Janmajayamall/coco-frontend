@@ -4,7 +4,7 @@ import { sliceAddress } from "../utils";
 function ChallengeHistoryTable({ stakeHistories }) {
 	return (
 		<Flex marginTop={5} flexDirection="column">
-			<Text fontSize={12} fontWeight={"bold"}>
+			<Text fontSize={16} fontWeight={"bold"}>
 				Past Challenges
 			</Text>
 			<Table size="sm">

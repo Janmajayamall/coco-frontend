@@ -25,9 +25,9 @@ import {
 	Slider,
 } from "@chakra-ui/react";
 
-function TwoColTitleInfo({ title, info, titleBold = false }) {
+function TwoColTitleInfo({ title, info, titleBold = false, ...props }) {
 	return (
-		<Flex>
+		<Flex {...props}>
 			<Text fontSize="12" fontWeight={titleBold ? "bold" : "normal"}>
 				{title}
 			</Text>
