@@ -256,45 +256,29 @@ function Page() {
 				{market && market.oracleInfo != undefined ? (
 					<PostDisplay market={market} />
 				) : undefined}
-
-				{/* {loadingMarket == false ? (
-					<>
-						<Text>Your past trades</Text>
-						<Table size="sm" variant="simple">
-							<Thead>
-								<Tr>
-									<Th>Direction</Th>
-									<Th>Amount 0</Th>
-									<Th>Amount 1</Th>
-									<Th>Amount C</Th>
-								</Tr>
-							</Thead>
-							<Tbody>
-								{tradeHistories.map((row) => {
-									return (
-										<Tr>
-											<Td>{row.buy ? "BUY" : "SELL"}</Td>
-											<Td>
-												{roundValueTwoDP(row.amount0)}
-											</Td>
-											<Td>
-												{roundValueTwoDP(row.amount1)}
-											</Td>
-											<Td>
-												{roundValueTwoDP(row.amountC)}
-											</Td>
-										</Tr>
-									);
-								})}
-							</Tbody>
-						</Table>
-					</>
-				) : undefined} */}
 			</Flex>
 
 			<Flex width="20%" marginLeft={5} flexDirection="column">
 				{loadingMarket == false && market ? (
 					<>
+						{market.optimisticState.blocksLeft !== 0 ? (
+							<Flex
+								flexDirection="column"
+								backgroundColor="#F3F5F7"
+								padding={2}
+								marginTop={5}
+								borderRadius={10}
+								alignItems="center"
+							>
+								<Text fontSize={14} fontWeight="bold">
+									{`Period ends in ${formatTimeInSeconds(
+										convertBlocksToSeconds(
+											market.optimisticState.blocksLeft
+										)
+									)}`}
+								</Text>
+							</Flex>
+						) : undefined}
 						{market.optimisticState.stage === 1 ? (
 							<TradingInterface
 								market={market}
@@ -353,24 +337,6 @@ function Page() {
 							stakePosition={stakePosition}
 							erc1155ApprovalForAll={erc1155ApprovalForAll}
 						/> */}
-						{market.optimisticState.blocksLeft !== 0 ? (
-							<Flex
-								flexDirection="column"
-								backgroundColor="#F3F5F7"
-								padding={2}
-								marginTop={5}
-								borderRadius={10}
-								alignItems="center"
-							>
-								<Text fontSize={14} fontWeight="bold">
-									{`Period ends in ${formatTimeInSeconds(
-										convertBlocksToSeconds(
-											market.optimisticState.blocksLeft
-										)
-									)}`}
-								</Text>
-							</Flex>
-						) : undefined}
 					</>
 				) : (
 					<Loader />

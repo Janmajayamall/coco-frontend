@@ -229,7 +229,7 @@ const QueryOraclesByManager = `
 const QueryMarketsByUserInteraction = `
   query ($user: Bytes!) {
 	user(id: $user){
-		markets{
+		markets(orderBy: timestamp, orderDirection: desc){
 			market{
 				id
 				marketIdentifier

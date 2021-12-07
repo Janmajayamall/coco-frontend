@@ -1,5 +1,6 @@
 import { TriangleDownIcon, TriangleUpIcon } from "@chakra-ui/icons";
 import { Avatar, Box, Flex, Image, Spacer, Text } from "@chakra-ui/react";
+import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router";
 import {
@@ -15,11 +16,11 @@ function PostDisplay({ market, onImageClick, ...children }) {
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
 
+	const [minHeightTrick, setMinHeightTrick] = useState(300);
+
 	if (!market || !market.oracleInfo) {
 		return <div />;
 	}
-
-	let id = new Date().getTime();
 
 	function MarketStatus({ status }) {
 		function color(val) {
@@ -145,19 +146,26 @@ function PostDisplay({ market, onImageClick, ...children }) {
 				}}
 				maxWidth={"100%"}
 				maxHeight={500}
+				minHeight={minHeightTrick}
 				justifyContent="center"
 			>
 				<Image
 					loading={"eager"}
+					onLoad={() => {
+						console.log("I was called ");
+						setMinHeightTrick(0);
+					}}
+					// onLoadStartCapture={() => {
+					// 	console.log("I was called ");
+					// 	setMinHeightTrick(0);
+					// }}
+					// onLoadedData=
 					src={
 						market.marketMetadata &&
 						market.marketMetadata.eventIdentifierStr
 							? market.marketMetadata.eventIdentifierStr
 							: ""
 					}
-					// fallbackSrc={
-					// 	"https://www.aroged.com/wp-content/uploads/2021/08/Where-to-Find-Good-Wallpapers-for-Xbox-One-or-Xbox.jpg"
-					// }
 					alt="Failed to load image"
 				/>
 			</Flex>
