@@ -68,7 +68,7 @@ function TradePricesBoxes({
 	}
 
 	return (
-		<Flex marginTop="2" flexDirection="column" marginBottom="2" {...props}>
+		<Flex flexDirection="column" marginBottom="2" {...props}>
 			<Panel outcome={1} />
 			<Panel outcome={0} />
 		</Flex>

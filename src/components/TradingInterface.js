@@ -48,6 +48,7 @@ import {
 	useQueryMarketTradeAndStakeInfoByUser,
 	useSellExactTokensForMinCTokens,
 	useERC1155SetApprovalForAll,
+	useCheckTokenApprovals,
 } from "../hooks";
 import {
 	convertBlocksToSeconds,
@@ -94,21 +95,14 @@ import TradingInput from "./TradingInput";
 import TradePriceBoxes from "./TradePriceBoxes";
 import addresses from "./../contracts/addresses.json";
 import { __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED } from "react-dom/cjs/react-dom.development";
+import ApprovalInterface from "./ApprovalInterface";
 
-function TradingInterface({
-	market,
-	tradePosition,
-	erc1155ApprovalForAll,
-	refreshFn,
-}) {
+function TradingInterface({ market, tradePosition, refreshFn }) {
 	const { account } = useEthers();
 	const userProfile = useSelector(selectUserProfile);
 	const isAuthenticated = account && userProfile ? true : false;
 	const toast = useToast();
-	console.log(
-		erc1155ApprovalForAll,
-		"erc1155ApprovalForAll erc1155ApprovalForAll"
-	);
+
 	/**
 	 * Contract calls
 	 */
@@ -117,10 +111,6 @@ function TradingInterface({
 		state: stateSell,
 		send: sendSell,
 	} = useSellExactTokensForMinCTokens();
-	const {
-		state: stateSetApproval,
-		send: sendSetApproval,
-	} = useERC1155SetApprovalForAll(market.oracle.id);
 
 	/**
 	 * tabIndex == 0 -> BUY
@@ -142,7 +132,6 @@ function TradingInterface({
 
 	/**
 	 * Sell side states
-	 * @TODO You are missing token approval button for selling tokens
 	 */
 	const {
 		input: inputSellAmount,
@@ -158,7 +147,18 @@ function TradingInterface({
 	// tx loading
 	const [buyLoading, setBuyLoading] = useState(false);
 	const [sellLoading, setSellLoading] = useState(false);
-	const [approvalLoading, setApprovalLoading] = useState(false);
+
+	const tokenApproval = useCheckTokenApprovals(
+		0,
+		account,
+		undefined,
+		inputBuyAmountBn
+	);
+	const erc1155TokenApproval = useCheckTokenApprovals(
+		1,
+		account,
+		market.oracle.id
+	);
 
 	useEffect(() => {
 		if (
@@ -236,30 +236,6 @@ function TradingInterface({
 			setSellLoading(false);
 		}
 	}, [stateBuy, stateSell]);
-
-	useEffect(() => {
-		if (stateSetApproval.status === "Success") {
-			setApprovalLoading(false);
-			toast({
-				title: "Success!",
-				status: "success",
-				isClosable: true,
-			});
-			if (refreshFn) {
-				refreshFn();
-			}
-		} else if (
-			stateSetApproval.status === "Exception" ||
-			stateSetApproval.status === "Fail"
-		) {
-			setApprovalLoading(false);
-			toast({
-				title: "Metamask Err!",
-				status: "error",
-				isClosable: true,
-			});
-		}
-	}, [stateSetApproval]);
 
 	function displayToast(title, status) {
 		toast({
@@ -381,13 +357,13 @@ function TradingInterface({
 					/>
 
 					<PrimaryButton
-						disabled={!isAuthenticated}
+						disabled={!isAuthenticated || !tokenApproval}
 						marginTop="2"
 						width="100%"
 						isLoading={buyLoading}
 						loadingText={"Processing..."}
 						onClick={() => {
-							if (!isAuthenticated) {
+							if (!isAuthenticated || !tokenApproval) {
 								return;
 							}
 
@@ -412,6 +388,14 @@ function TradingInterface({
 							);
 						}}
 						title={"Buy"}
+					/>
+
+					<ApprovalInterface
+						marginTop={5}
+						tokenType={0}
+						onSuccess={() => {}}
+						onFail={() => {}}
+						erc20AmountBn={inputBuyAmountBn}
 					/>
 				</Flex>
 			) : undefined}
@@ -470,11 +454,11 @@ function TradingInterface({
 						)}
 					/>
 					<PrimaryButton
-						disabled={!isAuthenticated || !erc1155ApprovalForAll}
+						disabled={!isAuthenticated || !erc1155TokenApproval}
 						marginTop="2"
 						width="100%"
 						onClick={() => {
-							if (!isAuthenticated) {
+							if (!isAuthenticated || !erc1155TokenApproval) {
 								return;
 							}
 
@@ -502,37 +486,7 @@ function TradingInterface({
 						title={"Sell"}
 					/>
 
-					{erc1155ApprovalForAll === false ? (
-						<Flex flexDirection={"column"} marginTop={5}>
-							<Box
-								padding={2}
-								backgroundColor="red.300"
-								borderRadius={20}
-							>
-								<Text fontSize={12}>
-									To sell, you will have to first give token
-									approval to the app. This is only needed
-									once per group.
-								</Text>
-							</Box>
-							<PrimaryButton
-								style={{ marginTop: 5 }}
-								disabled={erc1155ApprovalForAll !== false}
-								loadingText="Processing..."
-								isLoading={approvalLoading}
-								onClick={() => {
-									if (erc1155ApprovalForAll === false) {
-										setApprovalLoading(true);
-										sendSetApproval(
-											addresses.MarketRouter,
-											true
-										);
-									}
-								}}
-								title={"Set approval"}
-							/>
-						</Flex>
-					) : undefined}
+					
 				</Flex>
 			) : undefined}
 		</Flex>

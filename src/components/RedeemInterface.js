@@ -28,6 +28,7 @@ import {
 	useERC1155SetApprovalForAll,
 	useRedeemMaxWinning,
 	useRedeemMaxWinningAndStake,
+	useCheckTokenApprovals,
 } from "../hooks";
 import {
 	formatBNToDecimal,
@@ -62,13 +63,13 @@ import TradePriceBoxes from "./TradePriceBoxes";
 import ChallengeHistoryTable from "./ChallengeHistoryTable";
 import addresses from "./../contracts/addresses.json";
 import PrimaryButton from "./PrimaryButton";
+import ApprovalInterface from "./ApprovalInterface";
 
 function RedeemWinsInterface({
 	market,
 	stakeHistories,
 	tradePosition,
 	stakePosition,
-	erc1155ApprovalForAll,
 	refreshFn,
 }) {
 	const { account } = useEthers();
@@ -81,14 +82,15 @@ function RedeemWinsInterface({
 		state: stateRMaxWS,
 		send: sendRMaxWS,
 	} = useRedeemMaxWinningAndStake();
-	const {
-		state: stateSetApproval,
-		send: sendSetApproval,
-	} = useERC1155SetApprovalForAll(market.oracle.id);
+
+	const erc1155TokenApproval = useCheckTokenApprovals(
+		1,
+		account,
+		market.oracle.id
+	);
 
 	// redeem tx loading
 	const [redeemLoading, setRedeemLoading] = useState(false);
-	const [approvalLoading, setApprovalLoading] = useState(false);
 
 	useEffect(() => {
 		if (
@@ -108,36 +110,6 @@ function RedeemWinsInterface({
 			}, GRAPH_BUFFER_MS);
 		}
 	}, [stateRMaxW, stateRMaxWS]);
-
-	useEffect(() => {
-		if (stateSetApproval.status === "Success") {
-			setTimeout(() => {
-				setApprovalLoading(false);
-				toast({
-					title: "Success!",
-					status: "success",
-					isClosable: true,
-				});
-				if (refreshFn) {
-					refreshFn();
-				}
-			}, GRAPH_BUFFER_MS);
-		}
-	}, [stateSetApproval]);
-
-	useEffect(() => {
-		if (
-			stateSetApproval.status === "Exception" ||
-			stateSetApproval.status === "Fail"
-		) {
-			setApprovalLoading(false);
-			toast({
-				title: "Metamask Err!",
-				status: "error",
-				isClosable: true,
-			});
-		}
-	});
 
 	useEffect(() => {
 		if (
@@ -184,6 +156,7 @@ function RedeemWinsInterface({
 				backgroundColor="#F3F5F7"
 				padding={2}
 				marginTop={5}
+				marginBottom={3}
 				borderRadius={10}
 				alignItems="center"
 			>
@@ -195,6 +168,9 @@ function RedeemWinsInterface({
 					{outcomeDisplayName(market.optimisticState.outcome)}
 				</Text>
 			</Flex>
+			<Text fontSize={14} fontWeight="bold">
+				Your Trades
+			</Text>
 			<TradePriceBoxes market={market} tradePosition={tradePosition} />
 			{/* <TwoColTitleInfo
 				title={"Final outcome"}
@@ -239,7 +215,7 @@ function RedeemWinsInterface({
 						)} MEME`}
 					/>
 					<TwoColTitleInfo
-						title={"Your get back"}
+						title={"You get back"}
 						info={formatBNToDecimal(
 							determineTotalAmountStakeRedeem(
 								market,
@@ -272,12 +248,20 @@ function RedeemWinsInterface({
 				/>
 			</Flex>
 			<PrimaryButton
-				disabled={!isAuthenticated || determineWinLevel() === 0}
+				disabled={
+					!isAuthenticated ||
+					determineWinLevel() === 0 ||
+					!erc1155TokenApproval
+				}
 				loadingText="Processing..."
 				isLoading={redeemLoading}
 				onClick={() => {
 					let winLevel = determineWinLevel();
-					if (winLevel === 0) {
+					if (
+						winLevel === 0 ||
+						!isAuthenticated ||
+						!erc1155TokenApproval
+					) {
 						return;
 					}
 
@@ -295,36 +279,11 @@ function RedeemWinsInterface({
 				}}
 			/>
 
-			{erc1155ApprovalForAll === false ? (
-				<Flex flexDirection={"column"} marginTop={5}>
-					<Box
-						padding={2}
-						borderColor="blue.400"
-						borderWidth={1}
-						borderStyle="solid"
-						backgroundColor="#4F4F4F"
-						borderRadius={10}
-					>
-						<Text color={"#FDFDFD"} fontWeight="bold" fontSize={12}>
-							To claim, you will have to first give token approval
-							to the app. This is only needed once per group.
-						</Text>
-					</Box>
-					<PrimaryButton
-						style={{ marginTop: 5 }}
-						disabled={erc1155ApprovalForAll !== false}
-						loadingText="Processing..."
-						isLoading={approvalLoading}
-						onClick={() => {
-							if (erc1155ApprovalForAll === false) {
-								setApprovalLoading(true);
-								sendSetApproval(addresses.MarketRouter, true);
-							}
-						}}
-						title={"Set approval"}
-					/>
-				</Flex>
-			) : undefined}
+			<ApprovalInterface
+				tokenType={1}
+				erc1155Address={market.oracle.id}
+			/>
+
 			<ChallengeHistoryTable stakeHistories={stakeHistories} />
 		</Flex>
 	);

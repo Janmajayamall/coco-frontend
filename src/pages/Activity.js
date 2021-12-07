@@ -31,10 +31,6 @@ import {
 import Web3 from "web3";
 import { useEffect, useState } from "react";
 import {
-	newPost,
-	updateModerator,
-	getUser,
-	findAllFollows,
 	filterOracleIdsFromMarketsGraph,
 	findModeratorsByIdArr,
 	filterMarketIdentifiersFromMarketsGraph,
@@ -71,11 +67,8 @@ import {
 	useNavigate,
 	useParams,
 } from "react-router";
-import ConfigSidebar from "../components/ConfigSiderbar";
-import { FireIcon } from "../components/FireIcon";
-import { HomeIcon } from "../components/HomeIcon";
-import { ArrowBackIcon } from "@chakra-ui/icons";
 import Loader from "../components/Loader";
+import NoPostsTag from "../components/NoPostsTag";
 
 /**
  * Shows different posts user has interacted with in any form.
@@ -203,34 +196,31 @@ function Page() {
 		<Flex>
 			<Spacer />
 			<Flex width={"50%"} flexDirection={"column"}>
-				<Select
-					marginTop={5}
-					marginBottom={5}
-					onChange={(e) => {
-						setFilter(e.target.value);
-					}}
-					placeholder="Select Filter"
-				>
-					<option value={1}>In Trading Period</option>
-					<option value={2}>In Challenge Period</option>
-					<option value={3}>In Resolve</option>
-					<option value={4}>Finalized</option>
-					<option value={5}>Claim</option>
-					<option value={6}>Created by you</option>
-				</Select>
-				{
-					loading === true ? <Loader/> : undefined
-				}
-				{loading === false &&  filteredMarkets.length === 0 ? (
-					<Flex
-						marginTop={5}
-						justifyContent="center"
-						alignItems="center"
+				<Flex flexDirection={"column"} marginTop={5} marginBottom={5}>
+					<Text marginBottom={1} fontSize={"16"} fontWeight="bold">
+						Filter Posts
+					</Text>
+					<Select
+						onChange={(e) => {
+							setFilter(e.target.value);
+						}}
+						fontSize={14}
+						placeholder="No Filter"
+						borderWidth={1}
+						borderStyle="solid"
+						borderColor="#0B0B0B"
 					>
-						<Text fontSize="xl" fontWeight="bold">
-							No Posts
-						</Text>
-					</Flex>
+						<option value={1}>Live</option>
+						<option value={2}>Challenge</option>
+						<option value={3}>Resolution</option>
+						<option value={4}>Ended</option>
+						<option value={5}>Pending Claims</option>
+						<option value={6}>Created by you</option>
+					</Select>
+				</Flex>
+				{loading === true ? <Loader /> : undefined}
+				{loading === false && filteredMarkets.length === 0 ? (
+					<NoPostsTag marginTop={10} />
 				) : undefined}
 				{filteredMarkets.map((market) => {
 					return (

@@ -76,6 +76,7 @@ import { HomeIcon } from "../components/HomeIcon";
 import { ArrowBackIcon } from "@chakra-ui/icons";
 import SuggestionSidebar from "../components/SuggestionSidebar";
 import PrimaryButton from "../components/PrimaryButton";
+import NoPostsTag from "../components/NoPostsTag";
 
 function Page() {
 	const navigate = useNavigate();
@@ -380,9 +381,7 @@ function Page() {
 				) : undefined}
 				{loadingMarkets == true ? <Loader /> : undefined}
 				{loadingMarkets == false && noPostVisible(markets) ? (
-					<Flex justifyContent="center">
-						<Text>No posts</Text>
-					</Flex>
+					<NoPostsTag marginTop={10} />
 				) : undefined}
 				{feedType === 1 && !isAuthenticated ? (
 					<Flex

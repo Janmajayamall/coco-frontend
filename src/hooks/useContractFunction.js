@@ -94,7 +94,7 @@ export function useRedeemStake(oracleAddress) {
 
 export function useERC1155SetApprovalForAll(oracleAddress) {
 	const { state, send } = useContractFunction(
-		oracleContract(oracleAddress),
+		oracleAddress ? oracleContract(oracleAddress) : undefined,
 		"setApprovalForAll"
 	);
 

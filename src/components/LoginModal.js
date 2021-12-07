@@ -77,10 +77,12 @@ function LoginModal() {
 	}, [account]);
 
 	useEffect(async () => {
-		const id = await window.ethereum.request({
-			method: "eth_chainId",
-		});
-		setChainId(parseInt(id, 16));
+		if (window.ethereum) {
+			const id = await window.ethereum.request({
+				method: "eth_chainId",
+			});
+			setChainId(parseInt(id, 16));
+		}
 	}, []);
 
 	useEffect(() => {

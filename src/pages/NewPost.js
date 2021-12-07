@@ -32,6 +32,7 @@ import {
 	useCreateNewMarket,
 	useTokenAllowance,
 	useTokenApprove,
+	useCheckTokenApprovals,
 } from "./../hooks";
 import { useEthers } from "@usedapp/core/packages/core";
 import { utils } from "ethers";
@@ -41,6 +42,7 @@ import { selectUserProfile, sUpdateLoginModalIsOpen } from "../redux/reducers";
 import InputWithTitle from "../components/InputWithTitle";
 import PrimaryButton from "../components/PrimaryButton";
 import addresses from "../contracts/addresses.json";
+import ApprovalInterface from "../components/ApprovalInterface";
 function Page() {
 	const { account } = useEthers();
 	const userProfile = useSelector(selectUserProfile);
@@ -49,8 +51,6 @@ function Page() {
 	const toast = useToast();
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
-
-	const tokenAllowance = useTokenAllowance(account);
 
 	const [imageFile, setImageFile] = useState(null);
 	const [s3ImageUrl, setS3ImageUrl] = useState(null);
@@ -61,13 +61,17 @@ function Page() {
 	const [loading, setLoading] = useState(false);
 	const [moderators, setModerators] = useState([]);
 	const [newPostLoading, setNewPostLoading] = useState(false);
-	const [approvalLoading, setApprovalLoading] = useState(false);
 
 	const { state, send } = useCreateNewMarket();
-	const {
-		state: stateTokenApprove,
-		send: sendTokenApprove,
-	} = useTokenApprove();
+
+	const tokenApproval = useCheckTokenApprovals(
+		0,
+		account,
+		undefined,
+		utils
+			.parseEther(String(fundingAmount == "" ? 0 : fundingAmount))
+			.add(utils.parseEther(String(betAmount == "" ? 0 : betAmount)))
+	);
 
 	useEffect(async () => {
 		let res = await findModerators({});
@@ -92,29 +96,6 @@ function Page() {
 			setNewPostLoading(false);
 		}
 	}, [state]);
-
-	// handling token approve tx state
-	useEffect(() => {
-		if (stateTokenApprove.status === "Success") {
-			setApprovalLoading(false);
-			toast({
-				title: "Success!",
-				status: "success",
-				isClosable: true,
-			});
-			window.location.reload();
-		} else if (
-			stateTokenApprove.status === "Exception" ||
-			stateTokenApprove.status === "Fail"
-		) {
-			setApprovalLoading(false);
-			toast({
-				title: "Metamask Err!",
-				status: "error",
-				isClosable: true,
-			});
-		}
-	}, [stateTokenApprove]);
 
 	useEffect(() => {
 		if (s3ImageUrl == undefined || s3ImageUrl == "") {
@@ -155,22 +136,8 @@ function Page() {
 		return true;
 	}
 
-	function approvalGiven() {
-		if (!tokenAllowance) {
-			return true;
-		}
-
-		const totalAmount = utils
-			.parseEther(String(Number(fundingAmount)))
-			.add(utils.parseEther(String(Number(betAmount))));
-		if (totalAmount.gt(tokenAllowance)) {
-			return false;
-		}
-		return true;
-	}
-
 	async function uploadImageHelper() {
-		if (!isAuthenticated) {
+		if (!isAuthenticated || !tokenApproval) {
 			return;
 		}
 
@@ -329,39 +296,23 @@ function Page() {
 							style={{
 								marginTop: 20,
 							}}
-							disabled={!approvalGiven()}
+							disabled={!tokenApproval || !isAuthenticated}
 						/>
-						{approvalGiven() !== true ? (
-							<Flex flexDirection={"column"} marginTop={5}>
-								<Box
-									padding={2}
-									backgroundColor="red.300"
-									borderRadius={20}
-								>
-									<Text fontSize={12}>
-										To post, you will have to first give
-										MEME token approval to the app. This is
-										only needed once.
-									</Text>
-								</Box>
-								<PrimaryButton
-									style={{ marginTop: 5 }}
-									disabled={approvalGiven() === true}
-									loadingText="Processing..."
-									isLoading={approvalLoading}
-									onClick={() => {
-										if (approvalGiven() !== true) {
-											setApprovalLoading(true);
-											sendTokenApprove(
-												addresses.MarketRouter,
-												MAX_UINT_256
-											);
-										}
-									}}
-									title={"Set approval"}
-								/>
-							</Flex>
-						) : undefined}
+						<ApprovalInterface
+							marginTop={5}
+							tokenType={0}
+							erc20AmountBn={utils
+								.parseEther(
+									String(
+										fundingAmount == "" ? 0 : fundingAmount
+									)
+								)
+								.add(
+									utils.parseEther(
+										String(betAmount == "" ? 0 : betAmount)
+									)
+								)}
+						/>
 					</Flex>
 					<Spacer />
 				</Flex>

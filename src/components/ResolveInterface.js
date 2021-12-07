@@ -11,7 +11,7 @@ import {
 	selectRinkebyLatestBlockNumber,
 	selectUserProfile,
 } from "../redux/reducers";
-import { Button, Text, Flex, Select } from "@chakra-ui/react";
+import { Button, Text, Flex, Select, useToast } from "@chakra-ui/react";
 import { useEthers } from "@usedapp/core/packages/core";
 import { CloseIcon } from "@chakra-ui/icons";
 import { useEffect } from "react";
@@ -59,6 +59,7 @@ import {
 	ZERO_BN,
 	ZERO_DECIMAL_STR,
 	calculateResolveFee,
+	GRAPH_BUFFER_MS,
 } from "../utils";
 import PostDisplay from "../components/PostDisplay";
 import TwoColTitleInfo from "../components/TwoColTitleInfo";
@@ -70,14 +71,48 @@ import TradePriceBoxes from "./TradePriceBoxes";
 import ChallengeHistoryTable from "./ChallengeHistoryTable";
 import PrimaryButton from "./PrimaryButton";
 
-function ResolveInterface({ market, tradePosition, stakeHistories }) {
+function ResolveInterface({
+	market,
+	tradePosition,
+	stakeHistories,
+	refreshFn,
+}) {
 	const { account } = useEthers();
 	const userProfile = useSelector(selectUserProfile);
 	const isAuthenticated = account && userProfile ? true : false;
 
+	const toast = useToast();
+
 	const { state, send } = useSetOutcome(market ? market.oracle.id : "");
 
 	const [chosenOutcome, setChosenOutcome] = useState(2);
+
+	const [loading, setLoading] = useState(false);
+
+	useEffect(() => {
+		if (state.status === "Success") {
+			setTimeout(() => {
+				setLoading(false);
+
+				toast({
+					title: "Success!",
+					status: "success",
+					isClosable: true,
+				});
+
+				if (refreshFn) {
+					refreshFn();
+				}
+			}, GRAPH_BUFFER_MS);
+		} else if (state.status === "Exception" || state.status === "Fail") {
+			toast({
+				title: "Metamask err!",
+				status: "error",
+				isClosable: true,
+			});
+			setLoading(false);
+		}
+	}, [state]);
 
 	if (!market) {
 		return <div />;
@@ -96,7 +131,10 @@ function ResolveInterface({ market, tradePosition, stakeHistories }) {
 						info={formatBNToDecimal(
 							chosenOutcome == ""
 								? ZERO_BN
-								: calculateResolveFee(market, chosenOutcome)
+								: calculateResolveFee(
+										market,
+										parseInt(chosenOutcome, 10)
+								  )
 						)}
 						titleBold={true}
 					/>
@@ -126,6 +164,7 @@ function ResolveInterface({ market, tradePosition, stakeHistories }) {
 							) {
 								return;
 							}
+							setLoading(true);
 							send(chosenOutcome, market.marketIdentifier);
 						}}
 						title="Declare outcome"

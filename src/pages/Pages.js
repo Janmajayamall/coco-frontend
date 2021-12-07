@@ -146,18 +146,15 @@ function Page() {
 
 			<Flex flexDirection="column" width={"50%"}>
 				<Flex justifyContent="center" marginTop={5}>
-					<Heading fontSize={25}>
-						Posts that need your attention
-					</Heading>
+					<Heading fontSize={25}>Posts To Review</Heading>
 				</Flex>
 				{marketsLoading === true ? <Loader /> : undefined}
 				{marketsLoading === false && markets.length === 0 ? (
-					<NoPostsTag
-						style={{
-							marginTop: 20,
-							marginBottom: 20,
-						}}
-					/>
+					<Flex justifyContent="center" marginTop={20}>
+						<Text fontSize={14} fontWeight="bold">
+							Hurray, no posts to review!
+						</Text>
+					</Flex>
 				) : undefined}
 				{markets.map((market) => {
 					return (

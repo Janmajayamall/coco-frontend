@@ -132,15 +132,6 @@ function Page() {
 		postId,
 		account ? account.toLowerCase() : ""
 	);
-	const {
-		result: tokenApprovalsResult,
-		reexecuteQuery: tokenApprovalsReexecuteQuery,
-	} = useQueryTokenApprovalsByUserAndOracle(
-		account ? account.toLocaleLowerCase() : "",
-		result.data && result.data.market ? result.data.market.oracle.id : ""
-	);
-
-	useEffect(() => {}, [result]);
 
 	const [market, setMarket] = useState(undefined);
 	const [loadingMarket, setLoadingMarket] = useState(true);
@@ -336,6 +327,7 @@ function Page() {
 								market={market}
 								stakeHistories={stakeHistories}
 								tradePosition={tradePosition}
+								refreshFn={refreshPost}
 							/>
 						) : undefined}
 						{/* <ResolveInterface

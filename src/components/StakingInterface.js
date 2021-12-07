@@ -24,7 +24,7 @@ import { useEthers } from "@usedapp/core/packages/core";
 
 import { useEffect } from "react";
 import { useState } from "react";
-import { useStakeForOutcome } from "../hooks";
+import { useStakeForOutcome, useCheckTokenApprovals } from "../hooks";
 import {
 	convertBlocksToSeconds,
 	formatBNToDecimal,
@@ -45,6 +45,7 @@ import { BigNumber, ethers, utils } from "ethers";
 import TradingInput from "./TradingInput";
 import TradePriceBoxes from "./TradePriceBoxes";
 import ChallengeHistoryTable from "./ChallengeHistoryTable";
+import ApprovalInterface from "./ApprovalInterface";
 
 function StakingInterface({ market, stakeHistories, refreshFn }) {
 	const { account } = useEthers();
@@ -61,6 +62,13 @@ function StakingInterface({ market, stakeHistories, refreshFn }) {
 	const [tempOutcome, setTempOutcome] = useState(0);
 	const [favoredOutcome, setFavoredOutcome] = useState();
 	const [stakeLoading, setStakeLoading] = useState(false);
+
+	const tokenApproval = useCheckTokenApprovals(
+		0,
+		account,
+		undefined,
+		bnValue
+	);
 
 	function setInputToMinStakeReq() {
 		setInput(
@@ -198,9 +206,9 @@ function StakingInterface({ market, stakeHistories, refreshFn }) {
 			<PrimaryButton
 				loadingText="Processing..."
 				isLoading={stakeLoading}
-				disabled={!isAuthenticated}
+				disabled={!isAuthenticated || !tokenApproval}
 				onClick={() => {
-					if (!isAuthenticated) {
+					if (!isAuthenticated && tokenApproval) {
 						return;
 					}
 
@@ -229,6 +237,12 @@ function StakingInterface({ market, stakeHistories, refreshFn }) {
 			/>
 
 			<ChallengeHistoryTable stakeHistories={stakeHistories} />
+
+			<ApprovalInterface
+				marginTop={5}
+				tokenType={0}
+				erc20AmountBn={bnValue}
+			/>
 		</Flex>
 	);
 }
