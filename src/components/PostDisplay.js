@@ -165,7 +165,7 @@ function PostDisplay({ market, onImageClick, ...children }) {
 				<Flex>
 					<Text fontSize={15}>Volume:</Text>
 					<Text marginLeft={1} fontSize={15} fontWeight="bold">
-						{formatBNToDecimal(market.tradeVolume)} MEME
+						{formatBNToDecimal(market.totalVolume)} MEME
 					</Text>
 				</Flex>
 				<Spacer />

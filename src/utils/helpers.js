@@ -70,7 +70,7 @@ export function populateMarketWithMetadata(
 	};
 }
 
-export function roundDecimalStr(value, dp = 2) {
+export function roundDecimalStr(value, dp = 3) {
 	let _value = value;
 	try {
 		if (typeof _value == "string") {
@@ -114,7 +114,7 @@ export function parseDecimalToBN(val, base = 18) {
 	return ethers.utils.parseUnits(val, base);
 }
 
-export function formatBNToDecimal(val, base = 18, round = true, dp = 2) {
+export function formatBNToDecimal(val, base = 18, round = true, dp = 3) {
 	val = ethers.utils.formatUnits(val, base);
 	if (round === true) {
 		val = roundDecimalStr(val, dp);
@@ -130,9 +130,20 @@ export function getDecStrAvgPriceBN(amountIn, amountOut) {
 		return "0.00";
 	}
 	let val = amountIn.mul(BigNumber.from("1000")).div(amountOut).toString();
-	if (val.length <= 3) {
+
+	if (val.length == 3) {
 		return "0." + val;
 	}
+	if (val.length == 2) {
+		return "0.0" + val;
+	}
+	if (val.length == 1) {
+		return "0.00" + val;
+	}
+	if (val.length == 0) {
+		return "0.000";
+	}
+
 	return val.slice(0, val.length - 3) + "." + val.slice(val.length - 3);
 }
 
@@ -320,7 +331,21 @@ export function convertBlocksToSeconds(blocks) {
 }
 
 export function formatTimeInSeconds(seconds) {
-	return `${seconds} seconds`;
+	let sec = parseInt(seconds, 10);
+
+	let hours = Math.floor(sec / 3600);
+	if (hours > 0) {
+		let minutes = Math.floor((sec - hours * 3600) / 60);
+		return `${hours}h ${minutes}m`;
+	}
+
+	let minutes = Math.floor(sec / 60);
+	if (minutes > 0) {
+		sec = Math.floor(sec - minutes * 60);
+		return `${minutes}m ${sec}s`;
+	}
+
+	return `${sec}s`;
 }
 
 export function outcomeDisplayName(outcome) {

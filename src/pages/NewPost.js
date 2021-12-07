@@ -219,7 +219,7 @@ function Page() {
 	return (
 		<Flex flexDirection="column">
 			<Flex padding={10} justifyContent="center">
-				<Heading size="lg">Create new post</Heading>
+				<Heading size="lg">New post</Heading>
 			</Flex>
 			{isAuthenticated !== true ? (
 				<Flex justifyContent="center">

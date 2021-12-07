@@ -175,15 +175,15 @@ function Page() {
 	}
 
 	return (
-		<Flex justifyContent="center" paddingTop="10">
+		<Flex minHeight="100vh">
 			<Spacer />
 			<Flex
 				width="50%"
-				justifyContent="center"
 				alignItems="center"
 				flexDirection="column"
 				paddingRight={20}
 				paddingLeft={20}
+				paddingTop={10}
 			>
 				<Heading size="lg">New Group</Heading>
 				{InputWithTitle(
@@ -253,9 +253,17 @@ function Page() {
 				/>
 			</Flex>
 			<Spacer />
-			<Flex width="30%" flexDirection="column">
-				<Heading marginBottom={5} size="lg">
-					Your groups
+			<Flex
+				// borderRightWidth={1}
+				borderLeftWidth={1}
+				borderColor="#BDBDBD"
+				width="25%"
+				flexDirection="column"
+				paddingTop={10}
+				paddingLeft={5}
+			>
+				<Heading size="md" marginBottom={5}>
+					Your Groups
 				</Heading>
 				{oraclesLoading === true ? <Loader /> : undefined}
 				{oracleIds.map((id) => {

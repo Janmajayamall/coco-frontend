@@ -70,6 +70,7 @@ function InputWithTitle(
 				<Text
 					style={{
 						fontSize: 12,
+						color: "#EB5757",
 					}}
 				>
 					{expText}

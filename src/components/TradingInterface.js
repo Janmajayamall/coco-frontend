@@ -432,10 +432,22 @@ function TradingInterface({
 						inputValue={inputSellAmount}
 						setMaxSell={() => {
 							if (tokenActionIndex == 0) {
-								setInputSellAmount(tradePosition.amount0);
+								setInputSellAmount(
+									formatBNToDecimal(
+										tradePosition.amount0,
+										18,
+										false
+									)
+								);
 							}
 							if (tokenActionIndex == 1) {
-								setInputSellAmount(tradePosition.amount1);
+								setInputSellAmount(
+									formatBNToDecimal(
+										tradePosition.amount1,
+										18,
+										false
+									)
+								);
 							}
 						}}
 						err={inputSellAmountErr}
