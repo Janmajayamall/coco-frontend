@@ -45,6 +45,7 @@ import {
 	stateSetupOraclesInfo,
 	stateSetupMarketsMetadata,
 	unfollowModerator,
+	generateProfileInitials,
 } from "../utils";
 import {
 	sUpdateProfile,
@@ -275,16 +276,9 @@ function Page() {
 						<Flex marginBottom={5}>
 							<Avatar
 								size="md"
-								name={
+								name={generateProfileInitials(
 									groupDetails.name
-										? groupDetails.name[0]
-										: ""
-								}
-								src={
-									groupDetails.name
-										? groupDetails.groupImageUrl
-										: ""
-								}
+								)}
 								marginRight={5}
 							/>
 							<Box marginRight={5}>

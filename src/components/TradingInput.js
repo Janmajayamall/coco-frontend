@@ -23,6 +23,9 @@ import {
 	SliderFilledTrack,
 	SliderThumb,
 	Slider,
+	InputRightAddon,
+	InputRightElement,
+	HStack,
 } from "@chakra-ui/react";
 
 function TradingInput({
@@ -33,30 +36,33 @@ function TradingInput({
 	setMaxSell,
 	err,
 	errText,
+	isBuy,
 }) {
 	return (
 		<Flex marginTop="2" marginBottom="2" flexDirection="column">
-			<NumberInput
-				onChange={(val) => {
-					setInput(val);
-				}}
-				placeholder="Amount"
-				value={inputValue}
-			>
-				<NumberInputField />
+			<HStack>
+				<NumberInput
+					onChange={(val) => {
+						setInput(val);
+					}}
+					fontSize={14}
+					placeholder="Amount"
+					value={inputValue}
+				>
+					<NumberInputField />
+				</NumberInput>
+				<Text fontSize={14}>{isBuy === true ? "MEME" : "Shares"}</Text>
 				{setMaxSell != undefined ? (
-					<Flex>
-						<Spacer />
-						<Text
-							onClick={setMaxSell}
-							fontSize={12}
-							textDecoration="underline"
-						>
-							Max
-						</Text>
-					</Flex>
+					<Text
+						onClick={setMaxSell}
+						fontSize={14}
+						textDecoration="underline"
+					>
+						Max
+					</Text>
 				) : undefined}
-			</NumberInput>
+			</HStack>
+
 			{err === true ? (
 				<Text
 					marginTop="1"
@@ -83,20 +89,20 @@ function TradingInput({
 				max={5}
 				step={0.5}
 			>
-				<SliderTrack bg="red.100">
+				<SliderTrack>
 					<Box position="relative" right={10} />
-					<SliderFilledTrack bg="tomato" />
+					<SliderFilledTrack backgroundColor="#828282" />
 				</SliderTrack>
-				<SliderThumb boxSize={4} />
+				<SliderThumb boxSize={4} backgroundColor="#828282" />
 			</Slider>
-			{slippageValue < 1 ? (
+			{slippageValue < 0.5 ? (
 				<Text
 					marginTop="1"
 					marginBottom="1"
 					fontSize="10"
 					fontWeight="bold"
-					color="red.300"
-				>{`We recommend slippage >= 1%`}</Text>
+					color="#EB5757"
+				>{`We recommend slippage of at least 0.5%`}</Text>
 			) : undefined}
 		</Flex>
 	);

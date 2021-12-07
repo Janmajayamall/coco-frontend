@@ -95,17 +95,12 @@ export function validateGroupName(val) {
 		};
 	}
 
-	if (val.split(" ").length !== 1) {
+	let reg = /[\s!@#$%^&*()+\-=\[\]{};':"\\|,.<>\/?]+/;
+	if (reg.test(val) || val.length > MAX_LENGTH_NAME) {
 		return {
 			valid: false,
-			expText: "Name cannot have spaces!",
-		};
-	}
-
-	if (val.length > MAX_LENGTH_NAME) {
-		return {
-			valid: false,
-			expText: `Char count should be smaller than ${MAX_LENGTH_NAME}`,
+			expText:
+				"Names cannot contain spaces & special characters & should be less than 20 characters in length",
 		};
 	}
 

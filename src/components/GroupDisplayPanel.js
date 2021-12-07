@@ -48,6 +48,7 @@ import {
 	stateSetupMarketsMetadata,
 	unfollowModerator,
 	findAllModerators,
+	generateProfileInitials,
 } from "../utils";
 import {
 	selectGroupsFollowed,
@@ -64,7 +65,7 @@ function GroupDisplayName({ group, followStatusVisible, settingsVisible }) {
 
 	return (
 		<Flex marginTop={2} marginBottom={2} alignItems="center">
-			<Avatar size="sm" name={group.name[0]} src={group.groupImageUrl} />
+			<Avatar size="sm" name={generateProfileInitials(group.name)} />
 
 			<Text
 				onClick={() => {

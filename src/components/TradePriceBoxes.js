@@ -17,8 +17,20 @@ function TradePricesBoxes({
 			<Flex
 				margin={2}
 				padding={2}
-				backgroundColor={
-					outcomeChosen === outcome ? "blue.500" : "blue.100"
+				style={
+					outcomeChosen === outcome
+						? {
+								border: "2px",
+								borderStyle: "solid",
+								borderColor: "blue.400",
+								backgroundColor: "#F3F5F7",
+						  }
+						: {
+								backgroundColor: "#F3F5F7",
+								border: "2px",
+								borderStyle: "solid",
+								borderColor: "transparent",
+						  }
 				}
 				flexDirection="column"
 				onClick={() => {

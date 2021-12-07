@@ -4,6 +4,8 @@ import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router";
 import {
 	followModerator,
+	formatBNToDecimal,
+	generateProfileInitials,
 	marketStageDisplayName,
 	roundDecimalStr,
 } from "../utils";
@@ -19,20 +21,69 @@ function PostDisplay({ market, onImageClick, ...children }) {
 
 	let id = new Date().getTime();
 
+	function MarketStatus({ status }) {
+		function color(val) {
+			if (val === 1) {
+				return "#02B784";
+			}
+			if (val === 2) {
+				return "#EB5757";
+			}
+			if (val === 3) {
+				return "#F2C94C";
+			}
+			if (val === 4) {
+				return "#4F4F4F";
+			}
+			return "#FDFDFD";
+		}
+
+		function text(val) {
+			if (val === 1) {
+				return "Live";
+			}
+			if (val === 2) {
+				return "Challenge";
+			}
+			if (val === 3) {
+				return "Resolution";
+			}
+			if (val === 4) {
+				return "Ended";
+			}
+			return "";
+		}
+
+		return (
+			<Flex justifyContent="center" alignItems="center" paddingRight={3}>
+				<Text color={color(status)} fontSize="20" fontWeight="bold">
+					·
+				</Text>
+				<Text
+					color={color(status)}
+					fontSize="16"
+					fontWeight="bold"
+					marginLeft="2"
+				>
+					{text(status)}
+				</Text>
+			</Flex>
+		);
+	}
+
 	return (
 		<Box {...children}>
 			<Flex paddingBottom={3} paddingTop={4}>
 				<Flex alignItems="center">
 					<Avatar
 						size="sm"
-						name={market.oracleInfo.name[0]}
-						src={market.oracleInfo.groupImageUrl}
+						name={generateProfileInitials(market.oracleInfo.name)}
 					/>
 					<Text
 						onClick={() => {
 							navigate(`/group/${market.oracle.id}`);
 						}}
-						fontSize="14"
+						fontSize="16"
 						fontWeight="bold"
 						marginLeft="2"
 						color={"#4F4F4F"}
@@ -63,7 +114,7 @@ function PostDisplay({ market, onImageClick, ...children }) {
 									}
 									dispatch(sAddGroupFollow(market.oracle.id));
 								}}
-								fontSize="14"
+								fontSize="16"
 								fontWeight="bold"
 								marginLeft="3"
 							>
@@ -73,7 +124,7 @@ function PostDisplay({ market, onImageClick, ...children }) {
 					) : undefined}
 				</Flex>
 				<Spacer />
-				<Flex
+				{/* <Flex
 					backgroundColor="#F3F5F7"
 					alignItems="center"
 					paddingLeft={3}
@@ -83,7 +134,8 @@ function PostDisplay({ market, onImageClick, ...children }) {
 					<Text>
 						{marketStageDisplayName(market.optimisticState.stage)}
 					</Text>
-				</Flex>
+				</Flex> */}
+				<MarketStatus status={market.optimisticState.stage} />
 			</Flex>
 			<Flex
 				onClick={() => {
@@ -109,7 +161,13 @@ function PostDisplay({ market, onImageClick, ...children }) {
 					alt="Failed to load image"
 				/>
 			</Flex>
-			<Flex marginTop={5}>
+			<Flex marginTop={5} alignItems="flex-start">
+				<Flex>
+					<Text fontSize={15}>Volume:</Text>
+					<Text marginLeft={1} fontSize={15} fontWeight="bold">
+						{formatBNToDecimal(market.tradeVolume)} MEME
+					</Text>
+				</Flex>
 				<Spacer />
 				<Flex
 					backgroundColor="#C5E6DD"
@@ -121,7 +179,6 @@ function PostDisplay({ market, onImageClick, ...children }) {
 					marginRight={2}
 					justifyContent={"space-between"}
 					alignItems={"center"}
-					height={8}
 				>
 					<TriangleUpIcon
 						marginRight={2}
@@ -129,7 +186,9 @@ function PostDisplay({ market, onImageClick, ...children }) {
 						h={3}
 						color="#0B0B0B"
 					/>
-					<Text>{roundDecimalStr(market.probability1)}</Text>
+					<Text fontSize={15}>
+						{roundDecimalStr(market.probability1)}
+					</Text>
 				</Flex>
 				<Flex
 					backgroundColor="#E9CFCC"
@@ -148,7 +207,9 @@ function PostDisplay({ market, onImageClick, ...children }) {
 						h={3}
 						color="#0B0B0B"
 					/>
-					<Text>{roundDecimalStr(market.probability0)}</Text>
+					<Text fontSize={15}>
+						{roundDecimalStr(market.probability0)}
+					</Text>
 				</Flex>
 			</Flex>
 		</Box>

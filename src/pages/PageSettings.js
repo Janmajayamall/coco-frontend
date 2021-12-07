@@ -42,6 +42,7 @@ import {
 	GRAPH_BUFFER_MS,
 	validateGroupDescription,
 	uploadImageFileCloudinary,
+	generateProfileInitials,
 } from "../utils";
 import {
 	useCreateNewMarket,
@@ -91,8 +92,6 @@ function Page() {
 	 */
 	const [name, setName] = useState("");
 	const [description, setDescription] = useState("");
-	const [groupImageUrl, setGroupImageUrl] = useState(null);
-	const [uploadedImage, setUploadedImage] = useState(null);
 
 	/**
 	 * Oracle config states
@@ -152,7 +151,6 @@ function Page() {
 	useEffect(() => {
 		setName(oracleData.name);
 		setDescription(oracleData.description);
-		setGroupImageUrl(oracleData.groupImageUrl);
 		setFee(oracleData.fee);
 		setEscalationLimit(oracleData.donEscalationLimit);
 		setExpireHours(
@@ -166,67 +164,21 @@ function Page() {
 		);
 	}, [oracleData]);
 
-	function validateFile(file) {
-		const fsMb = file.size / (1024 * 1024);
-		const MAX_FILE_SIZE = 10;
-		if (fsMb > MAX_FILE_SIZE) {
-			return false;
-		}
-
-		return true;
-	}
-
 	return (
 		<Flex flexDirection="row" marginTop="20">
 			<Spacer />
 
 			<Flex width="30%" flexDirection="column">
-				<Heading>Group data</Heading>
+				<Flex justifyContent="center" marginBottom={5}>
+					<Heading size="lg">Group Info</Heading>
+				</Flex>
 				<Flex justifyContent="center" alignItems="center">
 					<Flex flexDirection="column" marginTo="5" marginBottom="5">
 						<Avatar
 							size="2xl"
-							name="G"
-							src={
-								groupImageUrl == undefined
-									? uploadedImage == undefined
-										? undefined
-										: URL.createObjectURL(uploadedImage)
-									: groupImageUrl
-							}
+							name={generateProfileInitials(name)}
+							src={""}
 						/>
-
-						{groupImageUrl == undefined &&
-						uploadedImage == undefined ? (
-							<FileUpload
-								accept={"image/*"}
-								onFileUpload={(file) => {
-									if (!validateFile(file)) {
-										toast({
-											title:
-												"File size limit (10MB) exceeded",
-											status: "error",
-											isClosable: true,
-										});
-										return;
-									}
-									setUploadedImage(file);
-								}}
-							>
-								<Button leftIcon={<Icon as={FiFile} />}>
-									Choose Image
-								</Button>
-							</FileUpload>
-						) : (
-							<Button
-								onClick={() => {
-									setGroupImageUrl(null);
-									setUploadedImage(null);
-								}}
-							>
-								Remove
-							</Button>
-						)}
 					</Flex>
 				</Flex>
 				{InputWithTitle(
@@ -286,30 +238,10 @@ function Page() {
 						}
 
 						setLoadingUpdateMetadata(true);
-
-						let updates = {
+						const res = await updateModerator(oracleData.id, {
 							name,
 							description,
-						};
-
-						// check whether to upload image
-						if (uploadedImage != undefined) {
-							const formData = new FormData();
-							formData.append("file", uploadedImage);
-							formData.append("upload_preset", "yow5vd7c");
-							const s3Url = await uploadImageFileCloudinary(
-								formData
-							);
-							updates = {
-								...updates,
-								groupImageUrl: s3Url,
-							};
-						}
-						console.log("updated data, ", updates);
-						const res = await updateModerator(
-							oracleData.id,
-							updates
-						);
+						});
 
 						if (res) {
 							toast({
@@ -326,12 +258,14 @@ function Page() {
 						}
 						setLoadingUpdateMetadata(false);
 					}}
-					title={"Update Metadata"}
+					title={"Update Info"}
 				/>
 			</Flex>
 			<Spacer />
 			<Flex width="30%" flexDirection="column">
-				<Heading>Market Config</Heading>
+				<Flex justifyContent="center" marginBottom={5}>
+					<Heading size="lg">Group Config</Heading>
+				</Flex>
 				<Flex flexDirection="column">
 					{InputWithTitle("Fee", false, fee, setFee, validateFee, {
 						defaultValue: 0.05,
@@ -439,7 +373,7 @@ function Page() {
 								convertHoursToBlocks(chainId, resolutionHours)
 							);
 						}}
-						title={"Update Config"}
+						title={"Update Configs"}
 					/>
 				</Flex>
 			</Flex>

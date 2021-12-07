@@ -23,6 +23,9 @@ function ChallengeHistoryTable({ stakeHistories }) {
 					</Tr>
 				))}
 			</Table>
+			<Flex justifyContent="center" padding={5}>
+				<Text fontSize={10}>No Challenges</Text>
+			</Flex>
 		</Flex>
 	);
 }

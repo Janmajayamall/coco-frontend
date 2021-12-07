@@ -327,7 +327,7 @@ function Page() {
 							) : undefined}
 						</Flex>
 
-						{market.optimisticState.stage === 1 ? (
+						{/* {market.optimisticState.stage === 1 ? (
 							<TradingInterface
 								market={market}
 								tradePosition={tradePosition}
@@ -359,12 +359,12 @@ function Page() {
 								market={market}
 								stakeHistories={stakeHistories}
 							/>
-						) : undefined}
-						{/* <TradingInterface
+						) : undefined} */}
+						<TradingInterface
 							market={market}
 							tradePosition={tradePosition}
 							erc1155ApprovalForAll={erc1155ApprovalForAll}
-						/> */}
+						/>
 						{/* <StakingInterface
 							market={market}
 							tradePosition={tradePosition}

@@ -496,3 +496,19 @@ export function toBase64(file) {
 		reader.onerror = (error) => reject(error);
 	});
 }
+
+export function generateProfileInitials(name) {
+	if (typeof name !== "string" || name.length === 0) {
+		return "";
+	}
+
+	let initials = name[0];
+	for (let i = 1; i < name.length; i++) {
+		let char = name[i];
+		if (char.toUpperCase() === char) {
+			initials += ` ${char}`;
+		}
+	}
+	console.log(initials, " initials");
+	return initials;
+}

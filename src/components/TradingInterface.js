@@ -153,7 +153,7 @@ function TradingInterface({
 	} = useBNInput(sellValidationFn);
 	const [amountCOutBn, setAmountCOutBn] = useState(BigNumber.from(0));
 
-	const [slippage, setSlippage] = useState(1);
+	const [slippage, setSlippage] = useState(0.5);
 
 	// tx loading
 	const [buyLoading, setBuyLoading] = useState(false);
@@ -210,7 +210,7 @@ function TradingInterface({
 		setAmountCOutBn(amount);
 	}, [inputSellAmountBn, tokenActionIndex]);
 
-	// tx loading
+	// tx state handle
 	useEffect(() => {
 		if (stateBuy.status == "Success" || stateSell.status == "Success") {
 			setTimeout(() => {
@@ -225,23 +225,6 @@ function TradingInterface({
 	}, [stateSell, stateBuy]);
 
 	useEffect(() => {
-		if (stateSetApproval.status === "Success") {
-			setTimeout(() => {
-				setApprovalLoading(false);
-				toast({
-					title: "Success!",
-					status: "success",
-					isClosable: true,
-				});
-				if (refreshFn) {
-					refreshFn();
-				}
-			}, GRAPH_BUFFER_MS);
-		}
-	}, [stateSetApproval]);
-
-	// handle tx error
-	useEffect(() => {
 		if (
 			stateBuy.status == "Exception" ||
 			stateBuy.status == "Fail" ||
@@ -255,7 +238,17 @@ function TradingInterface({
 	}, [stateBuy, stateSell]);
 
 	useEffect(() => {
-		if (
+		if (stateSetApproval.status === "Success") {
+			setApprovalLoading(false);
+			toast({
+				title: "Success!",
+				status: "success",
+				isClosable: true,
+			});
+			if (refreshFn) {
+				refreshFn();
+			}
+		} else if (
 			stateSetApproval.status === "Exception" ||
 			stateSetApproval.status === "Fail"
 		) {
@@ -292,220 +285,244 @@ function TradingInterface({
 		};
 	}
 
+	function TradingButton({ index, ...props }) {
+		return (
+			<Button
+				{...props}
+				style={
+					tabIndex === index
+						? {
+								backgroundColor: "#0B0B0B",
+						  }
+						: {
+								backgroundColor: "#FDFDFD",
+						  }
+				}
+				_hover={{
+					border: "1px",
+					borderStyle: "solid",
+					borderColor: "blue.400",
+					backgroundColor: "gray.700",
+				}}
+				width="50%"
+				justifyContent="center"
+			>
+				<Text
+					fontSize={14}
+					style={
+						tabIndex === index
+							? {
+									color: "#FDFDFD",
+							  }
+							: {
+									color: "#0B0B0B",
+							  }
+					}
+				>
+					{index == 0 ? "Buy" : "Sell"}
+				</Text>
+			</Button>
+		);
+	}
+
 	return (
 		<Flex flexDirection={"column"}>
-			<Tabs
-				backgroundColor={"#ffffff"}
-				defaultIndex={0}
-				isFitted
-				variant="enclosed"
-				onChange={(index) => {
-					setTabIndex(index);
-				}}
-			>
-				<TabList mb="1em">
-					<Tab>Buy</Tab>
-					<Tab>Sell</Tab>
-				</TabList>
-				<TabPanels>
-					<TabPanel>
-						<TradePriceBoxes
-							market={market}
-							outcomeChosen={tokenActionIndex}
-							onOutcomeChosen={(index) => {
-								setTokenActionIndex(index);
-							}}
-							tradePosition={tradePosition}
-						/>
-						<TradingInput
-							setSlippage={setSlippage}
-							slippageValue={slippage}
-							setInput={setInputBuyAmount}
-							inputValue={inputBuyAmount}
-						/>
-						<TwoColTitleInfo
-							title="Your choice"
-							info={tokenActionIndex === 0 ? "NO" : "YES"}
-						/>
-						<TwoColTitleInfo
-							title="Estimated shares bought"
-							info={formatBNToDecimal(tokenOutAmountBn)}
-						/>
-						<TwoColTitleInfo
-							title="Avg. Price per share"
-							info={getDecStrAvgPriceBN(
-								inputBuyAmountBn,
-								tokenOutAmountBn
-							)}
-						/>
-						<TwoColTitleInfo
-							title="Max. potential profit"
-							info={formatBNToDecimal(
-								tokenOutAmountBn.sub(inputBuyAmountBn)
-							)}
-						/>
-						<Button
-							disabled={!isAuthenticated}
-							marginTop="2"
-							width="100%"
-							backgroundColor="green.100"
-							onClick={() => {
-								if (!isAuthenticated) {
-									return;
-								}
+			<Flex marginTop={5}>
+				<TradingButton
+					index={0}
+					onClick={() => {
+						setTabIndex(0);
+					}}
+				/>
+				<TradingButton
+					index={1}
+					onClick={() => {
+						setTabIndex(1);
+					}}
+				/>
+			</Flex>
+			{tabIndex === 0 ? (
+				<Flex flexDirection="column">
+					<TradePriceBoxes
+						market={market}
+						outcomeChosen={tokenActionIndex}
+						onOutcomeChosen={(index) => {
+							setTokenActionIndex(index);
+						}}
+						tradePosition={tradePosition}
+					/>
+					<TradingInput
+						setSlippage={setSlippage}
+						slippageValue={slippage}
+						setInput={setInputBuyAmount}
+						inputValue={inputBuyAmount}
+						isBuy={true}
+					/>
+					<TwoColTitleInfo
+						title="Your choice"
+						info={tokenActionIndex === 0 ? "NO" : "YES"}
+					/>
+					<TwoColTitleInfo
+						title="Estimated shares bought"
+						info={formatBNToDecimal(tokenOutAmountBn)}
+					/>
+					<TwoColTitleInfo
+						title="Avg. Price per share"
+						info={getDecStrAvgPriceBN(
+							inputBuyAmountBn,
+							tokenOutAmountBn
+						)}
+					/>
+					<TwoColTitleInfo
+						title="Max. potential profit"
+						info={formatBNToDecimal(
+							tokenOutAmountBn.sub(inputBuyAmountBn)
+						)}
+					/>
 
-								setBuyLoading(true);
-
-								let a0 =
-									tokenActionIndex == 0
-										? tokenOutAmountBn
-										: BigNumber.from(0);
-								let a1 =
-									tokenActionIndex == 1
-										? tokenOutAmountBn
-										: BigNumber.from(0);
-
-								sendBuy(
-									a0,
-									a1,
-									inputBuyAmountBn,
-									1 - tokenActionIndex,
-									market.oracle.id,
-									market.marketIdentifier
-								);
-							}}
-							isLoading={buyLoading}
-							loadingText={"Processing..."}
-						>
-							<Text
-								color="white"
-								fontSize="md"
-								fontWeight="medium"
-								mr="2"
-							>
-								Buy
-							</Text>
-						</Button>
-					</TabPanel>
-					<TabPanel>
-						<TradePriceBoxes
-							market={market}
-							outcomeChosen={tokenActionIndex}
-							onOutcomeChosen={(index) => {
-								setTokenActionIndex(index);
-							}}
-							tradePosition={tradePosition}
-						/>
-						<TradingInput
-							setSlippage={setSlippage}
-							slippageValue={slippage}
-							setInput={setInputSellAmount}
-							inputValue={inputSellAmount}
-							setMaxSell={() => {
-								if (tokenActionIndex == 0) {
-									setInputSellAmount(tradePosition.amount0);
-								}
-								if (tokenActionIndex == 1) {
-									setInputSellAmount(tradePosition.amount1);
-								}
-							}}
-							err={inputSellAmountErr}
-							errText={inputSellAmountErrText}
-						/>
-						<TwoColTitleInfo
-							title="Your choice"
-							info={tokenActionIndex === 0 ? "NO" : "YES"}
-						/>
-						<TwoColTitleInfo
-							title="Estimated amount received"
-							info={formatBNToDecimal(amountCOutBn)}
-						/>
-						<TwoColTitleInfo
-							title="Avg. sell price"
-							info={getDecStrAvgPriceBN(
-								amountCOutBn,
-								inputSellAmountBn
-							)}
-						/>
-
-						<Button
-							disabled={
-								!isAuthenticated || !erc1155ApprovalForAll
+					<PrimaryButton
+						disabled={!isAuthenticated}
+						marginTop="2"
+						width="100%"
+						isLoading={buyLoading}
+						loadingText={"Processing..."}
+						onClick={() => {
+							if (!isAuthenticated) {
+								return;
 							}
-							backgroundColor="red.100"
-							marginTop="2"
-							width="100%"
-							onClick={() => {
-								if (!isAuthenticated) {
-									return;
-								}
 
-								setSellLoading(true);
+							setBuyLoading(true);
 
-								let a0 =
-									tokenActionIndex == 0
-										? inputSellAmountBn
-										: BigNumber.from(0);
-								let a1 =
-									tokenActionIndex == 1
-										? inputSellAmountBn
-										: BigNumber.from(0);
+							let a0 =
+								tokenActionIndex == 0
+									? tokenOutAmountBn
+									: BigNumber.from(0);
+							let a1 =
+								tokenActionIndex == 1
+									? tokenOutAmountBn
+									: BigNumber.from(0);
 
-								sendSell(
-									a0,
-									a1,
-									amountCOutBn,
-									market.oracle.id,
-									market.marketIdentifier
-								);
-							}}
-							isLoading={sellLoading}
-							loadingText={"Processing..."}
-						>
-							<Text
-								color="white"
-								fontSize="md"
-								fontWeight="medium"
-								mr="2"
+							sendBuy(
+								a0,
+								a1,
+								inputBuyAmountBn,
+								1 - tokenActionIndex,
+								market.oracle.id,
+								market.marketIdentifier
+							);
+						}}
+						title={"Buy"}
+					/>
+				</Flex>
+			) : undefined}
+			{tabIndex === 1 ? (
+				<Flex flexDirection="column">
+					<TradePriceBoxes
+						market={market}
+						outcomeChosen={tokenActionIndex}
+						onOutcomeChosen={(index) => {
+							setTokenActionIndex(index);
+						}}
+						tradePosition={tradePosition}
+					/>
+					<TradingInput
+						setSlippage={setSlippage}
+						slippageValue={slippage}
+						setInput={setInputSellAmount}
+						inputValue={inputSellAmount}
+						setMaxSell={() => {
+							if (tokenActionIndex == 0) {
+								setInputSellAmount(tradePosition.amount0);
+							}
+							if (tokenActionIndex == 1) {
+								setInputSellAmount(tradePosition.amount1);
+							}
+						}}
+						err={inputSellAmountErr}
+						errText={inputSellAmountErrText}
+						isBuy={false}
+					/>
+					<TwoColTitleInfo
+						title="Your choice"
+						info={tokenActionIndex === 0 ? "NO" : "YES"}
+					/>
+					<TwoColTitleInfo
+						title="Estimated amount received"
+						info={formatBNToDecimal(amountCOutBn)}
+					/>
+					<TwoColTitleInfo
+						title="Avg. sell price"
+						info={getDecStrAvgPriceBN(
+							amountCOutBn,
+							inputSellAmountBn
+						)}
+					/>
+					<PrimaryButton
+						disabled={!isAuthenticated || !erc1155ApprovalForAll}
+						marginTop="2"
+						width="100%"
+						onClick={() => {
+							if (!isAuthenticated) {
+								return;
+							}
+
+							setSellLoading(true);
+
+							let a0 =
+								tokenActionIndex == 0
+									? inputSellAmountBn
+									: BigNumber.from(0);
+							let a1 =
+								tokenActionIndex == 1
+									? inputSellAmountBn
+									: BigNumber.from(0);
+
+							sendSell(
+								a0,
+								a1,
+								amountCOutBn,
+								market.oracle.id,
+								market.marketIdentifier
+							);
+						}}
+						isLoading={sellLoading}
+						loadingText={"Processing..."}
+						title={"Sell"}
+					/>
+
+					{erc1155ApprovalForAll === false ? (
+						<Flex flexDirection={"column"} marginTop={5}>
+							<Box
+								padding={2}
+								backgroundColor="red.300"
+								borderRadius={20}
 							>
-								Sell
-							</Text>
-						</Button>
-
-						{erc1155ApprovalForAll === false ? (
-							<Flex flexDirection={"column"} marginTop={5}>
-								<Box
-									padding={2}
-									backgroundColor="red.300"
-									borderRadius={20}
-								>
-									<Text fontSize={12}>
-										To sell, you will have to first give
-										token approval to the app. This is only
-										needed once per group.
-									</Text>
-								</Box>
-								<PrimaryButton
-									style={{ marginTop: 5 }}
-									disabled={erc1155ApprovalForAll !== false}
-									loadingText="Processing..."
-									isLoading={approvalLoading}
-									onClick={() => {
-										if (erc1155ApprovalForAll === false) {
-											setApprovalLoading(true);
-											sendSetApproval(
-												addresses.MarketRouter,
-												true
-											);
-										}
-									}}
-									title={"Set approval"}
-								/>
-							</Flex>
-						) : undefined}
-					</TabPanel>
-				</TabPanels>
-			</Tabs>
+								<Text fontSize={12}>
+									To sell, you will have to first give token
+									approval to the app. This is only needed
+									once per group.
+								</Text>
+							</Box>
+							<PrimaryButton
+								style={{ marginTop: 5 }}
+								disabled={erc1155ApprovalForAll !== false}
+								loadingText="Processing..."
+								isLoading={approvalLoading}
+								onClick={() => {
+									if (erc1155ApprovalForAll === false) {
+										setApprovalLoading(true);
+										sendSetApproval(
+											addresses.MarketRouter,
+											true
+										);
+									}
+								}}
+								title={"Set approval"}
+							/>
+						</Flex>
+					) : undefined}
+				</Flex>
+			) : undefined}
 		</Flex>
 	);
 }
