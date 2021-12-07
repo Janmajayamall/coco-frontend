@@ -266,6 +266,13 @@ function Page() {
 					Your Groups
 				</Heading>
 				{oraclesLoading === true ? <Loader /> : undefined}
+				{oraclesLoading === false && oracleIds.length === 0 ? (
+					<Flex>
+						<Text fontSize={14} fontWeight="bold">
+							You manage 0 groups
+						</Text>
+					</Flex>
+				) : undefined}
 				{oracleIds.map((id) => {
 					const group = oraclesInfoObj[id];
 					if (group == undefined) {
@@ -289,6 +296,7 @@ const styles = {
 		width: "100%",
 		marginTop: 5,
 	},
+
 	inputsText: {
 		width: "100%",
 		marginTop: 5,

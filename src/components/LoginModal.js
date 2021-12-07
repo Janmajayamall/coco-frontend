@@ -67,7 +67,9 @@ function LoginModal() {
 		// close modal
 		dispatch(sUpdateLoginModalIsOpen(false));
 
-		navigate("/explore");
+		window.location.reload();
+
+		// navigate("/explore");
 	}
 
 	useEffect(async () => {

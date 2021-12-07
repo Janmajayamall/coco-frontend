@@ -89,7 +89,14 @@ function MainMenu() {
 							}}
 							title={"Your activity"}
 						/>
-						<Item title={"Logout"} />
+						<Item
+							onClick={() => {
+								localStorage.removeItem("hotPvKey");
+								localStorage.removeItem("keySignature");
+								window.location.reload();
+							}}
+							title={"Logout"}
+						/>
 					</>
 				) : undefined}
 				<Item title={"Guide"} />

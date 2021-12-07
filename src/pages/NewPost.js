@@ -312,6 +312,20 @@ function Page() {
 										String(betAmount == "" ? 0 : betAmount)
 									)
 								)}
+							onSuccess={() => {
+								toast({
+									title: "Success!",
+									status: "success",
+									isClosable: true,
+								});
+							}}
+							onFail={() => {
+								toast({
+									title: "Metamask err!",
+									status: "error",
+									isClosable: true,
+								});
+							}}
 						/>
 					</Flex>
 					<Spacer />

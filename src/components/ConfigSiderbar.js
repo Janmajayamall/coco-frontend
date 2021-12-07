@@ -34,7 +34,7 @@ function ConfigSidebar() {
 		>
 			<Heading size="md">Display</Heading>
 			<Text marginTop={5} fontSize={14}>
-				Slide to set your minimum YES threshold to filter posts on feed
+				Set your minimum YES threshold for feed
 			</Text>
 			<Slider
 				marginTop={2}

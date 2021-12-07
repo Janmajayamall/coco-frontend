@@ -121,6 +121,7 @@ function GroupDisplayName({ group, followStatusVisible, settingsVisible }) {
 					size={"sm"}
 					aria-label="Search database"
 					icon={<SettingsIcon color="#FDFDFD" />}
+					marginRight={5}
 				/>
 			) : undefined}
 		</Flex>

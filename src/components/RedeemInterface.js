@@ -282,6 +282,20 @@ function RedeemWinsInterface({
 			<ApprovalInterface
 				tokenType={1}
 				erc1155Address={market.oracle.id}
+				onSuccess={() => {
+					toast({
+						title: "Success!",
+						status: "success",
+						isClosable: true,
+					});
+				}}
+				onFail={() => {
+					toast({
+						title: "Metamask err!",
+						status: "error",
+						isClosable: true,
+					});
+				}}
 			/>
 
 			<ChallengeHistoryTable stakeHistories={stakeHistories} />

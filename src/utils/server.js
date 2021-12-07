@@ -2,9 +2,12 @@ import { border } from "@chakra-ui/styled-system";
 import axios from "axios";
 import { signMessage } from ".";
 import { generateRequestSignatures } from "./auth";
+console.log(process.env.NODE_ENV, " NODE_ENV");
 const baseInstance = axios.create({
-	baseURL: "http://localhost:5000",
-	// baseURL: "https://pm-backend-9.herokuapp.com/",
+	baseURL:
+		process.env.NODE_ENV === "development"
+			? "http://localhost:5000"
+			: "https://pm-backend-9.herokuapp.com/",
 	timeout: 1000,
 	headers: { "Content-Type": "application/json" },
 });
@@ -189,7 +192,7 @@ export async function uploadImageFileCloudinary(formdata) {
 				"Content-type": "multipart/form-data",
 			},
 		});
-		return data.url
+		return data.url;
 	} catch (e) {
 		console.log(e, " image upload failed");
 	}

@@ -157,6 +157,8 @@ function ResolveInterface({
 						You are seeing this because you manage the group.
 					</Text>
 					<PrimaryButton
+						isLoading={loading}
+						loadingText={"Processing..."}
 						onClick={() => {
 							if (
 								chosenOutcome == undefined ||

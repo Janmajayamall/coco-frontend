@@ -242,6 +242,20 @@ function StakingInterface({ market, stakeHistories, refreshFn }) {
 				marginTop={5}
 				tokenType={0}
 				erc20AmountBn={bnValue}
+				onSuccess={() => {
+					toast({
+						title: "Success!",
+						status: "success",
+						isClosable: true,
+					});
+				}}
+				onFail={() => {
+					toast({
+						title: "Metamask err!",
+						status: "error",
+						isClosable: true,
+					});
+				}}
 			/>
 		</Flex>
 	);

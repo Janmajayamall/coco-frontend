@@ -393,9 +393,21 @@ function TradingInterface({ market, tradePosition, refreshFn }) {
 					<ApprovalInterface
 						marginTop={5}
 						tokenType={0}
-						onSuccess={() => {}}
-						onFail={() => {}}
 						erc20AmountBn={inputBuyAmountBn}
+						onSuccess={() => {
+							toast({
+								title: "Success!",
+								status: "success",
+								isClosable: true,
+							});
+						}}
+						onFail={() => {
+							toast({
+								title: "Metamask err!",
+								status: "error",
+								isClosable: true,
+							});
+						}}
 					/>
 				</Flex>
 			) : undefined}
@@ -486,7 +498,25 @@ function TradingInterface({ market, tradePosition, refreshFn }) {
 						title={"Sell"}
 					/>
 
-					
+					<ApprovalInterface
+						marginTop={5}
+						tokenType={1}
+						erc1155Address={market.oracle.id}
+						onSuccess={() => {
+							toast({
+								title: "Success!",
+								status: "success",
+								isClosable: true,
+							});
+						}}
+						onFail={() => {
+							toast({
+								title: "Metamask err!",
+								status: "error",
+								isClosable: true,
+							});
+						}}
+					/>
 				</Flex>
 			) : undefined}
 		</Flex>

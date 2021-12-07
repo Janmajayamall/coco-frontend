@@ -116,10 +116,11 @@ function Page() {
 	const [groupDetails, setGroupDetails] = useState({});
 	const [loadingMarkets, setLoadingMarkets] = useState(true);
 
+	const timestamp24HrsBefore = Math.floor(Date.now() / 1000) - 24 * 3600;
 	const { result: result0, reexecuteQuery: rQ0 } = useQueryExploreMarkets(
 		pagination.first,
 		pagination.skip,
-		0,
+		timestamp24HrsBefore,
 		true
 	);
 
@@ -195,7 +196,8 @@ function Page() {
 				dispatch
 			);
 
-			setMarkets([...markets, ..._result.data.markets]);
+			// setMarkets([...markets, ..._result.data.markets]); TODO uncomment this for pagination to work
+			setMarkets([..._result.data.markets]);
 		} else {
 			setMarkets([]);
 		}

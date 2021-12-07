@@ -141,13 +141,16 @@ function Page() {
 	 * escalation limit (that are, the ones with 0 escalation limit)
 	 */
 	return (
-		<Flex flexDirection="row">
+		<Flex flexDirection="row" minHeight="100vh">
 			<Spacer />
+			<Flex
+				paddingTop={10}
+				flexDirection="column"
+				alignItems={"center"}
+				width={"50%"}
+			>
+				<Heading size="lg">Posts To Review</Heading>
 
-			<Flex flexDirection="column" width={"50%"}>
-				<Flex justifyContent="center" marginTop={5}>
-					<Heading fontSize={25}>Posts To Review</Heading>
-				</Flex>
 				{marketsLoading === true ? <Loader /> : undefined}
 				{marketsLoading === false && markets.length === 0 ? (
 					<Flex justifyContent="center" marginTop={20}>
@@ -167,13 +170,19 @@ function Page() {
 					);
 				})}
 			</Flex>
-			<Flex paddingLeft={10} width={"30%"}>
+			<Spacer />
+			<Flex
+				borderLeftWidth={1}
+				borderColor="#BDBDBD"
+				width={"25%"}
+				flexDirection="column"
+				paddingTop={10}
+				paddingLeft={5}
+			>
 				<Flex flexDirection="column">
-					<Flex justifyContent="center" marginTop={5}>
-						<Text fontSize={20} fontWeight={"bold"}>
-							Your groups
-						</Text>
-					</Flex>
+					<Heading size="md" marginBottom={5}>
+						Your Groups
+					</Heading>
 					{oraclesLoading === true ? <Loader /> : undefined}
 					{oracleIds.map((id) => {
 						const group = oraclesInfoObj[id];
@@ -190,7 +199,6 @@ function Page() {
 						);
 					})}
 				</Flex>
-				<Spacer />
 			</Flex>
 		</Flex>
 	);
