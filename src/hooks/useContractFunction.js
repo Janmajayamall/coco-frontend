@@ -6,6 +6,7 @@ import {
 	oracleContract,
 	memeTokenInterface,
 	tokenDistributorContract,
+	memeTokenContract,
 } from "../utils";
 
 export function useCreateNewMarket() {
@@ -132,6 +133,14 @@ export function useClaim() {
 		tokenDistributorContract,
 		"claim"
 	);
+	return {
+		state,
+		send,
+	};
+}
+
+export function useTokenApprove() {
+	const { state, send } = useContractFunction(memeTokenContract, "approve");
 	return {
 		state,
 		send,

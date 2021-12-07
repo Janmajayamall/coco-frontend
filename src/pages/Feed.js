@@ -336,11 +336,27 @@ function Page() {
 								}
 								navigate("/explore");
 							}}
-							colorScheme={
-								feedType == 0 ? "twitter" : "whiteAlpha"
+							style={
+								feedType == 0
+									? {
+											border: "2px",
+											borderStyle: "solid",
+											borderColor: "blue.400",
+											backgroundColor: "blue.400",
+									  }
+									: {
+											backgroundColor: "#FDFDFD",
+									  }
 							}
-							padding="1"
-							icon={<FireIcon w={10} h={10} />}
+							margin="1"
+							icon={
+								<FireIcon
+									// fill={feedType == 0 ? "#FDFDFD" : "#0B0B0B"}
+									fill={"#0B0B0B"}
+									w={8}
+									h={8}
+								/>
+							}
 						/>
 
 						<IconButton
@@ -350,11 +366,21 @@ function Page() {
 								}
 								navigate("/home");
 							}}
-							colorScheme={
-								feedType == 1 ? "twitter" : "whiteAlpha"
+							borderRadius={10}
+							style={
+								feedType == 1
+									? {
+											border: "2px",
+											borderStyle: "solid",
+											borderColor: "blue.400",
+											backgroundColor: "blue.400",
+									  }
+									: {
+											backgroundColor: "#FDFDFD",
+									  }
 							}
-							padding="1"
-							icon={<HomeIcon w={10} h={10} />}
+							margin="1"
+							icon={<HomeIcon fill={"#0B0B0B"} w={8} h={8} />}
 						/>
 					</Flex>
 				) : undefined}

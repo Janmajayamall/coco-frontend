@@ -3,52 +3,22 @@ import Icon from "@chakra-ui/icon";
 /**
  * @ref https://orioniconlibrary.com/icon/real-estate-5959?from=query&name=home
  */
-export function HomeIcon(props) {
+{
+	/* <svg
+	fill="#000000"
+	xmlns="http://www.w3.org/2000/svg"
+	viewBox="0 0 48 48"
+	width="144px"
+	height="144px"
+></svg>; */
+}
+export function HomeIcon({ fill, ...props }) {
 	return (
-		<Icon viewBox="0 0 64 64" {...props}>
+		<Icon viewBox="0 0 48 48" {...props}>
 			<path
-				data-name="layer3"
-				fill="#ef5940"
-				d="M54 21.6V7h-9v7.4l9 7.2z"
-			></path>
-			<path data-name="layer2" fill="#bb806c" d="M23 39h18v22H23z"></path>
-			<path
-				data-name="layer1"
-				fill="#e8ddc9"
-				d="M32 4L10 21.6V61h13V39h18v22h13V21.6L32 4z"
-			></path>
-			<path
-				data-name="opacity"
-				fill="#000064"
-				opacity=".2"
-				d="M32 9l22 17.6v-5L32 4 10 21.6V61h5V23L32 9z"
-			></path>
-			<path
-				data-name="opacity"
-				fill="#000064"
-				opacity=".2"
-				d="M26 42v3h9v16h3V42H26z"
-			></path>
-			<path
-				data-name="stroke"
-				fill="none"
-				stroke="#2e4369"
-				stroke-linecap="round"
-				stroke-miterlimit="10"
-				stroke-width="2"
-				d="M2 28L32 4l30 24M23 61V39h18v22"
-				stroke-linejoin="round"
-			></path>
-			<path
-				data-name="stroke"
-				fill="none"
-				stroke="#2e4369"
-				stroke-linecap="round"
-				stroke-miterlimit="10"
-				stroke-width="2"
-				d="M10 21.6V61h44V7h-9v7.445"
-				stroke-linejoin="round"
-			></path>
+				fill={fill}
+				d="M39.5,43h-9c-1.381,0-2.5-1.119-2.5-2.5v-9c0-1.105-0.895-2-2-2h-4c-1.105,0-2,0.895-2,2v9c0,1.381-1.119,2.5-2.5,2.5h-9	C7.119,43,6,41.881,6,40.5V21.413c0-2.299,1.054-4.471,2.859-5.893L23.071,4.321c0.545-0.428,1.313-0.428,1.857,0L39.142,15.52	C40.947,16.942,42,19.113,42,21.411V40.5C42,41.881,40.881,43,39.5,43z"
+			/>
 		</Icon>
 	);
 }

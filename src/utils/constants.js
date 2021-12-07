@@ -1,4 +1,4 @@
-import { BigNumber } from "ethers";
+import { BigNumber, constants } from "ethers";
 export const ZERO_BN = BigNumber.from("0");
 export const ONE_BN = BigNumber.from("1");
 export const TWO_BN = BigNumber.from("2");
@@ -7,3 +7,4 @@ export const ZERO_DECIMAL_STR = "0";
 export const GRAPH_BUFFER_MS = 20000;
 export const MAX_LENGTH_NAME = 50;
 export const MAX_LENGTH_DESCRIPTION = 500;
+export const MAX_UINT_256 = constants.MaxUint256; 

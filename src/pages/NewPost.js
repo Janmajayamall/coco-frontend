@@ -11,6 +11,7 @@ import {
 	Spacer,
 	Heading,
 	Text,
+	Box,
 } from "@chakra-ui/react";
 import { FiFile } from "react-icons/fi";
 import FileUpload from "./../components/FileUpload";
@@ -25,8 +26,13 @@ import {
 	toBase64,
 	validateInitialBetAmount,
 	validateFundingAmount,
+	MAX_UINT_256,
 } from "./../utils";
-import { useCreateNewMarket, useTokenAllowance } from "./../hooks";
+import {
+	useCreateNewMarket,
+	useTokenAllowance,
+	useTokenApprove,
+} from "./../hooks";
 import { useEthers } from "@usedapp/core/packages/core";
 import { utils } from "ethers";
 import { useNavigate } from "react-router";
@@ -34,7 +40,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectUserProfile, sUpdateLoginModalIsOpen } from "../redux/reducers";
 import InputWithTitle from "../components/InputWithTitle";
 import PrimaryButton from "../components/PrimaryButton";
-
+import addresses from "../contracts/addresses.json";
 function Page() {
 	const { account } = useEthers();
 	const userProfile = useSelector(selectUserProfile);
@@ -55,8 +61,13 @@ function Page() {
 	const [loading, setLoading] = useState(false);
 	const [moderators, setModerators] = useState([]);
 	const [newPostLoading, setNewPostLoading] = useState(false);
+	const [approvalLoading, setApprovalLoading] = useState(false);
 
 	const { state, send } = useCreateNewMarket();
+	const {
+		state: stateTokenApprove,
+		send: sendTokenApprove,
+	} = useTokenApprove();
 
 	useEffect(async () => {
 		let res = await findModerators({});
@@ -64,7 +75,7 @@ function Page() {
 	}, []);
 
 	useEffect(async () => {
-		if (state.receipt) {
+		if (state.status === "Success") {
 			const res = await newPost(selectModerator, s3ImageUrl);
 
 			setTimeout(() => {
@@ -73,18 +84,37 @@ function Page() {
 				// end new post loading
 				setNewPostLoading(false);
 
-				navigate("/explore");
+				navigate("/home");
 			}, 5000);
-		}
-	}, [state]);
-
-	useEffect(async () => {
-		if (state.status == "Exception" || state.status == "Fail") {
+		} else if (state.status == "Exception" || state.status == "Fail") {
 			displayToast("Metamask error!", "error");
 			setS3ImageUrl("");
 			setNewPostLoading(false);
 		}
 	}, [state]);
+
+	// handling token approve tx state
+	useEffect(() => {
+		if (stateTokenApprove.status === "Success") {
+			setApprovalLoading(false);
+			toast({
+				title: "Success!",
+				status: "success",
+				isClosable: true,
+			});
+			window.location.reload();
+		} else if (
+			stateTokenApprove.status === "Exception" ||
+			stateTokenApprove.status === "Fail"
+		) {
+			setApprovalLoading(false);
+			toast({
+				title: "Metamask Err!",
+				status: "error",
+				isClosable: true,
+			});
+		}
+	}, [stateTokenApprove]);
 
 	useEffect(() => {
 		if (s3ImageUrl == undefined || s3ImageUrl == "") {
@@ -302,8 +332,34 @@ function Page() {
 							disabled={!approvalGiven()}
 						/>
 						{approvalGiven() !== true ? (
-							<Flex>
-								<Text>Giver Approvcal</Text>
+							<Flex flexDirection={"column"} marginTop={5}>
+								<Box
+									padding={2}
+									backgroundColor="red.300"
+									borderRadius={20}
+								>
+									<Text fontSize={12}>
+										To post, you will have to first give
+										MEME token approval to the app. This is
+										only needed once.
+									</Text>
+								</Box>
+								<PrimaryButton
+									style={{ marginTop: 5 }}
+									disabled={approvalGiven() === true}
+									loadingText="Processing..."
+									isLoading={approvalLoading}
+									onClick={() => {
+										if (approvalGiven() !== true) {
+											setApprovalLoading(true);
+											sendTokenApprove(
+												addresses.MarketRouter,
+												MAX_UINT_256
+											);
+										}
+									}}
+									title={"Set approval"}
+								/>
 							</Flex>
 						) : undefined}
 					</Flex>

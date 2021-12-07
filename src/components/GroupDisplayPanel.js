@@ -70,9 +70,10 @@ function GroupDisplayName({ group, followStatusVisible, settingsVisible }) {
 				onClick={() => {
 					navigate(`/group/${group.oracleAddress}`);
 				}}
-				fontSize={14}
-				fontWeight={"bold"}
-				marginLeft={2}
+				fontSize="14"
+				fontWeight="bold"
+				marginLeft="2"
+				color={"#4F4F4F"}
 			>
 				{group.name}
 			</Text>

@@ -1,23 +1,13 @@
-import {
-	Button,
-	Box,
-	Text,
-	Flex,
-	Spacer,
-	Switch,
-	Heading,
-	Image,
-	Avatar,
-} from "@chakra-ui/react";
-import { TriangleUpIcon, TriangleDownIcon } from "@chakra-ui/icons";
+import { TriangleDownIcon, TriangleUpIcon } from "@chakra-ui/icons";
+import { Avatar, Box, Flex, Image, Spacer, Text } from "@chakra-ui/react";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router";
 import {
 	followModerator,
 	marketStageDisplayName,
 	roundDecimalStr,
 } from "../utils";
-import { useDispatch } from "react-redux";
-import { sUpdatePostTradeModal, sAddGroupFollow } from "./../redux/reducers";
-import { useNavigate } from "react-router";
+import { sAddGroupFollow } from "./../redux/reducers";
 
 function PostDisplay({ market, onImageClick, ...children }) {
 	const dispatch = useDispatch();
@@ -38,37 +28,48 @@ function PostDisplay({ market, onImageClick, ...children }) {
 						name={market.oracleInfo.name[0]}
 						src={market.oracleInfo.groupImageUrl}
 					/>
-					<Heading
+					<Text
 						onClick={() => {
 							navigate(`/group/${market.oracle.id}`);
 						}}
-						marginLeft={2}
-						size="xs"
+						fontSize="14"
+						fontWeight="bold"
+						marginLeft="2"
+						color={"#4F4F4F"}
 					>
 						{market.oracleInfo.name}
-					</Heading>
+					</Text>
 
 					{market.following === false ? (
-						<Text
-							onClick={async () => {
-								if (market.following === true) {
-									return;
-								}
-								const res = await followModerator(
-									market.oracle.id
-								);
+						<>
+							<Text
+								fontSize="20"
+								fontWeight="bold"
+								marginLeft="3"
+							>
+								·
+							</Text>
+							<Text
+								onClick={async () => {
+									if (market.following === true) {
+										return;
+									}
+									const res = await followModerator(
+										market.oracle.id
+									);
 
-								if (res == undefined) {
-									return;
-								}
-								dispatch(sAddGroupFollow(market.oracle.id));
-							}}
-							fontSize="12"
-							fontWeight="bold"
-							marginLeft="2"
-						>
-							Join
-						</Text>
+									if (res == undefined) {
+										return;
+									}
+									dispatch(sAddGroupFollow(market.oracle.id));
+								}}
+								fontSize="14"
+								fontWeight="bold"
+								marginLeft="3"
+							>
+								Join
+							</Text>
+						</>
 					) : undefined}
 				</Flex>
 				<Spacer />
