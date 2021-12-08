@@ -185,6 +185,7 @@ function Page() {
 					"Name",
 					true,
 					name,
+					name,
 					setName,
 					validateGroupName,
 					{}
@@ -192,6 +193,7 @@ function Page() {
 				{InputWithTitle(
 					"Description",
 					true,
+					description,
 					description,
 					setDescription,
 					validateGroupDescription,
@@ -264,13 +266,22 @@ function Page() {
 					<Heading size="lg">Group Config</Heading>
 				</Flex>
 				<Flex flexDirection="column">
-					{InputWithTitle("Fee", false, fee, setFee, validateFee, {
-						defaultValue: 0.05,
-						precision: 3,
-					})}
+					{InputWithTitle(
+						"Fee",
+						false,
+						fee,
+						fee,
+						setFee,
+						validateFee,
+						{
+							defaultValue: 0.05,
+							precision: 3,
+						}
+					)}
 					{InputWithTitle(
 						"Escalation Limit",
 						false,
+						escalationLimit,
 						escalationLimit,
 						setEscalationLimit,
 						validateEscalationLimit,
@@ -283,6 +294,7 @@ function Page() {
 						"Trading Period (in hrs)",
 						false,
 						expireHours,
+						expireHours,
 						setExpireHours,
 						validateExpireHours,
 						{
@@ -294,6 +306,7 @@ function Page() {
 						"Challenge period (in hrs)",
 						false,
 						bufferHours,
+						bufferHours,
 						setBufferHours,
 						validateBufferHours,
 						{
@@ -304,6 +317,7 @@ function Page() {
 					{InputWithTitle(
 						"Resolution period (in hrs)",
 						false,
+						resolutionHours,
 						resolutionHours,
 						setResolutionHours,
 						validateResolutionHours,

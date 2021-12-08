@@ -1,13 +1,16 @@
 import addresses from "../contracts/addresses.json";
-import { useContractFunction } from "@usedapp/core/packages/core";
+import {
+	useContractFunction,
+	useSendTransaction,
+} from "@usedapp/core/packages/core";
 import {
 	marketRouterContract,
 	oracleFactoryContract,
 	oracleContract,
-	memeTokenInterface,
 	tokenDistributorContract,
-	memeTokenContract,
+	wEthContract,
 } from "../utils";
+import Web3 from "web3";
 
 export function useCreateNewMarket() {
 	const { state, send } = useContractFunction(
@@ -140,9 +143,16 @@ export function useClaim() {
 }
 
 export function useTokenApprove() {
-	const { state, send } = useContractFunction(memeTokenContract, "approve");
+	const { state, send } = useContractFunction(wEthContract, "approve");
 	return {
 		state,
 		send,
 	};
+}
+
+export function useDepositEthToWeth() {
+	const { state, sendTransaction } = useSendTransaction({
+		transactionName: "Deposit ETH",
+	});
+	return { state, sendTransaction };
 }

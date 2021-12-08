@@ -49,6 +49,7 @@ import {
 	useSellExactTokensForMinCTokens,
 	useERC1155SetApprovalForAll,
 	useCheckTokenApprovals,
+	useTokenBalance,
 } from "../hooks";
 import {
 	convertBlocksToSeconds,
@@ -95,7 +96,6 @@ import { BigNumber, ethers, utils } from "ethers";
 import TradingInput from "./TradingInput";
 import TradePriceBoxes from "./TradePriceBoxes";
 import addresses from "./../contracts/addresses.json";
-import { __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED } from "react-dom/cjs/react-dom.development";
 import ApprovalInterface from "./ApprovalInterface";
 
 function TradingInterface({ market, tradePosition, refreshFn }) {
@@ -103,6 +103,8 @@ function TradingInterface({ market, tradePosition, refreshFn }) {
 	const userProfile = useSelector(selectUserProfile);
 	const isAuthenticated = account && userProfile ? true : false;
 	const toast = useToast();
+
+	const wEthTokenBalance = useTokenBalance(account);
 
 	/**
 	 * Contract calls
@@ -127,8 +129,9 @@ function TradingInterface({ market, tradePosition, refreshFn }) {
 		input: inputBuyAmount,
 		bnValue: inputBuyAmountBn,
 		setInput: setInputBuyAmount,
-		err: inputBuyAmountErr, // TODO supply validation function
-	} = useBNInput();
+		err: inputBuyAmountErr,
+		errText: inputBuyAmountErrText,
+	} = useBNInput(buyValidationFn);
 	const [tokenOutAmountBn, setTokenOutAmountBn] = useState(BigNumber.from(0));
 
 	/**
@@ -246,6 +249,16 @@ function TradingInterface({ market, tradePosition, refreshFn }) {
 		});
 	}
 
+	function buyValidationFn(bnValue) {
+		if (wEthTokenBalance != undefined && bnValue.lte(wEthTokenBalance)) {
+			return { valid: true, expStr: "" };
+		}
+		return {
+			valid: false,
+			expStr: "Insufficient Balance",
+		};
+	}
+
 	function sellValidationFn(bnValue) {
 		if (
 			(tokenActionIndex === 0 && bnValue.gt(tradePosition.amount0)) ||
@@ -334,6 +347,8 @@ function TradingInterface({ market, tradePosition, refreshFn }) {
 						setInput={setInputBuyAmount}
 						inputValue={inputBuyAmount}
 						isBuy={true}
+						err={inputBuyAmountErr}
+						errText={inputBuyAmountErrText}
 					/>
 					<TwoColTitleInfo
 						title="Your choice"
@@ -358,13 +373,21 @@ function TradingInterface({ market, tradePosition, refreshFn }) {
 					/>
 
 					<PrimaryButton
-						disabled={!isAuthenticated || !tokenApproval}
+						disabled={
+							!isAuthenticated ||
+							!tokenApproval ||
+							inputBuyAmountErr
+						}
 						marginTop="2"
 						width="100%"
 						isLoading={buyLoading}
 						loadingText={"Processing..."}
 						onClick={() => {
-							if (!isAuthenticated || !tokenApproval) {
+							if (
+								!isAuthenticated ||
+								!tokenApproval ||
+								inputBuyAmountErr
+							) {
 								return;
 							}
 
@@ -467,11 +490,19 @@ function TradingInterface({ market, tradePosition, refreshFn }) {
 						)}
 					/>
 					<PrimaryButton
-						disabled={!isAuthenticated || !erc1155TokenApproval}
+						disabled={
+							!isAuthenticated ||
+							!erc1155TokenApproval ||
+							inputSellAmountErr
+						}
 						marginTop="2"
 						width="100%"
 						onClick={() => {
-							if (!isAuthenticated || !erc1155TokenApproval) {
+							if (
+								!isAuthenticated ||
+								!erc1155TokenApproval ||
+								inputSellAmountErr
+							) {
 								return;
 							}
 

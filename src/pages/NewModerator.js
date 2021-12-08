@@ -163,7 +163,7 @@ function Page() {
 		send(
 			account,
 			account,
-			addresses.MemeToken,
+			addresses.WETH,
 			true,
 			feeNumerator,
 			feeDenominator,
@@ -188,19 +188,21 @@ function Page() {
 				<Heading size="lg">New Group</Heading>
 				{InputWithTitle(
 					"Name",
-					true,
+					0,
+					name,
 					name,
 					setName,
 					validateGroupName,
 					{}
 				)}
-				{InputWithTitle("Fee", false, fee, setFee, validateFee, {
+				{InputWithTitle("Fee", 1, fee, fee, setFee, validateFee, {
 					defaultValue: 0.05,
 					precision: 3,
 				})}
 				{InputWithTitle(
 					"Escalation Limit",
-					false,
+					1,
+					escalationLimit,
 					escalationLimit,
 					setEscalationLimit,
 					validateEscalationLimit,
@@ -211,7 +213,8 @@ function Page() {
 				)}
 				{InputWithTitle(
 					"Trading Period (in hrs)",
-					false,
+					1,
+					expireHours,
 					expireHours,
 					setExpireHours,
 					validateExpireHours,
@@ -224,6 +227,7 @@ function Page() {
 					"Challenge period (in hrs)",
 					false,
 					bufferHours,
+					bufferHours,
 					setBufferHours,
 					validateBufferHours,
 					{
@@ -234,6 +238,7 @@ function Page() {
 				{InputWithTitle(
 					"Resolution period (in hrs)",
 					false,
+					resolutionHours,
 					resolutionHours,
 					setResolutionHours,
 					validateResolutionHours,

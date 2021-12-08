@@ -1,14 +1,6 @@
 import { useDisclosure } from "@chakra-ui/hooks";
 import { useDispatch, useSelector } from "react-redux";
 import {
-	selectPostTradeModalState,
-	selectOracleInfoObj,
-	selectMarketsMetadata,
-	sUpdatePostTradeModal,
-	sUpdateOraclesInfoObj,
-	sUpdateMarketsMetadata,
-	selectGroupsFollowed,
-	selectRinkebyLatestBlockNumber,
 	selectUserProfile,
 } from "../redux/reducers";
 import {
@@ -24,7 +16,11 @@ import { useEthers } from "@usedapp/core/packages/core";
 
 import { useEffect } from "react";
 import { useState } from "react";
-import { useStakeForOutcome, useCheckTokenApprovals } from "../hooks";
+import {
+	useStakeForOutcome,
+	useCheckTokenApprovals,
+	useTokenBalance,
+} from "../hooks";
 import {
 	convertBlocksToSeconds,
 	formatBNToDecimal,
@@ -36,6 +32,7 @@ import {
 	determineOutcomeInExpiry,
 	GRAPH_BUFFER_MS,
 	formatBNToDecimalCurr,
+	CURR_SYMBOL,
 } from "../utils";
 import PostDisplay from "../components/PostDisplay";
 import TwoColTitleInfo from "../components/TwoColTitleInfo";
@@ -51,9 +48,10 @@ import ApprovalInterface from "./ApprovalInterface";
 function StakingInterface({ market, stakeHistories, refreshFn }) {
 	const { account } = useEthers();
 	const toast = useToast();
-
 	const userProfile = useSelector(selectUserProfile);
 	const isAuthenticated = account && userProfile ? true : false;
+
+	const wEthTokenBalance = useTokenBalance(account);
 
 	const { state, send } = useStakeForOutcome();
 
@@ -132,18 +130,25 @@ function StakingInterface({ market, stakeHistories, refreshFn }) {
 			};
 		}
 
-		if (bnValue.gte(market.lastAmountStaked.mul(TWO_BN))) {
+		if (bnValue.lt(market.lastAmountStaked.mul(TWO_BN))) {
 			return {
-				valid: true,
-				expStr: "",
+				valid: false,
+				expStr: `Challenge amount should be min ${formatBNToDecimal(
+					market.lastAmountStaked.mul(TWO_BN).toString()
+				)}`,
+			};
+		}
+
+		if (wEthTokenBalance == undefined || bnValue.gt(wEthTokenBalance)) {
+			return {
+				valid: false,
+				expStr: "Insufficient Balance",
 			};
 		}
 
 		return {
-			valid: false,
-			expStr: `Challenge amount should be min ${formatBNToDecimal(
-				market.lastAmountStaked.mul(TWO_BN).toString()
-			)}`,
+			valid: true,
+			expStr: "",
 		};
 	}
 
@@ -191,7 +196,7 @@ function StakingInterface({ market, stakeHistories, refreshFn }) {
 				>
 					<NumberInputField />
 				</NumberInput>
-				<Text fontSize={14}>Meme</Text>
+				<Text fontSize={14}>{`${CURR_SYMBOL}`}</Text>
 			</HStack>
 			{err === true ? (
 				<Text

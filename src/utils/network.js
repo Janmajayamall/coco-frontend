@@ -2,7 +2,6 @@ import Web3 from "web3";
 
 const web3 = new Web3("https://rinkeby.arbitrum.io/rpc");
 
-
 export function convertHoursToBlocks(chainId, hours) {
 	if (chainId == 421611) {
 		return Math.ceil((3600 * hours) / 15);
@@ -42,4 +41,8 @@ export async function getOracleDetails(address) {
 	// 	return undefined;
 	// }
 	return;
+}
+
+export function getFunctionSignature(functionStr) {
+	return web3.eth.abi.encodeFunctionSignature(functionStr);
 }

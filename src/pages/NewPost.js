@@ -27,12 +27,15 @@ import {
 	validateInitialBetAmount,
 	validateFundingAmount,
 	MAX_UINT_256,
+	useBNInput,
+	ZERO_BN,
 } from "./../utils";
 import {
 	useCreateNewMarket,
 	useTokenAllowance,
 	useTokenApprove,
 	useCheckTokenApprovals,
+	useTokenBalance,
 } from "./../hooks";
 import { useEthers } from "@usedapp/core/packages/core";
 import { utils } from "ethers";
@@ -41,8 +44,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectUserProfile, sUpdateLoginModalIsOpen } from "../redux/reducers";
 import InputWithTitle from "../components/InputWithTitle";
 import PrimaryButton from "../components/PrimaryButton";
-import addresses from "../contracts/addresses.json";
 import ApprovalInterface from "../components/ApprovalInterface";
+
 function Page() {
 	const { account } = useEthers();
 	const userProfile = useSelector(selectUserProfile);
@@ -52,11 +55,25 @@ function Page() {
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
 
+	const wEthTokenBalance = useTokenBalance(account);
+
 	const [imageFile, setImageFile] = useState(null);
 	const [s3ImageUrl, setS3ImageUrl] = useState(null);
 	const [selectModerator, setSelectModerator] = useState(null);
-	const [fundingAmount, setFundingAmount] = useState(1);
-	const [betAmount, setBetAmount] = useState(1);
+	const {
+		input: fundingAmount,
+		bnValue: fundingAmountBn,
+		setInput: setFundingAmount,
+		err: fundingAmountErr,
+		errText: fundingAmountErrText,
+	} = useBNInput();
+	const {
+		input: betAmount,
+		bnValue: betAmountBn,
+		setInput: setBetAmount,
+		err: betAmountErr,
+		errText: betAmountErrText,
+	} = useBNInput();
 
 	const [loading, setLoading] = useState(false);
 	const [moderators, setModerators] = useState([]);
@@ -68,9 +85,7 @@ function Page() {
 		0,
 		account,
 		undefined,
-		utils
-			.parseEther(String(fundingAmount == "" ? 0 : fundingAmount))
-			.add(utils.parseEther(String(betAmount == "" ? 0 : betAmount)))
+		fundingAmountBn.add(betAmountBn)
 	);
 
 	useEffect(async () => {
@@ -123,16 +138,19 @@ function Page() {
 	}
 
 	function validateInputs() {
-		if (
-			selectModerator == undefined ||
-			fundingAmount === "" ||
-			betAmount === "" ||
-			fundingAmount <= 0 ||
-			imageFile == undefined
-		) {
-			setNewPostLoading(false);
+		if (selectModerator == undefined || imageFile == undefined) {
 			return false;
 		}
+
+		if (
+			!validateFundingAmount(fundingAmountBn, wEthTokenBalance).valid ||
+			!validateInitialBetAmount(betAmountBn, wEthTokenBalance).valid ||
+			wEthTokenBalance == undefined ||
+			wEthTokenBalance.lt(fundingAmountBn.add(betAmountBn))
+		) {
+			return false;
+		}
+
 		return true;
 	}
 
@@ -146,7 +164,7 @@ function Page() {
 
 		// validate inputs
 		if (!validateInputs()) {
-			// TODO give error
+			setNewPostLoading(false);
 			displayToast("Invalid Inputs!", "error");
 			return;
 		}
@@ -158,7 +176,6 @@ function Page() {
 		formData.append("file", imageFile);
 		formData.append("upload_preset", "yow5vd7c");
 		const s3Url = await uploadImageFileCloudinary(formData);
-		// const s3Url = "ht7cfvgybuhj16730";
 		if (s3Url == undefined) {
 			displayToast("Something went wrong!", "error");
 			setNewPostLoading(false);
@@ -169,6 +186,7 @@ function Page() {
 	async function newPostTxHelper() {
 		// validation checks
 		if (!validateInputs()) {
+			setNewPostLoading(false);
 			displayToast("Invalid Inputs!", "error");
 			setS3ImageUrl("");
 			return;
@@ -266,26 +284,30 @@ function Page() {
 
 						{InputWithTitle(
 							"Liquidity",
-							false,
+							2,
 							fundingAmount,
+							fundingAmountBn,
 							setFundingAmount,
 							validateFundingAmount,
 							{
 								defaultValue: 1,
 								precision: 3,
-							}
+							},
+							wEthTokenBalance
 						)}
 
 						{InputWithTitle(
 							"Bet for YES",
-							false,
+							2,
 							betAmount,
+							betAmountBn,
 							setBetAmount,
 							validateInitialBetAmount,
 							{
 								defaultValue: 1,
 								precision: 3,
-							}
+							},
+							wEthTokenBalance
 						)}
 
 						<PrimaryButton

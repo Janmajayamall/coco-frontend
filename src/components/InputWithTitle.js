@@ -11,17 +11,49 @@ import {
 	Text,
 	Box,
 	useToast,
+	HStack,
 } from "@chakra-ui/react";
+import { CURR_SYMBOL, ZERO_BN } from "../utils";
 
 function InputWithTitle(
 	title,
-	isText,
+	inputType,
 	value,
+	rValue,
 	setValue,
 	validationFn,
-	inputOptions = {}
+	inputOptions = {},
+	userBalance = ZERO_BN
 ) {
-	const { valid, expText } = validationFn(value);
+	const { valid, expText } = validationHelper();
+
+	const symbol = generateSymbol();
+
+	function validationHelper() {
+		let res = {
+			valid: false,
+			expText: "Invalid input type",
+		};
+		if (inputType == 0 || inputType == 1) {
+			res = validationFn(rValue);
+		}
+		if (inputType == 2) {
+			res = validationFn(rValue, userBalance);
+		}
+
+		return res;
+	}
+
+	function generateSymbol() {
+		let symbol = "";
+		if (inputType === 1) {
+			symbol = "Hr";
+		}
+		if (inputType === 2) {
+			symbol = CURR_SYMBOL;
+		}
+		return symbol;
+	}
 
 	return (
 		<Flex
@@ -38,7 +70,7 @@ function InputWithTitle(
 			>
 				{title}
 			</Text>
-			{isText === true ? (
+			{inputType === 0 ? (
 				<Input
 					{...inputOptions}
 					style={{
@@ -50,22 +82,28 @@ function InputWithTitle(
 						setValue(e.target.value);
 					}}
 					value={value}
+					fontSize={14}
 				/>
-			) : (
-				<NumberInput
-					{...inputOptions}
-					style={{
-						width: "100%",
-						marginTop: 5,
-					}}
-					onChange={(val) => {
-						setValue(val);
-					}}
-					value={value}
-				>
-					<NumberInputField />
-				</NumberInput>
-			)}
+			) : undefined}
+			{inputType === 1 || inputType === 2 ? (
+				<HStack>
+					<NumberInput
+						{...inputOptions}
+						style={{
+							width: "100%",
+							marginTop: 5,
+						}}
+						onChange={(val) => {
+							setValue(val);
+						}}
+						value={value}
+						fontSize={14}
+					>
+						<NumberInputField />
+					</NumberInput>
+					<Text fontSize={14}>{`${symbol}`}</Text>
+				</HStack>
+			) : undefined}
 			{valid === false ? (
 				<Text
 					style={{

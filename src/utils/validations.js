@@ -1,8 +1,22 @@
-import { MAX_LENGTH_DESCRIPTION, MAX_LENGTH_NAME } from ".";
+import { BigNumber } from "@ethersproject/abi/node_modules/@ethersproject/bignumber";
+import { MAX_LENGTH_DESCRIPTION, MAX_LENGTH_NAME, ZERO_BN } from ".";
 
 export function validateIsNumber(val) {
 	let value = Number(val);
 	if (Number.isNaN(value)) {
+		return {
+			valid: false,
+			expText: "Invalid value!",
+		};
+	}
+	return {
+		valid: true,
+		expText: "",
+	};
+}
+
+export function validateIsBN(val) {
+	if (!BigNumber.isBigNumber(val)) {
 		return {
 			valid: false,
 			expText: "Invalid value!",
@@ -157,17 +171,23 @@ export function validateUpdateMarketConfigTxInputs(
 	};
 }
 
-export function validateFundingAmount(val) {
-	let isNum = validateIsNumber(val);
-	if (!isNum.valid) {
-		return isNum;
+export function validateFundingAmount(val, userBalance) {
+	if (!validateIsBN(val).valid || !validateIsBN(userBalance).valid) {
+		return validateIsBN(val);
 	}
 
-	if (val < 1) {
+	if (val.lte(ZERO_BN)) {
 		return {
 			valid: false,
 			expText:
-				"We recommend initial liquidity to be at least 1 MEME. This helps attract more users to your post",
+				"Initial liquidity should to be greater than 0. Liquidity attract more users to your post",
+		};
+	}
+
+	if (val.gt(userBalance)) {
+		return {
+			valid: false,
+			expText: "Insufficient Balance",
 		};
 	}
 
@@ -177,17 +197,23 @@ export function validateFundingAmount(val) {
 	};
 }
 
-export function validateInitialBetAmount(val) {
-	let isNum = validateIsNumber(val);
-	if (!isNum.valid) {
-		return isNum;
+export function validateInitialBetAmount(val, userBalance) {
+	if (!validateIsBN(val).valid || !validateIsBN(userBalance).valid) {
+		return validateIsBN(val);
 	}
 
-	if (val < 1) {
+	if (val.lte(ZERO_BN)) {
 		return {
 			valid: false,
 			expText:
-				"We recommend initial YES bet amount to be at least 1 MEME. This shows others that you are confident that your post belongs to group's feed.",
+				"Initial YES bet amount should be greater than 0. It helps show others that you are confident that your post belongs to group's feed.",
+		};
+	}
+
+	if (val.gt(userBalance)) {
+		return {
+			valid: false,
+			expText: "Insufficient Balance",
 		};
 	}
 

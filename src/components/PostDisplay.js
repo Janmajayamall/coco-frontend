@@ -6,6 +6,7 @@ import { useNavigate } from "react-router";
 import {
 	followModerator,
 	formatBNToDecimal,
+	formatBNToDecimalCurr,
 	generateProfileInitials,
 	marketStageDisplayName,
 	roundDecimalStr,
@@ -191,7 +192,7 @@ function PostDisplay({ market, onImageClick, ...children }) {
 			<Flex marginTop={5} alignItems="flex-start">
 				<BottomStats
 					title="Trade Volume"
-					info={`${formatBNToDecimal(market.totalVolume)}`}
+					info={`${formatBNToDecimalCurr(market.totalVolume)}`}
 				/>
 
 				<Spacer />

@@ -9,19 +9,19 @@ import {
 	marketRouterContract,
 	oracleFactoryContract,
 	oracleContract,
-	memeTokenInterface,
 	tokenDistributorContract,
 	tokenDistributorInterface,
 	oracleInterface,
+	wEthInterface,
 } from "../utils";
 
 export function useTokenBalance(account) {
 	const [tokenBalance] =
 		useContractCall(
 			account &&
-				addresses.MemeToken && {
-					abi: memeTokenInterface,
-					address: addresses.MemeToken,
+				addresses.WETH && {
+					abi: wEthInterface,
+					address: addresses.WETH,
 					method: "balanceOf",
 					args: [account],
 				}
@@ -33,9 +33,9 @@ export function useTokenAllowance(account) {
 	const [allowance] =
 		useContractCall(
 			account &&
-				addresses.MemeToken && {
-					abi: memeTokenInterface,
-					address: addresses.MemeToken,
+				addresses.WETH && {
+					abi: wEthInterface,
+					address: addresses.WETH,
 					method: "allowance",
 					args: [account, addresses.MarketRouter],
 				}

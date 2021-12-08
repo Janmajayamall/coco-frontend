@@ -6,25 +6,13 @@ import {
 	Text,
 	Flex,
 	Spacer,
-	Switch,
 	Heading,
-	Image,
 	Avatar,
-	Slider,
-	SliderTrack,
-	SliderFilledTrack,
-	SliderThumb,
 	IconButton,
 } from "@chakra-ui/react";
 
 import { useEthers } from "@usedapp/core/packages/core";
-import {
-	useCreateNewMarket,
-	useQueryMarketsOrderedByLatest,
-	useQueryExploreMarkets,
-	useQueryMarketByOracles,
-	useQueryMarketTradeAndStakeInfoByUser,
-} from "../hooks";
+import { useQueryExploreMarkets, useQueryMarketByOracles } from "../hooks";
 
 import Web3 from "web3";
 import { useEffect, useState } from "react";
