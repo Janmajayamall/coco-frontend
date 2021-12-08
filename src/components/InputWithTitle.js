@@ -23,11 +23,10 @@ function InputWithTitle(
 	setValue,
 	validationFn,
 	inputOptions = {},
-	userBalance = ZERO_BN
+	userBalance = ZERO_BN,
+	symbol = undefined
 ) {
 	const { valid, expText } = validationHelper();
-
-	const symbol = generateSymbol();
 
 	function validationHelper() {
 		let res = {
@@ -42,17 +41,6 @@ function InputWithTitle(
 		}
 
 		return res;
-	}
-
-	function generateSymbol() {
-		let symbol = "";
-		if (inputType === 1) {
-			symbol = "Hr";
-		}
-		if (inputType === 2) {
-			symbol = CURR_SYMBOL;
-		}
-		return symbol;
 	}
 
 	return (
@@ -71,19 +59,24 @@ function InputWithTitle(
 				{title}
 			</Text>
 			{inputType === 0 ? (
-				<Input
-					{...inputOptions}
-					style={{
-						width: "100%",
-						marginTop: 5,
-					}}
-					placeholder={title}
-					onChange={(e) => {
-						setValue(e.target.value);
-					}}
-					value={value}
-					fontSize={14}
-				/>
+				<HStack>
+					<Input
+						{...inputOptions}
+						style={{
+							width: "100%",
+							marginTop: 5,
+						}}
+						placeholder={title}
+						onChange={(e) => {
+							setValue(e.target.value);
+						}}
+						value={value}
+						fontSize={14}
+					/>
+					{symbol != undefined ? (
+						<Text fontSize={14}>{`${symbol}`}</Text>
+					) : undefined}
+				</HStack>
 			) : undefined}
 			{inputType === 1 || inputType === 2 ? (
 				<HStack>
@@ -101,7 +94,9 @@ function InputWithTitle(
 					>
 						<NumberInputField />
 					</NumberInput>
-					<Text fontSize={14}>{`${symbol}`}</Text>
+					{symbol != undefined ? (
+						<Text fontSize={14}>{`${symbol}`}</Text>
+					) : undefined}
 				</HStack>
 			) : undefined}
 			{valid === false ? (

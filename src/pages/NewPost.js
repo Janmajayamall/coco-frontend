@@ -29,6 +29,7 @@ import {
 	MAX_UINT_256,
 	useBNInput,
 	ZERO_BN,
+	CURR_SYMBOL,
 } from "./../utils";
 import {
 	useCreateNewMarket,
@@ -293,7 +294,8 @@ function Page() {
 								defaultValue: 1,
 								precision: 3,
 							},
-							wEthTokenBalance
+							wEthTokenBalance,
+							CURR_SYMBOL
 						)}
 
 						{InputWithTitle(
@@ -307,7 +309,8 @@ function Page() {
 								defaultValue: 1,
 								precision: 3,
 							},
-							wEthTokenBalance
+							wEthTokenBalance,
+							CURR_SYMBOL
 						)}
 
 						<PrimaryButton

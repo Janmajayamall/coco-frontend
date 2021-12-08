@@ -183,7 +183,7 @@ function Page() {
 				</Flex>
 				{InputWithTitle(
 					"Name",
-					true,
+					0,
 					name,
 					name,
 					setName,
@@ -192,7 +192,7 @@ function Page() {
 				)}
 				{InputWithTitle(
 					"Description",
-					true,
+					0,
 					description,
 					description,
 					setDescription,
@@ -266,21 +266,13 @@ function Page() {
 					<Heading size="lg">Group Config</Heading>
 				</Flex>
 				<Flex flexDirection="column">
-					{InputWithTitle(
-						"Fee",
-						false,
-						fee,
-						fee,
-						setFee,
-						validateFee,
-						{
-							defaultValue: 0.05,
-							precision: 3,
-						}
-					)}
+					{InputWithTitle("Fee", 1, fee, fee, setFee, validateFee, {
+						defaultValue: 0.05,
+						precision: 3,
+					})}
 					{InputWithTitle(
 						"Escalation Limit",
-						false,
+						1,
 						escalationLimit,
 						escalationLimit,
 						setEscalationLimit,
@@ -292,7 +284,7 @@ function Page() {
 					)}
 					{InputWithTitle(
 						"Trading Period (in hrs)",
-						false,
+						1,
 						expireHours,
 						expireHours,
 						setExpireHours,
@@ -300,11 +292,13 @@ function Page() {
 						{
 							defaultValue: 1,
 							precision: 0,
-						}
+						},
+						undefined,
+						"Hr"
 					)}
 					{InputWithTitle(
 						"Challenge period (in hrs)",
-						false,
+						1,
 						bufferHours,
 						bufferHours,
 						setBufferHours,
@@ -312,11 +306,13 @@ function Page() {
 						{
 							defaultValue: 1,
 							precision: 0,
-						}
+						},
+						undefined,
+						"Hr"
 					)}
 					{InputWithTitle(
 						"Resolution period (in hrs)",
-						false,
+						1,
 						resolutionHours,
 						resolutionHours,
 						setResolutionHours,
@@ -324,7 +320,9 @@ function Page() {
 						{
 							defaultValue: 1,
 							precision: 0,
-						}
+						},
+						undefined,
+						"Hr"
 					)}
 					<PrimaryButton
 						style={{

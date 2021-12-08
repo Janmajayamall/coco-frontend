@@ -221,11 +221,13 @@ function Page() {
 					{
 						defaultValue: 1,
 						precision: 0,
-					}
+					},
+					undefined,
+					"Hr"
 				)}
 				{InputWithTitle(
 					"Challenge period (in hrs)",
-					false,
+					1,
 					bufferHours,
 					bufferHours,
 					setBufferHours,
@@ -233,11 +235,13 @@ function Page() {
 					{
 						defaultValue: 1,
 						precision: 0,
-					}
+					},
+					undefined,
+					"Hr"
 				)}
 				{InputWithTitle(
 					"Resolution period (in hrs)",
-					false,
+					1,
 					resolutionHours,
 					resolutionHours,
 					setResolutionHours,
@@ -245,7 +249,9 @@ function Page() {
 					{
 						defaultValue: 1,
 						precision: 0,
-					}
+					},
+					undefined,
+					"Hr"
 				)}
 				<PrimaryButton
 					style={{

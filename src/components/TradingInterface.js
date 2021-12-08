@@ -187,7 +187,7 @@ function TradingInterface({ market, tradePosition, refreshFn }) {
 		}
 
 		setTokenOutAmountBn(amount);
-	}, [inputBuyAmountBn, tokenActionIndex]);
+	}, [inputBuyAmountBn, tokenActionIndex, wEthTokenBalance]);
 
 	useEffect(() => {
 		if (
