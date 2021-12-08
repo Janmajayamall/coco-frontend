@@ -85,6 +85,7 @@ import {
 	getAvgPriceBN,
 	getDecStrAvgPriceBN,
 	GRAPH_BUFFER_MS,
+	formatBNToDecimalCurr,
 } from "../utils";
 import PostDisplay from "../components/PostDisplay";
 import TwoColTitleInfo from "../components/TwoColTitleInfo";
@@ -351,7 +352,7 @@ function TradingInterface({ market, tradePosition, refreshFn }) {
 					/>
 					<TwoColTitleInfo
 						title="Max. potential profit"
-						info={formatBNToDecimal(
+						info={formatBNToDecimalCurr(
 							tokenOutAmountBn.sub(inputBuyAmountBn)
 						)}
 					/>
@@ -456,7 +457,7 @@ function TradingInterface({ market, tradePosition, refreshFn }) {
 					/>
 					<TwoColTitleInfo
 						title="Estimated amount received"
-						info={formatBNToDecimal(amountCOutBn)}
+						info={formatBNToDecimalCurr(amountCOutBn)}
 					/>
 					<TwoColTitleInfo
 						title="Avg. sell price"

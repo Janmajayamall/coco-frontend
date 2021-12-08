@@ -34,7 +34,12 @@ import {
 
 import Web3 from "web3";
 import { useEffect, useState } from "react";
-import { findAllModerators, formatBNToDecimal, ZERO_BN } from "../utils";
+import {
+	findAllModerators,
+	formatBNToDecimal,
+	formatBNToDecimalCurr,
+	ZERO_BN,
+} from "../utils";
 import {
 	selectGroupsFollowed,
 	sAddGroupFollow,
@@ -114,9 +119,9 @@ function SuggestionSidebar() {
 					backgroundColor="gray.100"
 				>
 					<Text fontSize="large" fontWeight="bold">
-						{`Claim ${formatBNToDecimal(
+						{`Claim ${formatBNToDecimalCurr(
 							claimableAmount
-						)} MEME Tokens now!`}
+						)} Tokens now!`}
 					</Text>
 					<PrimaryButton
 						isLoading={claimLoading}

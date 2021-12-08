@@ -1,5 +1,5 @@
 import { Text, Flex, Table, Thead, Tr, Th, Td } from "@chakra-ui/react";
-import { sliceAddress } from "../utils";
+import { formatBNToDecimalCurr, sliceAddress } from "../utils";
 
 function ChallengeHistoryTable({ stakeHistories }) {
 	return (
@@ -18,7 +18,7 @@ function ChallengeHistoryTable({ stakeHistories }) {
 				{stakeHistories.map((obj) => (
 					<Tr>
 						<Td>{sliceAddress(obj.user.id)}</Td>
-						<Td>{obj.amountC}</Td>
+						<Td>{formatBNToDecimalCurr(obj.amountC)}</Td>
 						<Td>{obj.outcomeStaked === "1" ? "Yes" : "No"}</Td>
 					</Tr>
 				))}

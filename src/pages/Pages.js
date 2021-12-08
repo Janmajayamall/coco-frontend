@@ -162,6 +162,10 @@ function Page() {
 				{markets.map((market) => {
 					return (
 						<PostDisplay
+							style={{
+								marginBottom: 25,
+								width: "100%",
+							}}
 							market={market}
 							onImageClick={(marketIdentifier) => {
 								navigate(`/post/${marketIdentifier}`);

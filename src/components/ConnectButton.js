@@ -11,6 +11,7 @@ import addresses from "./../contracts/addresses.json";
 import { useTokenBalance } from "./../hooks";
 import {
 	formatBNToDecimal,
+	formatBNToDecimalCurr,
 	parseDecimalToBN,
 	roundDecimalStr,
 	sliceAddress,
@@ -39,7 +40,7 @@ function ConnectButton() {
 				{account && tokenBalance && userProfile ? (
 					<Box px="3">
 						<Text color="white" fontSize="md">
-							{formatBNToDecimal(tokenBalance)} MEME
+							{formatBNToDecimalCurr(tokenBalance)}
 						</Text>
 					</Box>
 				) : undefined}

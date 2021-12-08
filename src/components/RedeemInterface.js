@@ -52,6 +52,7 @@ import {
 	determineTotalAmountStakeRedeem,
 	determineTradeWinAmount,
 	GRAPH_BUFFER_MS,
+	formatBNToDecimalCurr,
 } from "../utils";
 import PostDisplay from "../components/PostDisplay";
 import TwoColTitleInfo from "../components/TwoColTitleInfo";
@@ -178,7 +179,7 @@ function RedeemWinsInterface({
 			/> */}
 			<TwoColTitleInfo
 				title={"Your trade winnings"}
-				info={formatBNToDecimal(
+				info={formatBNToDecimalCurr(
 					determineTradeWinAmount(
 						tradePosition,
 						market.optimisticState.outcome
@@ -195,34 +196,34 @@ function RedeemWinsInterface({
 					{!stakePosition.amount1.isZero() ? (
 						<TwoColTitleInfo
 							title={"In favour of Yes"}
-							info={`${formatBNToDecimal(
+							info={`${formatBNToDecimalCurr(
 								stakePosition.amount1
-							)} MEME`}
+							)}`}
 						/>
 					) : undefined}
 					{!stakePosition.amount0.isZero() ? (
 						<TwoColTitleInfo
 							title={"In favour of No"}
-							info={`${formatBNToDecimal(
+							info={`${formatBNToDecimalCurr(
 								stakePosition.amount0
-							)} MEME`}
+							)}`}
 						/>
 					) : undefined}
 					<TwoColTitleInfo
 						title={"Challenge winnings"}
-						info={`${formatBNToDecimal(
+						info={`${formatBNToDecimalCurr(
 							determineStakeWinnings(market, account)
-						)} MEME`}
+						)}`}
 					/>
 					<TwoColTitleInfo
 						title={"You get back"}
-						info={formatBNToDecimal(
+						info={`${formatBNToDecimalCurr(
 							determineTotalAmountStakeRedeem(
 								market,
 								stakePosition,
 								account
 							)
-						)}
+						)}`}
 						titleBold={true}
 					/>
 				</Flex>
@@ -231,7 +232,7 @@ function RedeemWinsInterface({
 			<Flex flexDirection="column" marginTop="5">
 				<TwoColTitleInfo
 					title={"You get back in total"}
-					info={formatBNToDecimal(
+					info={`${formatBNToDecimalCurr(
 						determineTradeWinAmount(
 							tradePosition,
 							market.optimisticState.outcome
@@ -243,7 +244,7 @@ function RedeemWinsInterface({
 								account
 							)
 						)
-					)}
+					)}`}
 					titleBold={true}
 				/>
 			</Flex>

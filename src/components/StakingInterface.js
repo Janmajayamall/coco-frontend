@@ -35,6 +35,7 @@ import {
 	formatTimeInSeconds,
 	determineOutcomeInExpiry,
 	GRAPH_BUFFER_MS,
+	formatBNToDecimalCurr,
 } from "../utils";
 import PostDisplay from "../components/PostDisplay";
 import TwoColTitleInfo from "../components/TwoColTitleInfo";
@@ -169,9 +170,9 @@ function StakingInterface({ market, stakeHistories, refreshFn }) {
 			/>
 			<TwoColTitleInfo
 				title={"Min. amount to challenge"}
-				info={`${formatBNToDecimal(
+				info={`${formatBNToDecimalCurr(
 					market.lastAmountStaked.mul(TWO_BN)
-				)} MEME`}
+				)}`}
 			/>
 
 			<TwoColTitleInfo

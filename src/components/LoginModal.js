@@ -13,13 +13,18 @@ import {
 	ModalBody,
 	ModalOverlay,
 	ModalContent,
+	Image,
+	Text,
+	Icon,
 } from "@chakra-ui/react";
+import { ExternalLinkIcon } from "@chakra-ui/icons";
 import { useEthers } from "@usedapp/core/packages/core";
 import { CloseIcon } from "@chakra-ui/icons";
 import { useEffect } from "react";
 import { useState } from "react";
 import { createHotAccount, getAccountNonce, loginUser } from "../utils";
 import { useNavigate } from "react-router";
+import MetamaskFox from "./../metamask_fox.svg";
 
 function LoginModal() {
 	const navigate = useNavigate();
@@ -28,7 +33,6 @@ function LoginModal() {
 
 	const isOpen = useSelector(selectLoginModalState).isOpen;
 	const { activateBrowserWallet, account } = useEthers();
-	console.log(account, " account, diowio");
 
 	const [stage, setStage] = useState(0);
 	const [chainId, setChainId] = useState(null);
@@ -75,8 +79,11 @@ function LoginModal() {
 	useEffect(async () => {
 		if (account && window.ethereum) {
 			setStage(1);
+			if (isOpen) {
+				login();
+			}
 		}
-	}, [account]);
+	}, [account, isOpen]);
 
 	useEffect(async () => {
 		if (window.ethereum) {
@@ -90,11 +97,10 @@ function LoginModal() {
 	useEffect(() => {
 		if (window.ethereum) {
 			window.ethereum.on("chainChanged", (id) => {
-				console.log(chainId, " daiwjsaiojawo");
 				setChainId(parseInt(id, 16));
 			});
 		}
-	}, []);
+	}, [window.ethereum]);
 
 	return (
 		<Modal
@@ -104,65 +110,152 @@ function LoginModal() {
 			}}
 		>
 			<ModalOverlay />
-			<ModalContent paddingLeft={5} paddingRight={5} paddingTop={3}>
+			<ModalContent
+				paddingLeft={5}
+				paddingRight={5}
+				paddingTop={3}
+				paddingBottom={8}
+			>
 				<Flex
 					paddingLeft={2}
 					paddingRight={2}
 					paddingTop={2}
+					paddingBottom={2}
 					alignItems="center"
 					borderBottomWidth={1}
 					borderColor="#E0E0E0"
 				>
 					<Heading size="xl">Sign In</Heading>
 					<Spacer />
-					<CloseIcon marginRight={2} w={3} h={3} color="#0B0B0B" />
+					<CloseIcon
+						onClick={() => {
+							dispatch(sUpdateLoginModalIsOpen(false));
+						}}
+						marginRight={2}
+						w={3}
+						h={3}
+						color="#0B0B0B"
+					/>
 				</Flex>
-				{chainId === 421611 ? (
-					stage == 1 ? (
-						<Button onClick={login}>Please sign message</Button>
-					) : (
-						<Button
+
+				<Flex
+					style={{
+						backgroundColor: "#F3F5F7",
+						borderRadius: 8,
+						marginTop: 20,
+						paddingTop: 40,
+						paddingBottom: 40,
+						justifyContent: "center",
+						alignItems: "center",
+					}}
+					flexDirection="column"
+				>
+					<Image width="30%" src={MetamaskFox} />
+					<Heading size="xl">Metamask</Heading>
+					{chainId === 421611 && stage == 1 ? (
+						<>
+							<Text
+								style={{
+									...styles.actionText,
+								}}
+								onClick={login}
+							>
+								Sign login message
+							</Text>
+							<Text
+								style={{
+									...styles.actionText,
+									fontSize: 16,
+								}}
+								onClick={login}
+							>
+								Sign message on Metamask wallet to login
+							</Text>
+						</>
+					) : undefined}
+					{chainId === 421611 && stage == 0 ? (
+						<Text
+							style={{
+								...styles.actionText,
+							}}
 							onClick={async () => {
 								activateBrowserWallet();
 							}}
 						>
 							Connect your wallet
-						</Button>
-					)
-				) : (
-					<Button
-						onClick={async () => {
-							if (window.ethereum) {
-								await window.ethereum.request({
-									method: "wallet_addEthereumChain",
-									params: [
-										{
-											chainId: "0x66EEB",
-											chainName: "Rinkeby-arbitrum",
-											nativeCurrency: {
-												name: "Ethereum",
-												symbol: "ETH",
-												decimals: 18,
+						</Text>
+					) : undefined}
+					{chainId !== 421611 ? (
+						<Text
+							style={{
+								...styles.actionText,
+							}}
+							onClick={async () => {
+								if (window.ethereum) {
+									await window.ethereum.request({
+										method: "wallet_addEthereumChain",
+										params: [
+											{
+												chainId: "0x66EEB",
+												chainName: "Rinkeby-arbitrum",
+												nativeCurrency: {
+													name: "Ethereum",
+													symbol: "ETH",
+													decimals: 18,
+												},
+												rpcUrls: [
+													"https://rinkeby.arbitrum.io/rpc",
+												],
+												blockExplorerUrls: [
+													"https://testnet.arbiscan.io/",
+												],
 											},
-											rpcUrls: [
-												"https://rinkeby.arbitrum.io/rpc",
-											],
-											blockExplorerUrls: [
-												"https://testnet.arbiscan.io/",
-											],
-										},
-									],
-								});
-							}
-						}}
+										],
+									});
+								}
+							}}
+						>
+							Switch to Rinkeby-Arbitrum
+						</Text>
+					) : undefined}
+				</Flex>
+
+				{chainId === -1 || true ? (
+					<Flex
+						justifyContent="center"
+						paddingTop={5}
+						alignItems="center"
 					>
-						Switch to Rinkeby Abritum
-					</Button>
-				)}
-				<ModalBody>{/* <Lorem count={2} /> */}</ModalBody>
+						<Text
+							marginRight={1}
+							color="#337DCF"
+							fontSize={18}
+							onClick={async () => {
+								window.open(
+									"https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn"
+								);
+							}}
+						>
+							Get Metamask
+						</Text>
+						<ExternalLinkIcon
+							marginLeft={1}
+							height={18}
+							color="#337DCF"
+						/>
+					</Flex>
+				) : undefined}
 			</ModalContent>
 		</Modal>
 	);
 }
+
+const styles = {
+	actionText: {
+		fontSize: 28,
+		color: "#828282",
+		marginTop: 10,
+	},
+};
 
 export default LoginModal;

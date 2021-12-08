@@ -122,6 +122,10 @@ export function formatBNToDecimal(val, base = 18, round = true, dp = 3) {
 	return val;
 }
 
+export function formatBNToDecimalCurr(val, base = 18, dp = 3) {
+	return `${formatBNToDecimal(val, base, true, dp)} COCO`;
+}
+
 export function getDecStrAvgPriceBN(amountIn, amountOut) {
 	if (!BigNumber.isBigNumber(amountIn) || !BigNumber.isBigNumber(amountOut)) {
 		return "0.00";

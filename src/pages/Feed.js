@@ -390,7 +390,7 @@ function Page() {
 						marginRight="3"
 					>
 						<Heading size="lg" marginBottom={1}>
-							Skip algos, and see what people bet on you would
+							Skip algos, and see what people bet that you would
 							want to see!
 						</Heading>
 						<Text>
@@ -454,6 +454,7 @@ function Page() {
 								<PostDisplay
 									style={{
 										marginBottom: 25,
+										width: "100%",
 									}}
 									market={populatedMarket}
 									onImageClick={(marketIdentifier) => {

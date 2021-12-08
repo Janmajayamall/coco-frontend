@@ -9,6 +9,7 @@ import {
 	generateProfileInitials,
 	marketStageDisplayName,
 	roundDecimalStr,
+	sliceAddress,
 } from "../utils";
 import { sAddGroupFollow } from "./../redux/reducers";
 
@@ -72,60 +73,77 @@ function PostDisplay({ market, onImageClick, ...children }) {
 		);
 	}
 
+	function BottomStats({ title, info, ...props }) {
+		return (
+			<Flex flexDirection="column" {...props}>
+				<Text fontSize={14} color={"#828282"}>
+					{title}
+				</Text>
+				<Text fontSize={16} color={"#000000"}>
+					{info}
+				</Text>
+			</Flex>
+		);
+	}
+
 	return (
 		<Box {...children}>
-			<Flex paddingBottom={3} paddingTop={4}>
-				<Flex alignItems="center">
-					<Avatar
-						size="sm"
-						name={generateProfileInitials(market.oracleInfo.name)}
-					/>
-					<Text
-						onClick={() => {
-							navigate(`/group/${market.oracle.id}`);
-						}}
-						fontSize="16"
-						fontWeight="bold"
-						marginLeft="2"
-						color={"#4F4F4F"}
-					>
-						{market.oracleInfo.name}
-					</Text>
+			<Flex flexDirection={"column"} paddingBottom={3} paddingTop={4}>
+				<Flex paddingBottom={1}>
+					<Flex alignItems="center">
+						<Avatar
+							size="sm"
+							name={generateProfileInitials(
+								market.oracleInfo.name
+							)}
+						/>
+						<Text
+							onClick={() => {
+								navigate(`/group/${market.oracle.id}`);
+							}}
+							fontSize="16"
+							fontWeight="bold"
+							marginLeft="2"
+							color={"#4F4F4F"}
+						>
+							{market.oracleInfo.name}
+						</Text>
+						{market.following === false ? (
+							<>
+								<Text
+									fontSize="20"
+									fontWeight="bold"
+									marginLeft="3"
+								>
+									·
+								</Text>
+								<Text
+									onClick={async () => {
+										if (market.following === true) {
+											return;
+										}
+										const res = await followModerator(
+											market.oracle.id
+										);
 
-					{market.following === false ? (
-						<>
-							<Text
-								fontSize="20"
-								fontWeight="bold"
-								marginLeft="3"
-							>
-								·
-							</Text>
-							<Text
-								onClick={async () => {
-									if (market.following === true) {
-										return;
-									}
-									const res = await followModerator(
-										market.oracle.id
-									);
-
-									if (res == undefined) {
-										return;
-									}
-									dispatch(sAddGroupFollow(market.oracle.id));
-								}}
-								fontSize="16"
-								fontWeight="bold"
-								marginLeft="3"
-							>
-								Join
-							</Text>
-						</>
-					) : undefined}
-				</Flex>
-				<Spacer />
-				{/* <Flex
+										if (res == undefined) {
+											return;
+										}
+										dispatch(
+											sAddGroupFollow(market.oracle.id)
+										);
+									}}
+									fontSize="16"
+									fontWeight="bold"
+									marginLeft="3"
+								>
+									Join
+								</Text>
+							</>
+						) : undefined}
+					</Flex>
+					<Spacer />
+					{/* <Flex
 					backgroundColor="#F3F5F7"
 					alignItems="center"
 					paddingLeft={3}
@@ -136,7 +154,14 @@ function PostDisplay({ market, onImageClick, ...children }) {
 						{marketStageDisplayName(market.optimisticState.stage)}
 					</Text>
 				</Flex> */}
-				<MarketStatus status={market.optimisticState.stage} />
+					<MarketStatus status={market.optimisticState.stage} />
+				</Flex>
+
+				<Flex paddingLeft={2}>
+					<Text fontSize={14} color="#4F4F4F">{`By ${sliceAddress(
+						market.creator
+					)}`}</Text>
+				</Flex>
 			</Flex>
 			<Flex
 				onClick={() => {
@@ -170,55 +195,21 @@ function PostDisplay({ market, onImageClick, ...children }) {
 				/>
 			</Flex>
 			<Flex marginTop={5} alignItems="flex-start">
-				<Flex>
-					<Text fontSize={15}>Volume:</Text>
-					<Text marginLeft={1} fontSize={15} fontWeight="bold">
-						{formatBNToDecimal(market.totalVolume)} MEME
-					</Text>
-				</Flex>
+				<BottomStats
+					title="Trade Volume"
+					info={`${formatBNToDecimal(market.totalVolume)}`}
+				/>
+
 				<Spacer />
-				<Flex
-					backgroundColor="#C5E6DD"
-					borderColor="#00EBA9"
-					borderRadius={4}
-					borderWidth={1}
-					paddingLeft={3}
-					paddingRight={3}
-					marginRight={2}
-					justifyContent={"space-between"}
-					alignItems={"center"}
-				>
-					<TriangleUpIcon
-						marginRight={2}
-						w={3}
-						h={3}
-						color="#0B0B0B"
-					/>
-					<Text fontSize={15}>
-						{roundDecimalStr(market.probability1)}
-					</Text>
-				</Flex>
-				<Flex
-					backgroundColor="#E9CFCC"
-					borderColor="#FF523E"
-					borderRadius={4}
-					borderWidth={1}
-					paddingLeft={15}
-					paddingRight={15}
-					marginRight={2}
-					justifyContent={"space-between"}
-					alignItems={"center"}
-				>
-					<TriangleDownIcon
-						marginRight={2}
-						w={3}
-						h={3}
-						color="#0B0B0B"
-					/>
-					<Text fontSize={15}>
-						{roundDecimalStr(market.probability0)}
-					</Text>
-				</Flex>
+				<BottomStats
+					marginRight={4}
+					title="Yes"
+					info={`${roundDecimalStr(market.probability1)}`}
+				/>
+				<BottomStats
+					title="No"
+					info={`${roundDecimalStr(market.probability0)}`}
+				/>
 			</Flex>
 		</Box>
 	);
