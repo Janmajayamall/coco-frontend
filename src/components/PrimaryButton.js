@@ -12,7 +12,7 @@ function PrimaryButton({ title, ...children }) {
 				backgroundColor: "gray.700",
 			}}
 			border="1px solid transparent"
-			borderRadius="xl"
+			borderRadius="md"
 		>
 			<Text color="#FDFDFD">{title}</Text>
 		</Button>

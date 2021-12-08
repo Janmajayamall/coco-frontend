@@ -257,7 +257,7 @@ function Page() {
 				borderColor={"#E0E0E0"}
 			>
 				{groupId ? (
-					<Flex flexDirection="column">
+					<Flex flexDirection="column" marginBottom={5}>
 						<Flex
 							marginBottom={5}
 							marginTop={5}
@@ -382,16 +382,29 @@ function Page() {
 					</Flex>
 				) : undefined}
 				{loadingMarkets == true ? <Loader /> : undefined}
+
 				{loadingMarkets == false && noPostVisible(markets) ? (
-					<NoPostsTag marginTop={10} />
-				) : undefined}
-				{feedType === 1 && !isAuthenticated ? (
 					<Flex
-						width="100%"
-						alignContent="center"
-						justifyContent="center"
-						marginTop={10}
+						flexDirection={"column"}
+						marginLeft="3"
+						marginRight="3"
 					>
+						<Heading size="lg" marginBottom={1}>
+							Skip algos, and see what people bet on you would
+							want to see!
+						</Heading>
+						<Text>
+							Join groups, make posts, place bets and curate
+							content
+						</Text>
+					</Flex>
+				) : undefined}
+
+				{(feedType === 1 ||
+					(feedType == 0 && noPostVisible(markets))) &&
+				loadingMarkets === false &&
+				!isAuthenticated ? (
+					<Flex margin={3}>
 						<PrimaryButton
 							onClick={() => {
 								if (userProfile && account) {
@@ -399,10 +412,24 @@ function Page() {
 								}
 								dispatch(sUpdateLoginModalIsOpen(true));
 							}}
-							title={"Please sign in"}
+							title={"Sign in"}
 						/>
 					</Flex>
 				) : undefined}
+
+				{(feedType === 2 || (feedType !== 2 && isAuthenticated)) &&
+				loadingMarkets === false &&
+				noPostVisible(markets) ? (
+					<Flex margin={3}>
+						<PrimaryButton
+							onClick={() => {
+								navigate("/add");
+							}}
+							title={"Create a Post"}
+						/>
+					</Flex>
+				) : undefined}
+
 				{(feedType === 1 && isAuthenticated) || feedType != 1
 					? markets.map((market) => {
 							const populatedMarket = populateMarketWithMetadata(
