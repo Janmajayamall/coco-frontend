@@ -9,7 +9,7 @@ import {
 import { useEthers } from "@usedapp/core/packages/core";
 import { useEffect, useState } from "react";
 import { BigNumber } from "@ethersproject/abi/node_modules/@ethersproject/bignumber";
-import { MAX_UINT_256, ZERO_BN } from "../utils";
+import { CURR_SYMBOL, MAX_UINT_256, ZERO_BN } from "../utils";
 import addresses from "../contracts/addresses.json";
 
 /**
@@ -92,7 +92,7 @@ function ApprovalInterface({
 			>
 				<Text color={"#FDFDFD"} fontWeight="bold" fontSize={12}>
 					{tokenType === 0
-						? `To spend your MEME tokes, you will first have to give approval to the app. This is only needed once.`
+						? `To spend your ${CURR_SYMBOL} tokes, you will first have to give approval to the app. This is only needed once.`
 						: `To spend your Outcome shares, you will first have to give approval to the app. This is only needed once per group`}
 				</Text>
 			</Box>

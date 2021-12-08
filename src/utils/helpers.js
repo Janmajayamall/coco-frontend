@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { parse } from "graphql";
 import { ZERO_BN, TWO_BN } from "./constants";
 import { useTab } from "@chakra-ui/tabs";
+import { CURR_SYMBOL } from ".";
 
 export function populateMarketWithMetadata(
 	market,
@@ -123,7 +124,7 @@ export function formatBNToDecimal(val, base = 18, round = true, dp = 3) {
 }
 
 export function formatBNToDecimalCurr(val, base = 18, dp = 3) {
-	return `${formatBNToDecimal(val, base, true, dp)} COCO`;
+	return `${formatBNToDecimal(val, base, true, dp)} ${CURR_SYMBOL}`;
 }
 
 export function getDecStrAvgPriceBN(amountIn, amountOut) {

@@ -8,3 +8,4 @@ export const GRAPH_BUFFER_MS = 10000;
 export const MAX_LENGTH_NAME = 20;
 export const MAX_LENGTH_DESCRIPTION = 500;
 export const MAX_UINT_256 = constants.MaxUint256;
+export const CURR_SYMBOL = "MEME";

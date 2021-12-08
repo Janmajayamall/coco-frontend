@@ -27,6 +27,7 @@ import {
 	InputRightElement,
 	HStack,
 } from "@chakra-ui/react";
+import { CURR_SYMBOL } from "../utils";
 
 function TradingInput({
 	slippageValue,
@@ -51,7 +52,9 @@ function TradingInput({
 				>
 					<NumberInputField />
 				</NumberInput>
-				<Text fontSize={14}>{isBuy === true ? "MEME" : "Shares"}</Text>
+				<Text fontSize={14}>
+					{isBuy === true ? `${CURR_SYMBOL}` : "Shares"}
+				</Text>
 				{setMaxSell != undefined ? (
 					<Text
 						onClick={setMaxSell}
