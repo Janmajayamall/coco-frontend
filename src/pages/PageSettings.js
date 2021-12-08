@@ -226,9 +226,6 @@ function Page() {
 							!validateGroupName(name).valid ||
 							!validateGroupDescription(description).valid
 						) {
-							console.log(validateGroupName(name));
-							console.log(validateGroupDescription(description));
-							console.log("bro!");
 							toast({
 								title: "Invalid input!",
 								error: "error",

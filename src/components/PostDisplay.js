@@ -177,14 +177,8 @@ function PostDisplay({ market, onImageClick, ...children }) {
 				<Image
 					loading={"eager"}
 					onLoad={() => {
-						console.log("I was called ");
 						setMinHeightTrick(0);
 					}}
-					// onLoadStartCapture={() => {
-					// 	console.log("I was called ");
-					// 	setMinHeightTrick(0);
-					// }}
-					// onLoadedData=
 					src={
 						market.marketMetadata &&
 						market.marketMetadata.eventIdentifierStr

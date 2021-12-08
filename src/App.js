@@ -95,7 +95,7 @@ function App() {
 
 	useEffect(async () => {
 		let res = await getRinkebyLatestBlockNumber();
-		console.log(res);
+
 		if (res == undefined) {
 			return;
 		}
@@ -105,7 +105,6 @@ function App() {
 	useEffect(() => {
 		const interval = setInterval(async () => {
 			let res = await getRinkebyLatestBlockNumber();
-			console.log(res);
 			if (res == undefined) {
 				return;
 			}

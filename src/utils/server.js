@@ -1,8 +1,7 @@
-import { border } from "@chakra-ui/styled-system";
 import axios from "axios";
-import { signMessage } from ".";
+
 import { generateRequestSignatures } from "./auth";
-console.log(process.env.NODE_ENV, " NODE_ENV");
+
 const baseInstance = axios.create({
 	baseURL:
 		process.env.NODE_ENV === "development"

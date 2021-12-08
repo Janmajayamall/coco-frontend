@@ -47,7 +47,6 @@ function LoginModal() {
 			return;
 		}
 		let accountNonce = Math.ceil(Number(res.accountNonce) + 1);
-		console.log(accountNonce, "dwa");
 		const { privateKey, address } = createHotAccount();
 
 		const signature = await window.ethereum.request({

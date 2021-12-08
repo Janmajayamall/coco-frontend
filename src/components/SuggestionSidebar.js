@@ -48,6 +48,7 @@ import {
 } from "../redux/reducers";
 import { useDispatch, useSelector } from "react-redux";
 import PrimaryButton from "./PrimaryButton";
+import { ExternalLinkIcon } from "@chakra-ui/icons";
 
 function SuggestionSidebar() {
 	const { account } = useEthers();
@@ -70,7 +71,7 @@ function SuggestionSidebar() {
 	const [claimLoading, setClaimLoading] = useState(false);
 
 	useEffect(() => {
-		if (state.receipt) {
+		if (state.status === "Success") {
 			setClaimLoading(false);
 			toast({
 				title: "Claim Success!",
@@ -81,6 +82,12 @@ function SuggestionSidebar() {
 
 		if (state.status == "Exception" || state.status == "Fail") {
 			setClaimLoading(false);
+			toast({
+				title:
+					"Metamask err! Make sure you have enough test ETH to send transaction.",
+				status: "error",
+				isClosable: true,
+			});
 		}
 	}, [state]);
 
@@ -123,6 +130,19 @@ function SuggestionSidebar() {
 							claimableAmount
 						)} Tokens now!`}
 					</Text>
+					<Flex>
+						<Text
+							onClick={() => {
+								if (window) {
+									window.open("https://faucet.paradigm.xyz/");
+								}
+							}}
+							textDecoration="underline"
+							fontSize={14}
+						>
+							{`Missing test ETH? Use a faucet`}
+						</Text>
+					</Flex>
 					<PrimaryButton
 						isLoading={claimLoading}
 						loadingText="Processing..."

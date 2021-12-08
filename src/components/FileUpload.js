@@ -15,7 +15,6 @@ function FileUpload(props) {
 				hidden
 				accept={accept}
 				onChange={(e) => {
-					console.log(e.target.files, " it is insider")
 					onFileUpload(e.target.files[0]);
 				}}
 				ref={(e) => {

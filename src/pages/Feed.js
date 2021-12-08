@@ -180,7 +180,6 @@ function Page() {
 		let _result;
 		if (feedType == 0) {
 			_result = result0;
-			// console.log("This is the result, :", _result);
 		} else if (feedType == 1 || feedType == 2) {
 			_result = result1;
 		}

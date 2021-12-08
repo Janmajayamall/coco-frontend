@@ -539,6 +539,5 @@ export function generateProfileInitials(name) {
 			initials += ` ${char}`;
 		}
 	}
-	console.log(initials, " initials");
 	return initials;
 }
