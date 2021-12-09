@@ -176,24 +176,9 @@ export async function uploadImageFile(presignedUrl, imageFile) {
 			},
 			data: imageFile,
 		});
-
-		return presignedUrl;
-	} catch (e) {}
-}
-
-export async function uploadImageFileCloudinary(formdata) {
-	try {
-		const { data } = await axios.request({
-			url: "https://api.cloudinary.com/v1_1/db429ejsk/image/upload",
-			method: "POST",
-			data: formdata,
-			headers: {
-				"Content-type": "multipart/form-data",
-			},
-		});
-		return data.url;
+		return presignedUrl.split("?")[0];
 	} catch (e) {
-		console.log(e, " image upload failed");
+		console.log(e, "ashdbjk");
 	}
 }
 

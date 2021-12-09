@@ -30,6 +30,7 @@ import {
 	useBNInput,
 	ZERO_BN,
 	CURR_SYMBOL,
+	uploadImageFile,
 } from "./../utils";
 import {
 	useCreateNewMarket,
@@ -170,13 +171,9 @@ function Page() {
 			return;
 		}
 
-		// const presignedUrl = await getPresignedUrl();
-		// const s3Url = await uploadImageFile(presignedUrl);
+		const { presignedUrl } = await getPresignedUrl();
+		const s3Url = await uploadImageFile(presignedUrl, imageFile);
 
-		const formData = new FormData();
-		formData.append("file", imageFile);
-		formData.append("upload_preset", "yow5vd7c");
-		const s3Url = await uploadImageFileCloudinary(formData);
 		if (s3Url == undefined) {
 			displayToast("Something went wrong!", "error");
 			setNewPostLoading(false);
