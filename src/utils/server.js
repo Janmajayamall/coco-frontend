@@ -6,7 +6,7 @@ const baseInstance = axios.create({
 	baseURL:
 		process.env.NODE_ENV === "development"
 			? "http://localhost:5000"
-			: "https://pm-backend-9.herokuapp.com/",
+			: "http://pm-backend-dev.eu-central-1.elasticbeanstalk.com/",
 	timeout: 1000,
 	headers: { "Content-Type": "application/json" },
 });
