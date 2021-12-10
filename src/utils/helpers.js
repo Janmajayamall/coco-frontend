@@ -160,7 +160,9 @@ export function useBNInput(validationFn) {
 
 	useEffect(() => {
 		try {
-			let bn = parseDecimalToBN(`${input == "" ? "0" : input}`);
+			let bn = parseDecimalToBN(
+				`${input == "" || input == "." ? "0" : input}`
+			);
 
 			setBnValue(bn);
 			if (validationFn != undefined) {

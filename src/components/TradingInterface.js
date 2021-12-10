@@ -187,7 +187,7 @@ function TradingInterface({ market, tradePosition, refreshFn }) {
 		}
 
 		setTokenOutAmountBn(amount);
-	}, [inputBuyAmountBn, tokenActionIndex, wEthTokenBalance]);
+	}, [inputBuyAmountBn, tokenActionIndex]);
 
 	useEffect(() => {
 		if (
@@ -250,7 +250,7 @@ function TradingInterface({ market, tradePosition, refreshFn }) {
 	}
 
 	function buyValidationFn(bnValue) {
-		if (wEthTokenBalance != undefined && bnValue.lte(wEthTokenBalance)) {
+		if (wEthTokenBalance == undefined || bnValue.lte(wEthTokenBalance)) {
 			return { valid: true, expStr: "" };
 		}
 		return {

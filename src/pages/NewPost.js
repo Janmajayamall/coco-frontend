@@ -77,9 +77,10 @@ function Page() {
 		errText: betAmountErrText,
 	} = useBNInput();
 
-	const [loading, setLoading] = useState(false);
 	const [moderators, setModerators] = useState([]);
 	const [newPostLoading, setNewPostLoading] = useState(false);
+	const [selectErr, setSelectErr] = useState(false);
+	const [imageErr, setImageErr] = useState(false);
 
 	const { state, send } = useCreateNewMarket();
 
@@ -140,7 +141,12 @@ function Page() {
 	}
 
 	function validateInputs() {
-		if (selectModerator == undefined || imageFile == undefined) {
+		if (selectModerator == undefined || selectModerator == "") {
+			setSelectErr(true);
+			return false;
+		}
+		if (imageFile == undefined) {
+			setImageErr(true);
 			return false;
 		}
 
@@ -232,10 +238,23 @@ function Page() {
 											//TODO throw mmax file size error
 											return;
 										}
+										setImageErr(false);
 										setImageFile(file);
 									}}
 								>
-									<PrimaryButton title={"Choose Image"} />
+									<Flex flexDirection="column">
+										<PrimaryButton title={"Choose Image"} />
+										{imageErr === true ? (
+											<Text
+												style={{
+													fontSize: 12,
+													color: "#EB5757",
+												}}
+											>
+												Please select an image
+											</Text>
+										) : undefined}
+									</Flex>
 								</FileUpload>
 							</Flex>
 						) : undefined}
@@ -263,22 +282,35 @@ function Page() {
 						flexDirection="column"
 						alignItems="center"
 					>
-						<Select
-							onChange={(e) => {
-								setSelectModerator(e.target.value);
-							}}
-							placeholder="Select Group"
-						>
-							{moderators.map((obj) => {
-								return (
-									<>
-										<option value={obj.oracleAddress}>
-											{`${obj.name}`}
-										</option>
-									</>
-								);
-							})}
-						</Select>
+						<Flex width="100%" flexDirection="column">
+							<Select
+								onChange={(e) => {
+									setSelectErr(false);
+									setSelectModerator(e.target.value);
+								}}
+								placeholder="Select Group"
+							>
+								{moderators.map((obj) => {
+									return (
+										<>
+											<option value={obj.oracleAddress}>
+												{`${obj.name}`}
+											</option>
+										</>
+									);
+								})}
+							</Select>
+							{selectErr === true ? (
+								<Text
+									style={{
+										fontSize: 12,
+										color: "#EB5757",
+									}}
+								>
+									Please select a group
+								</Text>
+							) : undefined}
+						</Flex>
 
 						{InputWithTitle(
 							"Liquidity",
@@ -323,17 +355,7 @@ function Page() {
 						<ApprovalInterface
 							marginTop={5}
 							tokenType={0}
-							erc20AmountBn={utils
-								.parseEther(
-									String(
-										fundingAmount == "" ? 0 : fundingAmount
-									)
-								)
-								.add(
-									utils.parseEther(
-										String(betAmount == "" ? 0 : betAmount)
-									)
-								)}
+							erc20AmountBn={fundingAmountBn.add(betAmountBn)}
 							onSuccess={() => {
 								toast({
 									title: "Success!",

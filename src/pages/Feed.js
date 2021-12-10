@@ -111,7 +111,6 @@ function Page() {
 		timestamp24HrsBefore,
 		true
 	);
-
 	const { result: result1, reexecuteQuery: rQ1 } = useQueryMarketByOracles(
 		pagination.first,
 		pagination.skip,
@@ -377,8 +376,8 @@ function Page() {
 						marginRight="3"
 					>
 						<Heading size="lg" marginBottom={1}>
-							Skip algos, and see posts people bet you would
-							want to see!
+							Skip algos, and see posts people bet you would want
+							to see!
 						</Heading>
 						<Text>
 							Join groups, make posts, place bets and curate
