@@ -10,36 +10,7 @@ import {
 	selectGroupsFollowed,
 	selectRinkebyLatestBlockNumber,
 } from "../redux/reducers";
-import {
-	Button,
-	Box,
-	Text,
-	Flex,
-	Tabs,
-	TabList,
-	TabPanel,
-	TabPanels,
-	Tab,
-	NumberInput,
-	NumberInputField,
-	Table,
-	TableCaption,
-	Thead,
-	Tr,
-	Th,
-	Tbody,
-	Td,
-	Tfoot,
-	Spacer,
-	SliderTrack,
-	SliderFilledTrack,
-	SliderThumb,
-	Slider,
-	Avatar,
-	Heading,
-	Image,
-	Select,
-} from "@chakra-ui/react";
+import { Text, Flex, Spacer } from "@chakra-ui/react";
 import { useEthers } from "@usedapp/core/packages/core";
 import { CloseIcon } from "@chakra-ui/icons";
 import { useEffect } from "react";
@@ -104,7 +75,7 @@ import TwoColTitleInfo from "../components/TwoColTitleInfo";
 import StakingInterface from "../components/StakingInterface";
 import ChallengeHistoryTable from "../components/ChallengeHistoryTable";
 import RedeemWinsInterface from "../components/RedeemInterface";
-import addresses from "./../contracts/addresses.json";
+import { addresses } from "./../contracts";
 import ResolveInterface from "../components/ResolveInterface";
 import { makeErrorResult } from "@urql/core";
 import Loader from "../components/Loader";
@@ -171,7 +142,16 @@ function Page() {
 		if (!result.data || !result.data.market) {
 			return;
 		}
-
+		console.log(
+			result.data.market,
+			populateMarketWithMetadata(
+				result.data.market,
+				oraclesInfoObj,
+				marketsMetadata,
+				groupsFollowed,
+				rinkebyLatestBlockNumber
+			)
+		);
 		setMarket(
 			populateMarketWithMetadata(
 				result.data.market,

@@ -56,7 +56,7 @@ import {
 } from "../redux/reducers";
 import { useDispatch, useSelector } from "react-redux";
 import PrimaryButton from "./PrimaryButton";
-import addresses from "./../contracts/addresses.json";
+import { addresses } from "./../contracts";
 
 function SuggestionSidebar() {
 	const { account } = useEthers();

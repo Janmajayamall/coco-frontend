@@ -1,4 +1,4 @@
-import addresses from "../contracts/addresses.json";
+import { addresses } from "../contracts";
 import {
 	useContractFunction,
 	useSendTransaction,
@@ -7,7 +7,6 @@ import {
 	marketRouterContract,
 	oracleFactoryContract,
 	oracleContract,
-	tokenDistributorContract,
 	wEthContract,
 } from "../utils";
 import Web3 from "web3";
@@ -86,7 +85,7 @@ export function useRedeemMaxWinningAndStake() {
 
 export function useRedeemStake(oracleAddress) {
 	const { state, send } = useContractFunction(
-		oracleContract(oracleAddress),
+		oracleAddress ? oracleContract(oracleAddress) : undefined,
 		"redeemStake"
 	);
 	return {
@@ -109,7 +108,7 @@ export function useERC1155SetApprovalForAll(oracleAddress) {
 
 export function useSetOutcome(oracleAddress) {
 	const { state, send } = useContractFunction(
-		oracleContract(oracleAddress),
+		oracleAddress ? oracleContract(oracleAddress) : undefined,
 		"setOutcome"
 	);
 
@@ -121,21 +120,10 @@ export function useSetOutcome(oracleAddress) {
 
 export function useUpdateMarketConfig(oracleAddress) {
 	const { state, send } = useContractFunction(
-		oracleContract(oracleAddress),
+		oracleAddress ? oracleContract(oracleAddress) : undefined,
 		"updateMarketConfig"
 	);
 
-	return {
-		state,
-		send,
-	};
-}
-
-export function useClaim() {
-	const { state, send } = useContractFunction(
-		tokenDistributorContract,
-		"claim"
-	);
 	return {
 		state,
 		send,

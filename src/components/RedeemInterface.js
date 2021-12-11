@@ -62,7 +62,7 @@ import { BigNumber, ethers, utils } from "ethers";
 import TradingInput from "./TradingInput";
 import TradePriceBoxes from "./TradePriceBoxes";
 import ChallengeHistoryTable from "./ChallengeHistoryTable";
-import addresses from "./../contracts/addresses.json";
+
 import PrimaryButton from "./PrimaryButton";
 import ApprovalInterface from "./ApprovalInterface";
 

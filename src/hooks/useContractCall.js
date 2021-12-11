@@ -1,4 +1,4 @@
-import addresses from "../contracts/addresses.json";
+import { addresses } from "../contracts";
 import {
 	useEthers,
 	useContractFunction,
@@ -9,7 +9,6 @@ import {
 	marketRouterContract,
 	oracleFactoryContract,
 	oracleContract,
-	tokenDistributorContract,
 	tokenDistributorInterface,
 	oracleInterface,
 	wEthInterface,

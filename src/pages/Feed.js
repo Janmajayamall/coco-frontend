@@ -13,6 +13,7 @@ import {
 
 import { useEthers } from "@usedapp/core/packages/core";
 import { useQueryExploreMarkets, useQueryMarketByOracles } from "../hooks";
+import useInView from "react-cool-inview";
 
 import Web3 from "web3";
 import { useEffect, useState } from "react";
@@ -34,6 +35,8 @@ import {
 	stateSetupMarketsMetadata,
 	unfollowModerator,
 	generateProfileInitials,
+	isValidAddress,
+	FEED_BATCH_COUNT,
 } from "../utils";
 import {
 	sUpdateProfile,
@@ -75,7 +78,11 @@ function Page() {
 
 	const location = useLocation();
 	const urlParams = useParams();
-	const groupId = urlParams.groupId;
+	const groupId =
+		urlParams.groupId != undefined && isValidAddress(urlParams.groupId)
+			? urlParams.groupId
+			: undefined;
+
 	const feedType = (() => {
 		if (location.pathname == "/explore" || location.pathname == "/") {
 			return 0;
@@ -100,7 +107,7 @@ function Page() {
 	const [pagination, setPagination] = useState({ first: 0, skip: 0 });
 	const [queryOracles, setQueryOracles] = useState([]);
 	const [markets, setMarkets] = useState([]);
-	const [popularGroups, setPopularGroups] = useState([]);
+	const [filteredMarkets, setFilteredMarkets] = useState([]);
 	const [groupDetails, setGroupDetails] = useState({});
 	const [loadingMarkets, setLoadingMarkets] = useState(true);
 
@@ -125,16 +132,15 @@ function Page() {
 			return;
 		}
 
+		setPagination({ first: FEED_BATCH_COUNT, skip: 0 });
 		if (feedType == 0) {
-			setPagination({ first: 10, skip: 0 });
+			setQueryOracles([]);
 		} else if (feedType == 1) {
 			let idsToLowerCase = Object.keys(groupsFollowed).map((id) =>
 				id.toLowerCase()
 			);
-			setPagination({ first: 10, skip: 0 });
 			setQueryOracles(idsToLowerCase);
 		} else if (feedType == 2) {
-			setPagination({ first: 10, skip: 0 });
 			setQueryOracles([groupId.toLowerCase()]);
 		}
 	}, [groupsFollowed, feedType, groupId]);
@@ -183,7 +189,7 @@ function Page() {
 			);
 
 			// setMarkets([...markets, ..._result.data.markets]); TODO uncomment this for pagination to work
-			setMarkets([..._result.data.markets]);
+			setMarkets([...markets, ..._result.data.markets]);
 		} else {
 			setMarkets([]);
 		}
@@ -191,6 +197,33 @@ function Page() {
 		// end loading
 		setLoadingMarkets(false);
 	}, [result0, result1, feedType]);
+
+	useEffect(() => {
+		const _filteredMarkets = [];
+		markets.forEach((market) => {
+			const populatedMarket = populateMarketWithMetadata(
+				market,
+				oraclesInfoObj,
+				marketsMetadata,
+				groupsFollowed,
+				rinkebyLatestBlockNumber
+			);
+			if (
+				populatedMarket.oracleInfo != undefined &&
+				populatedMarket.probability1 >= Number(feedThreshold) / 100
+			) {
+				_filteredMarkets.push(populatedMarket);
+			}
+		});
+		setFilteredMarkets(_filteredMarkets);
+	}, [
+		feedThreshold,
+		markets,
+		oraclesInfoObj,
+		marketsMetadata,
+		groupsFollowed,
+		rinkebyLatestBlockNumber,
+	]);
 
 	useEffect(async () => {
 		if (groupId) {
@@ -202,27 +235,19 @@ function Page() {
 		}
 	}, [groupId]);
 
-	function noPostVisible(markets) {
-		const post = markets.find((obj) => {
-			const pM = populateMarketWithMetadata(
-				obj,
-				oraclesInfoObj,
-				marketsMetadata,
-				groupsFollowed,
-				rinkebyLatestBlockNumber
-			);
-
-			if (
-				pM.oracleInfo != undefined &&
-				pM.probability1 >= Number(Number(feedThreshold) / 100)
-			) {
-				return true;
-			}
-		});
-
-		return post == undefined;
-	}
-
+	// infinite scroll
+	const { observe } = useInView({
+		// When the last item comes to the viewport
+		onEnter: ({ unobserve }) => {
+			unobserve();
+			setLoadingMarkets(true);
+			setPagination({
+				first: FEED_BATCH_COUNT,
+				skip: markets.length,
+			});
+		},
+	});
+	console.log(pagination, filteredMarkets.length, " length");
 	return (
 		<Flex
 			style={{
@@ -367,9 +392,7 @@ function Page() {
 						/>
 					</Flex>
 				) : undefined}
-				{loadingMarkets == true ? <Loader /> : undefined}
-
-				{loadingMarkets == false && noPostVisible(markets) ? (
+				{loadingMarkets == false && filteredMarkets.length === 0 ? (
 					<Flex
 						flexDirection={"column"}
 						marginLeft="3"
@@ -387,7 +410,7 @@ function Page() {
 				) : undefined}
 
 				{(feedType === 1 ||
-					(feedType == 0 && noPostVisible(markets))) &&
+					(feedType == 0 && filteredMarkets.length === 0)) &&
 				loadingMarkets === false &&
 				!isAuthenticated ? (
 					<Flex margin={3}>
@@ -405,7 +428,7 @@ function Page() {
 
 				{(feedType === 2 || (feedType !== 2 && isAuthenticated)) &&
 				loadingMarkets === false &&
-				noPostVisible(markets) ? (
+				filteredMarkets.length === 0 ? (
 					<Flex margin={3}>
 						<PrimaryButton
 							onClick={() => {
@@ -417,32 +440,19 @@ function Page() {
 				) : undefined}
 
 				{(feedType === 1 && isAuthenticated) || feedType != 1
-					? markets.map((market) => {
-							const populatedMarket = populateMarketWithMetadata(
-								market,
-								oraclesInfoObj,
-								marketsMetadata,
-								groupsFollowed,
-								rinkebyLatestBlockNumber
-							);
-
-							if (!populatedMarket.oracleInfo) {
-								return;
-							}
-
-							if (
-								populatedMarket.probability1 <
-								Number(feedThreshold) / 100
-							) {
-								return;
-							}
+					? filteredMarkets.map((market, index) => {
 							return (
 								<PostDisplay
+									setRef={
+										index === filteredMarkets.length - 1
+											? observe
+											: null
+									}
 									style={{
 										marginBottom: 25,
 										width: "100%",
 									}}
-									market={populatedMarket}
+									market={market}
 									onImageClick={(marketIdentifier) => {
 										navigate(`/post/${marketIdentifier}`);
 									}}
@@ -450,6 +460,7 @@ function Page() {
 							);
 					  })
 					: undefined}
+				{loadingMarkets == true ? <Loader /> : undefined}
 			</Flex>
 			<SuggestionSidebar />
 			<Spacer />

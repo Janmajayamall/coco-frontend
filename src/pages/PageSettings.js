@@ -43,6 +43,7 @@ import {
 	validateGroupDescription,
 	uploadImageFileCloudinary,
 	generateProfileInitials,
+	isValidAddress,
 } from "../utils";
 import {
 	useCreateNewMarket,
@@ -74,8 +75,10 @@ function Page() {
 	const navigate = useNavigate();
 	const toast = useToast();
 	const urlParams = useParams();
-	const oracleId = urlParams.pageId;
-
+	const oracleId =
+		urlParams.pageId != undefined && isValidAddress(urlParams.pageId)
+			? urlParams.pageId
+			: undefined;
 	const oraclesInfoObj = useSelector(selectOracleInfoObj);
 	const { result: oracleResult } = useQueryOracleById(oracleId);
 	const { send, state } = useUpdateMarketConfig(oracleId);

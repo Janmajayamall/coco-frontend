@@ -31,6 +31,7 @@ import {
 	ZERO_BN,
 	CURR_SYMBOL,
 	uploadImageFile,
+	GRAPH_BUFFER_MS,
 } from "./../utils";
 import {
 	useCreateNewMarket,
@@ -98,8 +99,7 @@ function Page() {
 
 	useEffect(async () => {
 		if (state.status === "Success") {
-			const res = await newPost(selectModerator, s3ImageUrl);
-
+			await newPost(selectModerator, s3ImageUrl);
 			setTimeout(() => {
 				displayToast("Post created", "success");
 
@@ -107,7 +107,7 @@ function Page() {
 				setNewPostLoading(false);
 
 				navigate("/home");
-			}, 5000);
+			}, GRAPH_BUFFER_MS);
 		} else if (state.status == "Exception" || state.status == "Fail") {
 			displayToast("Metamask error!", "error");
 			setS3ImageUrl("");
@@ -184,6 +184,7 @@ function Page() {
 			displayToast("Something went wrong!", "error");
 			setNewPostLoading(false);
 		}
+
 		setS3ImageUrl(s3Url);
 	}
 

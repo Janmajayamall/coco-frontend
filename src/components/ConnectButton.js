@@ -7,7 +7,6 @@ import {
 	selectUserProfile,
 	sUpdateLoginModalIsOpen,
 } from "./../redux/reducers";
-import addresses from "./../contracts/addresses.json";
 import { useTokenBalance } from "./../hooks";
 import {
 	formatBNToDecimal,

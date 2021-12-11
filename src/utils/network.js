@@ -46,3 +46,7 @@ export async function getOracleDetails(address) {
 export function getFunctionSignature(functionStr) {
 	return web3.eth.abi.encodeFunctionSignature(functionStr);
 }
+
+export function isValidAddress(address) {
+	return web3.utils.isAddress(address);
+}

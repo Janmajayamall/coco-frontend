@@ -10,7 +10,7 @@ import { useEthers } from "@usedapp/core/packages/core";
 import { useEffect, useState } from "react";
 import { BigNumber } from "@ethersproject/abi/node_modules/@ethersproject/bignumber";
 import { CURR_SYMBOL, MAX_UINT_256, ZERO_BN } from "../utils";
-import addresses from "../contracts/addresses.json";
+import { addresses } from "../contracts";
 
 /**
  * tokenType -> 0: ERC20, 1: ERC1155

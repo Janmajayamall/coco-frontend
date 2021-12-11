@@ -29,12 +29,11 @@ import {
 import { useCreateNewOracle } from "./../hooks";
 import { useEthers } from "@usedapp/core/packages/core";
 
-import addresses from "./../contracts/addresses.json";
+import { addresses } from "./../contracts";
 import { useQueryOraclesByManager } from "./../hooks";
 import { useNavigate } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { selectOracleInfoObj, selectUserProfile } from "../redux/reducers";
-import { addScaleCorrection } from "framer-motion";
 import Loader from "../components/Loader";
 import GroupDisplayName from "../components/GroupDisplayPanel";
 import InputWithTitle from "../components/InputWithTitle";
@@ -55,6 +54,7 @@ function Page() {
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
 	const { result: oraclesResult } = useQueryOraclesByManager(account);
+	
 	const { state, send } = useCreateNewOracle();
 
 	const oraclesInfoObj = useSelector(selectOracleInfoObj);
@@ -105,7 +105,7 @@ function Page() {
 					status: "success",
 					isClosable: true,
 				});
-				navigate(`/settings/pages/${res.moderator.oracleAddress}`);
+				navigate(`/settings/${res.moderator.oracleAddress}`);
 			} else {
 				toast({
 					title: "Unknown Error!",

@@ -1,4 +1,4 @@
-import addresses from "./../contracts/addresses.json";
+import { addresses } from "./../contracts";
 import { utils, Contract } from "ethers";
 import MarkerRouterAbi from "../contracts/abis/MarketRouter.json";
 import OracleFactoryAbi from "../contracts/abis/OracleFactory.json";
@@ -21,10 +21,7 @@ export const oracleFactoryContract = new Contract(
 	addresses.OracleFactory,
 	oracleFactoryInterface
 );
-export const tokenDistributorContract = new Contract(
-	addresses.TokenDistributor,
-	new utils.Interface(TokenDistributorAbi)
-);
+
 export const wEthContract = new Contract(
 	addresses.WETH,
 	new utils.Interface(WETHAbi)

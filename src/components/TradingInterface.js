@@ -95,7 +95,6 @@ import { useParams } from "react-router";
 import { BigNumber, ethers, utils } from "ethers";
 import TradingInput from "./TradingInput";
 import TradePriceBoxes from "./TradePriceBoxes";
-import addresses from "./../contracts/addresses.json";
 import ApprovalInterface from "./ApprovalInterface";
 
 function TradingInterface({ market, tradePosition, refreshFn }) {

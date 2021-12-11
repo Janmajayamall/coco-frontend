@@ -59,12 +59,16 @@ export function populateMarketWithMetadata(
 		probability0:
 			optimisticState.stage !== 4 || _market.stage === 4
 				? _market.probability0
+				: optimisticState.outcome === 2
+				? 0.5
 				: optimisticState.outcome === 0
 				? 1
 				: 0,
 		probability1:
 			optimisticState.stage !== 4 || _market.stage === 4
 				? _market.probability1
+				: optimisticState.outcome === 2
+				? 0.5
 				: optimisticState.outcome === 1
 				? 1
 				: 0,

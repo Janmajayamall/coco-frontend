@@ -14,7 +14,7 @@ import {
 } from "../utils";
 import { sAddGroupFollow } from "./../redux/reducers";
 
-function PostDisplay({ market, onImageClick, ...children }) {
+function PostDisplay({ market, onImageClick, setRef, ...children }) {
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
 
@@ -87,8 +87,9 @@ function PostDisplay({ market, onImageClick, ...children }) {
 		);
 	}
 
+	const id = Math.random() * 1000;
 	return (
-		<Box {...children}>
+		<Box ref={setRef} {...children}>
 			<Flex flexDirection={"column"} paddingBottom={3} paddingTop={4}>
 				<Flex paddingBottom={1}>
 					<Flex alignItems="center">
@@ -183,7 +184,7 @@ function PostDisplay({ market, onImageClick, ...children }) {
 					src={
 						market.marketMetadata &&
 						market.marketMetadata.eventIdentifierStr
-							? market.marketMetadata.eventIdentifierStr
+							? `${market.marketMetadata.eventIdentifierStr}${id}`
 							: ""
 					}
 					alt="Failed to load image"

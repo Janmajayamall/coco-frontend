@@ -4,9 +4,9 @@ import { generateRequestSignatures } from "./auth";
 
 const baseInstance = axios.create({
 	baseURL:
-		process.env.NODE_ENV === "development"
-			? "http://localhost:8080"
-			: "http://pm-backend-dev.eu-central-1.elasticbeanstalk.com/",
+		process.env.NODE_ENV === "production"
+			? "http://pm-backend-dev.eu-central-1.elasticbeanstalk.com/"
+			: "http://localhost:8080",
 	timeout: 1000,
 	headers: { "Content-Type": "application/json" },
 });
@@ -85,7 +85,9 @@ export async function newPost(oracleAddress, eventIdentifierStr) {
 		});
 
 		return data.response;
-	} catch (e) {}
+	} catch (e) {
+		console.log(e, " new post error");
+	}
 }
 
 export async function findPosts(filter) {
