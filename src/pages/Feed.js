@@ -328,8 +328,29 @@ function Page() {
 								color="#FDFDFD"
 								size="sm"
 								variant="solid"
+								onClick={async () => {
+									if (groupsFollowed[groupId] != undefined) {
+										// leave group
+										const res = await unfollowModerator(
+											groupId
+										);
+										if (res == undefined) {
+											return;
+										}
+										dispatch(sDeleteGroupFollow(groupId));
+									} else {
+										// join group
+										const res = await followModerator(
+											groupId
+										);
+										if (res == undefined) {
+											return;
+										}
+										dispatch(sAddGroupFollow(groupId));
+									}
+								}}
 							>
-								{groupsFollowed[groupId]
+								{groupsFollowed[groupId] != undefined
 									? "Leave Group"
 									: "Join Group"}
 							</Button>
@@ -445,8 +466,13 @@ function Page() {
 							return (
 								<PostDisplay
 									setRef={
-										index === filteredMarkets.length - 1
-											? observe
+										filteredMarkets.length %
+											FEED_BATCH_COUNT ===
+										0
+											? index ===
+											  filteredMarkets.length - 1
+												? observe
+												: null
 											: null
 									}
 									style={{
