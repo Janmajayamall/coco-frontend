@@ -237,6 +237,7 @@ function Page() {
 
 	// infinite scroll
 	const { observe } = useInView({
+		rootMargin: "30px",
 		// When the last item comes to the viewport
 		onEnter: ({ unobserve }) => {
 			unobserve();
@@ -247,7 +248,7 @@ function Page() {
 			});
 		},
 	});
-	console.log(pagination, filteredMarkets.length, " length");
+	// console.log(pagination, filteredMarkets.length, " length");
 	return (
 		<Flex
 			style={{
