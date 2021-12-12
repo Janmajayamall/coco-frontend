@@ -157,7 +157,7 @@ function App() {
 								navigate("/");
 							}}
 						>
-							Mimi
+							Coco
 						</Heading>
 						<Spacer />
 						<ConnectButton />
