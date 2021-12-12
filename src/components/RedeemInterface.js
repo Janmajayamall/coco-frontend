@@ -281,6 +281,7 @@ function RedeemWinsInterface({
 			/>
 
 			<ApprovalInterface
+				marginTop={5}
 				tokenType={1}
 				erc1155Address={market.oracle.id}
 				onSuccess={() => {

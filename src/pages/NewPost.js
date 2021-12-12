@@ -346,7 +346,7 @@ function Page() {
 						<PrimaryButton
 							title={"Post"}
 							isLoading={newPostLoading}
-							loadingText="Posting..."
+							loadingText="Processing..."
 							onClick={uploadImageHelper}
 							style={{
 								marginTop: 20,

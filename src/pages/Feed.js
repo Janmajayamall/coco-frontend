@@ -111,7 +111,7 @@ function Page() {
 	const [groupDetails, setGroupDetails] = useState({});
 	const [loadingMarkets, setLoadingMarkets] = useState(true);
 
-	const timestamp24HrsBefore = Math.floor(Date.now() / 1000) - 24 * 3600;
+	const timestamp24HrsBefore = Math.floor(Date.now() / 1000) - 72 * 3600;
 	const { result: result0, reexecuteQuery: rQ0 } = useQueryExploreMarkets(
 		pagination.first,
 		pagination.skip,
@@ -248,7 +248,7 @@ function Page() {
 			});
 		},
 	});
-	// console.log(pagination, filteredMarkets.length, " length");
+
 	return (
 		<Flex
 			style={{

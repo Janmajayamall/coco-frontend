@@ -179,9 +179,7 @@ export async function uploadImageFile(presignedUrl, imageFile) {
 			data: imageFile,
 		});
 		return presignedUrl.split("?")[0];
-	} catch (e) {
-		console.log(e, "ashdbjk");
-	}
+	} catch (e) {}
 }
 
 export async function findModerators(filter) {
@@ -332,6 +330,24 @@ export async function getRinkebyLatestBlockNumber() {
 		const { data } = await baseInstance.request({
 			url: "/latestBlockNumber",
 			method: "GET",
+		});
+
+		return data.response;
+	} catch (e) {}
+}
+
+export async function moderatorCheckNameUniqueness(
+	name,
+	oracleAddress = undefined
+) {
+	try {
+		const { data } = await baseInstance.request({
+			url: "/moderator/checkNameUniqueness",
+			method: "POST",
+			data: {
+				name,
+				oracleAddress,
+			},
 		});
 
 		return data.response;

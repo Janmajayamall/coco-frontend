@@ -59,10 +59,12 @@ function ApprovalInterface({
 			stateERC1155.status === "Success" ||
 			stateToken.status === "Success"
 		) {
-			if (onSuccess) {
-				onSuccess();
-			}
-			setLoading(false);
+			setTimeout(() => {
+				if (onSuccess) {
+					onSuccess();
+				}
+				setLoading(false);
+			}, 5000);
 		} else if (
 			stateERC1155.status === "Exception" ||
 			stateERC1155.status === "Fail" ||
@@ -84,10 +86,10 @@ function ApprovalInterface({
 		<Flex flexDirection={"column"} {...props}>
 			<Box
 				padding={2}
-				borderColor="blue.400"
+				// borderColor="blue.400"
 				borderWidth={1}
 				borderStyle="solid"
-				backgroundColor="#4F4F4F"
+				backgroundColor="#0B0B0B"
 				borderRadius={10}
 			>
 				<Text color={"#FDFDFD"} fontWeight="bold" fontSize={12}>
@@ -116,7 +118,7 @@ function ApprovalInterface({
 						setLoading(false);
 					}
 				}}
-				title={"Set approval"}
+				title={"Give approval"}
 			/>
 		</Flex>
 	);

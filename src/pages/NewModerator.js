@@ -25,6 +25,7 @@ import {
 	validateFee,
 	validateGroupName,
 	validateUpdateMarketConfigTxInputs,
+	moderatorCheckNameUniqueness,
 } from "./../utils";
 import { useCreateNewOracle } from "./../hooks";
 import { useEthers } from "@usedapp/core/packages/core";
@@ -54,7 +55,7 @@ function Page() {
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
 	const { result: oraclesResult } = useQueryOraclesByManager(account);
-	
+
 	const { state, send } = useCreateNewOracle();
 
 	const oraclesInfoObj = useSelector(selectOracleInfoObj);
@@ -73,6 +74,9 @@ function Page() {
 	const [createLoading, setCreateLoading] = useState(false);
 	const [oraclesLoading, setLoadingOracles] = useState(true);
 
+	// err states
+	const [nameExists, setNameExists] = useState(false);
+
 	// oracles result
 	useEffect(async () => {
 		if (oraclesResult.data == undefined) {
@@ -90,8 +94,7 @@ function Page() {
 
 	// handle metamask tx status
 	useEffect(async () => {
-		if (state.receipt) {
-			const txHash = state.receipt.transactionHash;
+		if (state.status === "Success" && state.receipt) {
 			const oracleAddress = retrieveOracleAddressFormLogs(
 				state.receipt.logs
 			);
@@ -114,8 +117,6 @@ function Page() {
 				});
 			}
 		}
-	}, [state]);
-	useState(() => {
 		if (state.status === "Exception" || state.status === "Fail") {
 			setCreateLoading(false);
 			toast({
@@ -125,6 +126,10 @@ function Page() {
 			});
 		}
 	}, [state]);
+
+	useEffect(() => {
+		setNameExists(false);
+	}, [name]);
 
 	async function createModeratorHelper() {
 		if (!isAuthenticated) {
@@ -148,6 +153,18 @@ function Page() {
 		) {
 			toast({
 				title: "Invalid Input!",
+				status: "error",
+				isClosable: true,
+			});
+			return;
+		}
+
+		// check name uniqueness
+		let res = await moderatorCheckNameUniqueness(name);
+		if (res == undefined || res.isNameUnique === false) {
+			setNameExists(true);
+			toast({
+				title: "Name already taken!",
 				status: "error",
 				isClosable: true,
 			});
@@ -195,6 +212,16 @@ function Page() {
 					validateGroupName,
 					{}
 				)}
+				{nameExists === true ? (
+					<Text
+						style={{
+							fontSize: 12,
+							color: "#EB5757",
+						}}
+					>
+						Name already taken! Please try another one.
+					</Text>
+				) : undefined}
 				{InputWithTitle("Fee", 1, fee, fee, setFee, validateFee, {
 					defaultValue: 0.05,
 					precision: 3,

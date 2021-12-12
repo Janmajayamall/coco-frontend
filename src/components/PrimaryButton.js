@@ -12,6 +12,9 @@ function PrimaryButton({ title, ...children }) {
 				backgroundColor: "gray.700",
 			}}
 			border="1px solid transparent"
+			_loading={{
+				color: "#BDBDBD",
+			}}
 			borderRadius="md"
 		>
 			<Text color="#FDFDFD">{title}</Text>

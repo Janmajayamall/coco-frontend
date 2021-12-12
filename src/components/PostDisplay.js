@@ -184,7 +184,7 @@ function PostDisplay({ market, onImageClick, setRef, ...children }) {
 					src={
 						market.marketMetadata &&
 						market.marketMetadata.eventIdentifierStr
-							? `${market.marketMetadata.eventIdentifierStr}${id}`
+							? `${market.marketMetadata.eventIdentifierStr}`
 							: ""
 					}
 					alt="Failed to load image"

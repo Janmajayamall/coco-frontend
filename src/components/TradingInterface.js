@@ -1,89 +1,20 @@
-import { useDisclosure } from "@chakra-ui/hooks";
-import { useDispatch, useSelector } from "react-redux";
-import {
-	selectPostTradeModalState,
-	selectOracleInfoObj,
-	selectMarketsMetadata,
-	sUpdatePostTradeModal,
-	sUpdateOraclesInfoObj,
-	sUpdateMarketsMetadata,
-	selectGroupsFollowed,
-	selectRinkebyLatestBlockNumber,
-	selectUserProfile,
-} from "../redux/reducers";
-import {
-	Button,
-	Box,
-	Text,
-	Flex,
-	Tabs,
-	TabList,
-	TabPanel,
-	TabPanels,
-	Tab,
-	NumberInput,
-	NumberInputField,
-	Table,
-	TableCaption,
-	Thead,
-	Tr,
-	Th,
-	Tbody,
-	Td,
-	Tfoot,
-	Spacer,
-	SliderTrack,
-	SliderFilledTrack,
-	SliderThumb,
-	Slider,
-	useToast,
-} from "@chakra-ui/react";
+import { useSelector } from "react-redux";
+import { selectUserProfile } from "../redux/reducers";
+import { Button, Text, Flex, useToast } from "@chakra-ui/react";
 import { useEthers } from "@usedapp/core/packages/core";
-import { CloseIcon } from "@chakra-ui/icons";
 import { useEffect } from "react";
 import { useState } from "react";
 import {
 	useBuyMinTokensForExactCTokens,
-	useQueryMarketByMarketIdentifier,
-	useQueryMarketTradeAndStakeInfoByUser,
 	useSellExactTokensForMinCTokens,
-	useERC1155SetApprovalForAll,
-	useCheckTokenApprovals,
 	useTokenBalance,
+	useCheckTokenApprovals,
 } from "../hooks";
 import {
-	convertBlocksToSeconds,
-	convertDecimalStrToBigNumber,
-	convertDecimalStrToInt,
-	convertIntToDecimalStr,
-	determineMarketState,
-	filterMarketIdentifiersFromMarketsGraph,
-	filterOracleIdsFromMarketsGraph,
-	findModeratorsByIdArr,
-	findPostsByMarketIdentifierArr,
 	formatBNToDecimal,
 	getAmountCBySellTokenAmount,
-	getAmountCToBuyTokens,
-	getAvgPrice,
-	getAvgPriceOfOutcomeToken,
-	getFavoredOutcomeName,
-	getMarketStageName,
-	getMarketStateDetails,
-	getTempOutcomeInChallengePeriod,
 	getTokenAmountToBuyWithAmountC,
-	parseDecimalToBN,
-	populateMarketWithMetadata,
-	roundValueTwoDP,
-	TWO_BN,
 	useBNInput,
-	outcomeDisplayName,
-	formatTimeInSeconds,
-	determineOutcome,
-	getWinningsArr,
-	getTradeWinningsArr,
-	getStakeWinArr,
-	ONE_BN,
-	getAvgPriceBN,
 	getDecStrAvgPriceBN,
 	GRAPH_BUFFER_MS,
 	formatBNToDecimalCurr,
@@ -91,8 +22,7 @@ import {
 import PostDisplay from "../components/PostDisplay";
 import TwoColTitleInfo from "../components/TwoColTitleInfo";
 import PrimaryButton from "./PrimaryButton";
-import { useParams } from "react-router";
-import { BigNumber, ethers, utils } from "ethers";
+import { BigNumber } from "ethers";
 import TradingInput from "./TradingInput";
 import TradePriceBoxes from "./TradePriceBoxes";
 import ApprovalInterface from "./ApprovalInterface";
@@ -530,7 +460,7 @@ function TradingInterface({ market, tradePosition, refreshFn }) {
 					/>
 
 					<ApprovalInterface
-						marginTop={5}
+						marginTop={10}
 						tokenType={1}
 						erc1155Address={market.oracle.id}
 						onSuccess={() => {

@@ -158,6 +158,7 @@ function Page() {
 				balance: parseDecimalToBN(obj.balance),
 			};
 		});
+
 		setTokenBalancesObj(dict);
 	}, [tokenBalancesResult]);
 
