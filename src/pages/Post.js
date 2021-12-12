@@ -142,16 +142,6 @@ function Page() {
 		if (!result.data || !result.data.market) {
 			return;
 		}
-		console.log(
-			result.data.market,
-			populateMarketWithMetadata(
-				result.data.market,
-				oraclesInfoObj,
-				marketsMetadata,
-				groupsFollowed,
-				rinkebyLatestBlockNumber
-			)
-		);
 		setMarket(
 			populateMarketWithMetadata(
 				result.data.market,

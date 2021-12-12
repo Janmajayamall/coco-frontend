@@ -18,6 +18,7 @@ import {
 	getDecStrAvgPriceBN,
 	GRAPH_BUFFER_MS,
 	formatBNToDecimalCurr,
+	minAmountAfterSlippageBn,
 } from "../utils";
 import PostDisplay from "../components/PostDisplay";
 import TwoColTitleInfo from "../components/TwoColTitleInfo";
@@ -320,15 +321,26 @@ function TradingInterface({ market, tradePosition, refreshFn }) {
 								return;
 							}
 
+							let tokenOutAmountBnAfterSlippage = minAmountAfterSlippageBn(
+								tokenOutAmountBn,
+								slippage
+							);
+							if (
+								tokenOutAmountBnAfterSlippage.isZero() ||
+								inputBuyAmountBn.isZero()
+							) {
+								return;
+							}
+
 							setBuyLoading(true);
 
 							let a0 =
 								tokenActionIndex == 0
-									? tokenOutAmountBn
+									? tokenOutAmountBnAfterSlippage
 									: BigNumber.from(0);
 							let a1 =
 								tokenActionIndex == 1
-									? tokenOutAmountBn
+									? tokenOutAmountBnAfterSlippage
 									: BigNumber.from(0);
 
 							sendBuy(
@@ -435,6 +447,18 @@ function TradingInterface({ market, tradePosition, refreshFn }) {
 								return;
 							}
 
+							let amountCOutAfterSlippageBn = minAmountAfterSlippageBn(
+								amountCOutBn,
+								slippage
+							);
+
+							if (
+								amountCOutAfterSlippageBn.isZero() ||
+								inputSellAmountBn.isZero()
+							) {
+								return;
+							}
+
 							setSellLoading(true);
 
 							let a0 =
@@ -449,7 +473,7 @@ function TradingInterface({ market, tradePosition, refreshFn }) {
 							sendSell(
 								a0,
 								a1,
-								amountCOutBn,
+								amountCOutAfterSlippageBn,
 								market.oracle.id,
 								market.marketIdentifier
 							);

@@ -116,7 +116,6 @@ function Page() {
 		) {
 			return;
 		}
-		console.log(oracleResult, " mk");
 		await stateSetupOraclesInfo([oracleResult.data.oracle.id], dispatch);
 	}, [oracleResult]);
 
@@ -272,7 +271,7 @@ function Page() {
 									name,
 									oracleData.id
 								);
-								console.log(res, " res this");
+
 								if (
 									res == undefined ||
 									res.isNameUnique === false
@@ -291,7 +290,7 @@ function Page() {
 									name,
 									description,
 								});
-								console.log(res, "qwertyuio");
+
 								if (res != undefined) {
 									toast({
 										title: "Info updated!",
