@@ -5,7 +5,7 @@ import { generateRequestSignatures } from "./auth";
 const baseInstance = axios.create({
 	baseURL:
 		process.env.NODE_ENV === "production"
-			? "http://pm-backend-dev.eu-central-1.elasticbeanstalk.com/"
+			? "https://backend.cocoverse.club/"
 			: "http://localhost:8080",
 	timeout: 1000,
 	headers: { "Content-Type": "application/json" },
