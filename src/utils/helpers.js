@@ -344,6 +344,12 @@ export function convertBlocksToSeconds(blocks) {
 export function formatTimeInSeconds(seconds) {
 	let sec = parseInt(seconds, 10);
 
+	let days = Math.floor(sec / 86400);
+	if (days > 0) {
+		let hours = Math.floor((sec - days * 86400) / 3600);
+		return `${days}d ${hours}h`;
+	}
+
 	let hours = Math.floor(sec / 3600);
 	if (hours > 0) {
 		let minutes = Math.floor((sec - hours * 3600) / 60);

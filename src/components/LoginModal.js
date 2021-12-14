@@ -1,21 +1,17 @@
-import { useDisclosure } from "@chakra-ui/hooks";
 import { useDispatch, useSelector } from "react-redux";
 import {
 	selectLoginModalState,
 	sUpdateLoginModalIsOpen,
 } from "../redux/reducers";
 import {
-	Button,
 	Flex,
 	Spacer,
 	Heading,
 	Modal,
-	ModalBody,
 	ModalOverlay,
 	ModalContent,
 	Image,
 	Text,
-	Icon,
 } from "@chakra-ui/react";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
 import { useEthers } from "@usedapp/core/packages/core";
@@ -27,8 +23,6 @@ import { useNavigate } from "react-router";
 import MetamaskFox from "./../metamask_fox.svg";
 
 function LoginModal() {
-	const navigate = useNavigate();
-
 	const dispatch = useDispatch();
 
 	const isOpen = useSelector(selectLoginModalState).isOpen;
@@ -71,8 +65,6 @@ function LoginModal() {
 		dispatch(sUpdateLoginModalIsOpen(false));
 
 		window.location.reload();
-
-		// navigate("/explore");
 	}
 
 	useEffect(async () => {
@@ -190,6 +182,7 @@ function LoginModal() {
 								...styles.actionText,
 							}}
 							onClick={async () => {
+								console.log(" mkmkmkm");
 								if (window.ethereum) {
 									await window.ethereum.request({
 										method: "wallet_addEthereumChain",

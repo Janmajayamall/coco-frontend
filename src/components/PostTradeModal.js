@@ -1,28 +1,16 @@
-import { useDisclosure } from "@chakra-ui/hooks";
 import { useDispatch, useSelector } from "react-redux";
 import {
 	selectPostTradeModalState,
-	selectOracleInfoObj,
-	selectMarketsMetadata,
 	sUpdatePostTradeModal,
 } from "../redux/reducers";
 import {
 	Button,
-	Box,
 	Text,
 	Flex,
-	Spacer,
-	Switch,
-	Heading,
 	Image,
 	Modal,
-	ModalBody,
 	ModalOverlay,
 	ModalContent,
-	ModalHeader,
-	ModalCloseButton,
-	ModalFooter,
-	Lorem,
 	Tabs,
 	TabList,
 	TabPanel,
@@ -32,22 +20,19 @@ import {
 	NumberInputField,
 } from "@chakra-ui/react";
 import { useEthers } from "@usedapp/core/packages/core";
-import { CloseIcon } from "@chakra-ui/icons";
-import { useEffect } from "react";
+
 import { useState } from "react";
 import {
 	useQueryMarketByMarketIdentifier,
 	useQueryMarketTradeAndStakeInfoByUser,
 } from "../hooks";
-import { roundDecimalStr, roundValueTwoDP } from "../utils";
+import { roundDecimalStr } from "../utils";
 
 function PostTradeModal() {
 	const dispatch = useDispatch();
 
 	const { account } = useEthers();
 
-	const oraclesInfoObj = useSelector(selectOracleInfoObj);
-	const marketsMetadata = useSelector(selectMarketsMetadata);
 	const postTradeModalState = useSelector(selectPostTradeModalState);
 	const marketIdentifier = postTradeModalState.marketIdentifier;
 

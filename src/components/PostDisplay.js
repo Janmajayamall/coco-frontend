@@ -1,14 +1,11 @@
-import { TriangleDownIcon, TriangleUpIcon } from "@chakra-ui/icons";
 import { Avatar, Box, Flex, Image, Spacer, Text } from "@chakra-ui/react";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router";
 import {
 	followModerator,
-	formatBNToDecimal,
 	formatBNToDecimalCurr,
 	generateProfileInitials,
-	marketStageDisplayName,
 	roundDecimalStr,
 	sliceAddress,
 } from "../utils";

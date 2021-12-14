@@ -1,20 +1,12 @@
-import { Button, Box, Text, Flex } from "@chakra-ui/react";
+import { Box, Text, Flex } from "@chakra-ui/react";
 import { useEthers } from "@usedapp/core/packages/core";
-import { formatEther, formatUnits } from "@ethersproject/units";
-import { utils } from "ethers";
 import { useDispatch, useSelector } from "react-redux";
 import {
 	selectUserProfile,
 	sUpdateLoginModalIsOpen,
 } from "./../redux/reducers";
 import { useTokenBalance } from "./../hooks";
-import {
-	formatBNToDecimal,
-	formatBNToDecimalCurr,
-	parseDecimalToBN,
-	roundDecimalStr,
-	sliceAddress,
-} from "../utils";
+import { formatBNToDecimalCurr, sliceAddress } from "../utils";
 import PrimaryButton from "./PrimaryButton";
 
 /**

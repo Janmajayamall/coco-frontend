@@ -1,65 +1,26 @@
-import { useDisclosure, useFocusEffect } from "@chakra-ui/hooks";
-import { useDispatch, useSelector } from "react-redux";
-import {
-	selectPostTradeModalState,
-	selectOracleInfoObj,
-	selectMarketsMetadata,
-	sUpdatePostTradeModal,
-	sUpdateOraclesInfoObj,
-	sUpdateMarketsMetadata,
-	selectGroupsFollowed,
-	selectRinkebyLatestBlockNumber,
-	selectUserProfile,
-} from "../redux/reducers";
-import { Button, Text, Flex, useToast, Box, Spacer } from "@chakra-ui/react";
+import { useSelector } from "react-redux";
+import { selectUserProfile } from "../redux/reducers";
+import { Text, Flex, useToast, Box, Spacer } from "@chakra-ui/react";
 import { useEthers } from "@usedapp/core/packages/core";
-import { CloseIcon } from "@chakra-ui/icons";
+
 import { useEffect } from "react";
 import { useState } from "react";
 import {
-	useBuyMinTokensForExactCTokens,
-	useQueryMarketByMarketIdentifier,
-	useQueryMarketTradeAndStakeInfoByUser,
-	useRedeemWinning,
-	useSellExactTokensForMinCTokens,
-	useStakeForOutcome,
-	useRedeemWinningBothOutcomes,
-	useRedeemStake,
-	useERC1155SetApprovalForAll,
 	useRedeemMaxWinning,
 	useRedeemMaxWinningAndStake,
 	useCheckTokenApprovals,
 } from "../hooks";
 import {
-	formatBNToDecimal,
-	parseDecimalToBN,
-	populateMarketWithMetadata,
-	roundValueTwoDP,
-	TWO_BN,
-	useBNInput,
 	outcomeDisplayName,
-	formatTimeInSeconds,
-	determineOutcome,
-	getWinningsArr,
-	getTradeWinningsArr,
-	getStakeWinArr,
-	ONE_BN,
-	getTradeWinAmount,
 	determineStakeWinnings,
-	totalAmountReceivedInStakeRedeem,
-	roundDecimalStr,
-	ZERO_DECIMAL_STR,
 	determineTotalAmountStakeRedeem,
 	determineTradeWinAmount,
 	GRAPH_BUFFER_MS,
 	formatBNToDecimalCurr,
 } from "../utils";
-import PostDisplay from "../components/PostDisplay";
-import TwoColTitleInfo from "../components/TwoColTitleInfo";
-import { useParams } from "react-router";
 
-import { BigNumber, ethers, utils } from "ethers";
-import TradingInput from "./TradingInput";
+import TwoColTitleInfo from "../components/TwoColTitleInfo";
+
 import TradePriceBoxes from "./TradePriceBoxes";
 import ChallengeHistoryTable from "./ChallengeHistoryTable";
 

@@ -14,20 +14,11 @@ import {
 import { useEthers } from "@usedapp/core/packages/core";
 import { useQueryExploreMarkets, useQueryMarketByOracles } from "../hooks";
 import useInView from "react-cool-inview";
-
-import Web3 from "web3";
 import { useEffect, useState } from "react";
 import {
-	newPost,
-	updateModerator,
-	getUser,
-	findAllFollows,
 	filterOracleIdsFromMarketsGraph,
-	findModeratorsByIdArr,
 	filterMarketIdentifiersFromMarketsGraph,
-	findPostsByMarketIdentifierArr,
 	populateMarketWithMetadata,
-	findPopularModerators,
 	followModerator,
 	findModeratorsDetails,
 	numStrFormatter,
@@ -39,12 +30,8 @@ import {
 	FEED_BATCH_COUNT,
 } from "../utils";
 import {
-	sUpdateProfile,
-	sUpdateOraclesInfoObj,
 	selectOracleInfoObj,
 	selectMarketsMetadata,
-	sUpdateMarketsMetadata,
-	sUpdateGroupsFollowed,
 	selectGroupsFollowed,
 	selectRinkebyLatestBlockNumber,
 	sAddGroupFollow,
@@ -54,13 +41,7 @@ import {
 	sUpdateLoginModalIsOpen,
 } from "../redux/reducers";
 import { useDispatch, useSelector } from "react-redux";
-import {
-	Route,
-	Routes,
-	useLocation,
-	useNavigate,
-	useParams,
-} from "react-router";
+import { useLocation, useNavigate, useParams } from "react-router";
 import ConfigSidebar from "../components/ConfigSiderbar";
 import { FireIcon } from "../components/FireIcon";
 import { HomeIcon } from "../components/HomeIcon";
@@ -111,7 +92,7 @@ function Page() {
 	const [groupDetails, setGroupDetails] = useState({});
 	const [loadingMarkets, setLoadingMarkets] = useState(true);
 
-	const timestamp24HrsBefore = Math.floor(Date.now() / 1000) - 72 * 3600;
+	const timestamp24HrsBefore = Math.floor(Date.now() / 1000) - 168 * 3600; // seven days
 	const { result: result0, reexecuteQuery: rQ0 } = useQueryExploreMarkets(
 		pagination.first,
 		pagination.skip,

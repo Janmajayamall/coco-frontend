@@ -102,6 +102,7 @@ function SuggestionSidebar() {
 		}
 		// const ignoreList = Object.keys(groupsFollowed);
 		let res = await findAllModerators();
+		console.log("Got this, you know it!");
 		if (res == undefined) {
 			return;
 		}

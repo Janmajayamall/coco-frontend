@@ -1,10 +1,6 @@
-import { ReactNode, useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import {
-	Button,
-	Icon,
 	Select,
-	NumberInput,
-	NumberInputField,
 	Image,
 	useToast,
 	Flex,
@@ -13,30 +9,21 @@ import {
 	Text,
 	Box,
 } from "@chakra-ui/react";
-import { FiFile } from "react-icons/fi";
 import FileUpload from "./../components/FileUpload";
 import {
-	uploadImage,
 	keccak256,
 	newPost,
-	newPostTrial,
 	findModerators,
 	getPresignedUrl,
-	uploadImageFileCloudinary,
-	toBase64,
 	validateInitialBetAmount,
 	validateFundingAmount,
-	MAX_UINT_256,
 	useBNInput,
-	ZERO_BN,
 	CURR_SYMBOL,
 	uploadImageFile,
 	GRAPH_BUFFER_MS,
 } from "./../utils";
 import {
 	useCreateNewMarket,
-	useTokenAllowance,
-	useTokenApprove,
 	useCheckTokenApprovals,
 	useTokenBalance,
 } from "./../hooks";

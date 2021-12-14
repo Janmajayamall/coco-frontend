@@ -1,65 +1,25 @@
-import { useDisclosure } from "@chakra-ui/hooks";
 import { useDispatch, useSelector } from "react-redux";
 import {
-	selectPostTradeModalState,
 	selectOracleInfoObj,
 	selectMarketsMetadata,
-	sUpdatePostTradeModal,
-	sUpdateOraclesInfoObj,
-	sUpdateMarketsMetadata,
 	selectGroupsFollowed,
 	selectRinkebyLatestBlockNumber,
 } from "../redux/reducers";
 import { Text, Flex, Spacer } from "@chakra-ui/react";
 import { useEthers } from "@usedapp/core/packages/core";
-import { CloseIcon } from "@chakra-ui/icons";
 import { useEffect } from "react";
 import { useState } from "react";
 import {
-	useBuyMinTokensForExactCTokens,
 	useERC1155ApprovalForAll,
 	useQueryMarketByMarketIdentifier,
 	useQueryMarketTradeAndStakeInfoByUser,
-	useQueryTokenApprovalsByUserAndOracle,
-	useSellExactTokensForMinCTokens,
 } from "../hooks";
 import {
 	convertBlocksToSeconds,
-	convertDecimalStrToBigNumber,
-	convertDecimalStrToInt,
-	convertIntToDecimalStr,
-	determineMarketState,
 	filterMarketIdentifiersFromMarketsGraph,
 	filterOracleIdsFromMarketsGraph,
-	findModeratorsByIdArr,
-	findPostsByMarketIdentifierArr,
-	formatBNToDecimal,
-	getAmountCBySellTokenAmount,
-	getAmountCToBuyTokens,
-	getAvgPrice,
-	getAvgPriceOfOutcomeToken,
-	getFavoredOutcomeName,
-	getMarketStageName,
-	getMarketStateDetails,
-	getTempOutcomeInChallengePeriod,
-	getTokenAmountToBuyWithAmountC,
-	parseDecimalToBN,
 	populateMarketWithMetadata,
-	roundValueTwoDP,
-	TWO_BN,
-	useBNInput,
-	outcomeDisplayName,
 	formatTimeInSeconds,
-	determineOutcome,
-	getWinningsArr,
-	getTradeWinningsArr,
-	getStakeWinArr,
-	ONE_BN,
-	getTradeWinAmount,
-	determineStakeWinnings,
-	totalAmountReceivedInStakeRedeem,
-	marketStageDisplayName,
-	ZERO_DECIMAL_STR,
 	findTokenIdBalanceInTokenArr,
 	stateSetupOraclesInfo,
 	stateSetupMarketsMetadata,
@@ -68,16 +28,9 @@ import {
 import PostDisplay from "../components/PostDisplay";
 import TradingInterface from "../components/TradingInterface";
 import { useParams } from "react-router";
-
-import { BigNumber, ethers, utils } from "ethers";
-import TradePricesBoxes from "../components/TradePriceBoxes";
-import TwoColTitleInfo from "../components/TwoColTitleInfo";
 import StakingInterface from "../components/StakingInterface";
-import ChallengeHistoryTable from "../components/ChallengeHistoryTable";
 import RedeemWinsInterface from "../components/RedeemInterface";
-import { addresses } from "./../contracts";
 import ResolveInterface from "../components/ResolveInterface";
-import { makeErrorResult } from "@urql/core";
 import Loader from "../components/Loader";
 
 function Page() {

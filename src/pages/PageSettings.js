@@ -1,34 +1,15 @@
-import { ReactNode, useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import {
-	Button,
-	Icon,
-	Select,
-	NumberInput,
-	NumberInputField,
-	Image,
 	Text,
 	Flex,
-	Input,
 	Spacer,
 	Avatar,
 	useToast,
 	Heading,
 } from "@chakra-ui/react";
-import { FiFile } from "react-icons/fi";
-import FileUpload from "../components/FileUpload";
 import InputWithTitle from "../components/InputWithTitle";
 import {
-	uploadImage,
-	keccak256,
-	newPost,
-	newPostTrial,
-	stateSetupMarketsMetadata,
 	stateSetupOraclesInfo,
-	filterMarketIdentifiersFromMarketsGraph,
-	populateMarketWithMetadata,
-	ZERO_DECIMAL_STR,
-	parseDecimalToBN,
-	formatBNToDecimal,
 	updateModerator,
 	convertHoursToBlocks,
 	convertBlocksToHours,
@@ -41,28 +22,14 @@ import {
 	validateUpdateMarketConfigTxInputs,
 	GRAPH_BUFFER_MS,
 	validateGroupDescription,
-	uploadImageFileCloudinary,
 	generateProfileInitials,
 	isValidAddress,
 	moderatorCheckNameUniqueness,
 } from "../utils";
-import {
-	useCreateNewMarket,
-	useQueryOraclesByManager,
-	useQueryMarketsAtStage3ByOracles,
-	useQueryOracleById,
-	useUpdateMarketConfig,
-} from "../hooks";
+import { useQueryOracleById, useUpdateMarketConfig } from "../hooks";
 import { useEthers } from "@usedapp/core/packages/core";
-import { utils } from "ethers";
 import { useDispatch, useSelector } from "react-redux";
-import {
-	selectGroupsFollowed,
-	selectMarketsMetadata,
-	selectOracleInfoObj,
-	selectUserProfile,
-} from "../redux/reducers";
-import PostDisplay from "../components/PostDisplay";
+import { selectOracleInfoObj, selectUserProfile } from "../redux/reducers";
 import { useNavigate, useParams } from "react-router";
 import Loader from "../components/Loader";
 import PrimaryButton from "../components/PrimaryButton";

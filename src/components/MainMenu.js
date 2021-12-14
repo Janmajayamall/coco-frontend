@@ -1,30 +1,11 @@
 import {
-	Button,
-	Box,
-	Text,
-	Flex,
-	Spacer,
-	Switch,
-	Heading,
-	Image,
-	Avatar,
-	Slider,
-	SliderTrack,
-	SliderFilledTrack,
-	SliderThumb,
 	Menu,
 	MenuButton,
 	MenuList,
 	MenuItem,
 	IconButton,
 } from "@chakra-ui/react";
-import {
-	AddIcon,
-	ExternalLinkIcon,
-	RepeatIcon,
-	EditIcon,
-	HamburgerIcon,
-} from "@chakra-ui/icons";
+import { HamburgerIcon } from "@chakra-ui/icons";
 import { useEthers } from "@usedapp/core/packages/core";
 import { useSelector } from "react-redux";
 import { selectUserProfile } from "../redux/reducers";

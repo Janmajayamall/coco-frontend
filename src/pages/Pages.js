@@ -1,31 +1,13 @@
-import { ReactNode, useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
+import { Text, Flex, Spacer, Heading } from "@chakra-ui/react";
+
 import {
-	Button,
-	Icon,
-	Select,
-	NumberInput,
-	NumberInputField,
-	Image,
-	Text,
-	Flex,
-	Spacer,
-	Heading,
-} from "@chakra-ui/react";
-import { FiFile } from "react-icons/fi";
-import FileUpload from "../components/FileUpload";
-import {
-	uploadImage,
-	keccak256,
-	newPost,
-	newPostTrial,
-	findModerators,
 	stateSetupMarketsMetadata,
 	stateSetupOraclesInfo,
 	filterMarketIdentifiersFromMarketsGraph,
 	populateMarketWithMetadata,
 } from "../utils";
 import {
-	useCreateNewMarket,
 	useQueryOraclesByManager,
 	useQueryMarketsAtStage3ByOracles,
 } from "../hooks";
@@ -38,11 +20,10 @@ import {
 	selectOracleInfoObj,
 	selectRinkebyLatestBlockNumber,
 } from "../redux/reducers";
-import PostDisplay from "../components/PostDisplay";
 import { useNavigate } from "react-router";
+import PostDisplay from "../components/PostDisplay";
 import Loader from "../components/Loader";
 import GroupDisplayName from "../components/GroupDisplayPanel";
-import NoPostsTag from "../components/NoPostsTag";
 
 /**
  * Shows two things

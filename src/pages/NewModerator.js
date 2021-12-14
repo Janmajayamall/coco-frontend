@@ -1,18 +1,5 @@
-import { ReactNode, useEffect, useRef, useState, Sty } from "react";
-import {
-	Button,
-	Icon,
-	Select,
-	NumberInput,
-	NumberInputField,
-	Input,
-	Heading,
-	Flex,
-	Text,
-	Box,
-	useToast,
-	Spacer,
-} from "@chakra-ui/react";
+import { useEffect, useState } from "react";
+import { Heading, Flex, Text, Box, useToast, Spacer } from "@chakra-ui/react";
 import {
 	convertHoursToBlocks,
 	retrieveOracleAddressFormLogs,
@@ -29,7 +16,6 @@ import {
 } from "./../utils";
 import { useCreateNewOracle } from "./../hooks";
 import { useEthers } from "@usedapp/core/packages/core";
-
 import { addresses } from "./../contracts";
 import { useQueryOraclesByManager } from "./../hooks";
 import { useNavigate } from "react-router";

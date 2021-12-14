@@ -1,12 +1,5 @@
-import { Button, Box, Text, Flex } from "@chakra-ui/react";
-import { formatEther } from "@ethersproject/units";
-import { utils } from "ethers";
-import {
-	createHotAccount,
-	getAccountNonce,
-	loginUser,
-	getUser,
-} from "./../utils";
+import { Button } from "@chakra-ui/react";
+import { createHotAccount, getAccountNonce, loginUser } from "./../utils";
 import { useEthers } from "@usedapp/core/packages/core";
 import { selectUserProfile } from "./../redux/reducers";
 import { useDispatch, useSelector } from "react-redux";

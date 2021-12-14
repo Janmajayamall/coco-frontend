@@ -1,19 +1,12 @@
-import { ReactNode, useEffect, useRef, useState, Sty } from "react";
 import {
-	Button,
-	Icon,
-	Select,
 	NumberInput,
 	NumberInputField,
 	Input,
-	Heading,
 	Flex,
 	Text,
-	Box,
-	useToast,
 	HStack,
 } from "@chakra-ui/react";
-import { CURR_SYMBOL, ZERO_BN } from "../utils";
+import { ZERO_BN } from "../utils";
 
 function InputWithTitle(
 	title,

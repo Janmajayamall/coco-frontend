@@ -1,6 +1,5 @@
 import { Flex, Text } from "@chakra-ui/react";
 import { useNavigate } from "react-router";
-import PrimaryButton from "./PrimaryButton";
 
 function NoPostsTag({ ...children }) {
 	const navigate = useNavigate();

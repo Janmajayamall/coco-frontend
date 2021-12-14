@@ -1,53 +1,15 @@
-import ConnectButton from "../components/ConnectButton";
-import LoginButton from "../components/LoginButton";
-import PostDisplay from "../components/PostDisplay";
-import Loader from "../components/Loader";
 import {
 	Button,
-	Box,
 	Text,
 	Flex,
 	Spacer,
-	Switch,
-	Heading,
-	Image,
 	Avatar,
-	Slider,
-	SliderTrack,
-	SliderFilledTrack,
-	SliderThumb,
 	IconButton,
 } from "@chakra-ui/react";
 import { SettingsIcon } from "@chakra-ui/icons";
-
-import { useEthers } from "@usedapp/core/packages/core";
 import {
-	useCreateNewMarket,
-	useQueryMarketsOrderedByLatest,
-	useQueryExploreMarkets,
-	useQueryMarketByOracles,
-} from "../hooks";
-
-import Web3 from "web3";
-import { useEffect, useState } from "react";
-import {
-	newPost,
-	updateModerator,
-	getUser,
-	findAllFollows,
-	filterOracleIdsFromMarketsGraph,
-	findModeratorsByIdArr,
-	filterMarketIdentifiersFromMarketsGraph,
-	findPostsByMarketIdentifierArr,
-	populateMarketWithMetadata,
-	findPopularModerators,
 	followModerator,
-	findModeratorsDetails,
-	numStrFormatter,
-	stateSetupOraclesInfo,
-	stateSetupMarketsMetadata,
 	unfollowModerator,
-	findAllModerators,
 	generateProfileInitials,
 } from "../utils";
 import {

@@ -6,8 +6,6 @@ import {
 	SliderTrack,
 	SliderFilledTrack,
 	SliderThumb,
-	Spacer,
-	Button,
 } from "@chakra-ui/react";
 import { useDispatch, useSelector } from "react-redux";
 import {

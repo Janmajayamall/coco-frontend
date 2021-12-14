@@ -1,18 +1,8 @@
-import { ReactNode, useEffect, useRef, useState } from "react";
-import {
-	Button,
-	Icon,
-	Select,
-	NumberInput,
-	NumberInputField,
-	Input,
-	Flex,
-	Text,
-} from "@chakra-ui/react";
-
+import { useEffect, useState } from "react";
+import { Button, Input, Flex, Text } from "@chakra-ui/react";
 import { useEthers } from "@usedapp/core/packages/core";
-import { useSearchParams, useParams } from "react-router-dom";
-import { useQueryOracleById } from "./../hooks";
+import { useParams } from "react-router-dom";
+
 import { getOracleDetails, updateModerator, findModerators } from "./../utils";
 
 function Page() {
