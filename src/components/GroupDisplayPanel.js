@@ -37,6 +37,7 @@ function GroupDisplayName({ group, followStatusVisible, settingsVisible }) {
 				fontWeight="bold"
 				marginLeft="2"
 				color={"#4F4F4F"}
+				_hover={{ cursor: "pointer", textDecoration: "underline" }}
 			>
 				{group.name}
 			</Text>

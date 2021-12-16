@@ -104,6 +104,10 @@ function PostDisplay({ market, onImageClick, setRef, ...children }) {
 							fontWeight="bold"
 							marginLeft="2"
 							color={"#4F4F4F"}
+							_hover={{
+								cursor: "pointer",
+								textDecoration: "underline",
+							}}
 						>
 							{market.oracleInfo.name}
 						</Text>
@@ -172,6 +176,9 @@ function PostDisplay({ market, onImageClick, setRef, ...children }) {
 				maxHeight={500}
 				minHeight={minHeightTrick}
 				justifyContent="center"
+				_hover={{
+					cursor: "pointer",
+				}}
 			>
 				<Image
 					loading={"eager"}

@@ -80,6 +80,7 @@ import { Route, Routes, useNavigate } from "react-router";
 import LoginModal from "./components/LoginModal";
 import PostTradeModal from "./components/PostTradeModal";
 import MainMenu from "./components/MainMenu";
+import CocoFull from "./Coco-full.svg";
 
 const web3 = new Web3();
 
@@ -152,13 +153,15 @@ function App() {
 							paddingRight: 5,
 						}}
 					>
-						<Heading
+						<Image
+							_hover={{ cursor: "pointer" }}
+							src={CocoFull}
+							width={150}
 							onClick={() => {
 								navigate("/");
 							}}
-						>
-							Coco
-						</Heading>
+						/>
+
 						<Spacer />
 						<ConnectButton />
 						<MainMenu />

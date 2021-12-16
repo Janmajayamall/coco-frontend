@@ -150,6 +150,10 @@ function LoginModal() {
 									...styles.actionText,
 								}}
 								onClick={login}
+								_hover={{
+									cursor: "pointer",
+									textDecoration: "underline",
+								}}
 							>
 								Sign login message
 							</Text>
@@ -172,6 +176,10 @@ function LoginModal() {
 							onClick={async () => {
 								activateBrowserWallet();
 							}}
+							_hover={{
+								cursor: "pointer",
+								textDecoration: "underline",
+							}}
 						>
 							Connect your wallet
 						</Text>
@@ -182,7 +190,6 @@ function LoginModal() {
 								...styles.actionText,
 							}}
 							onClick={async () => {
-								console.log(" mkmkmkm");
 								if (window.ethereum) {
 									await window.ethereum.request({
 										method: "wallet_addEthereumChain",
@@ -226,6 +233,10 @@ function LoginModal() {
 								window.open(
 									"https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn"
 								);
+							}}
+							_hover={{
+								cursor: "pointer",
+								textDecoration: "underline",
 							}}
 						>
 							Get Metamask
