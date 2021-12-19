@@ -457,7 +457,7 @@ function Page() {
 											: null
 									}
 									style={{
-										marginBottom: 25,
+										marginBottom: 45,
 										width: "100%",
 									}}
 									market={market}

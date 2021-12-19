@@ -173,6 +173,8 @@ function PostDisplay({ market, onImageClick, setRef, ...children }) {
 					}
 				}}
 				minHeight={minHeightTrick}
+				maxHeight={500}
+				width={"100%"}
 				justifyContent="center"
 				_hover={{
 					cursor: "pointer",
@@ -183,7 +185,7 @@ function PostDisplay({ market, onImageClick, setRef, ...children }) {
 					onLoad={() => {
 						setMinHeightTrick(0);
 					}}
-					width={"100%"}
+					fit="contain"
 					src={
 						market.marketMetadata &&
 						market.marketMetadata.eventIdentifierStr
