@@ -22,7 +22,7 @@ function ChallengeHistoryTable({ stakeHistories }) {
 				{stakeHistories.map((obj) => (
 					<Tr>
 						<Td>{sliceAddress(obj.user.id)}</Td>
-						<Td>{formatDecimalToCurrc(obj.amountC)}</Td>
+						<Td>{formatDecimalToCurr(obj.amountC)}</Td>
 						<Td>{obj.outcomeStaked === "1" ? "Yes" : "No"}</Td>
 					</Tr>
 				))}

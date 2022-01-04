@@ -96,8 +96,6 @@ function Page() {
 			return;
 		}
 
-		console.log(result.data.market, rinkebyLatestBlockNumber);
-
 		setMarket(
 			populateMarketWithMetadata(
 				result.data.market,

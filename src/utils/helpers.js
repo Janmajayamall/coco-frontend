@@ -351,7 +351,6 @@ export function convertBlocksToSeconds(blocks) {
 }
 
 export function formatTimeInSeconds(seconds) {
-	console.log("seconds ", seconds);
 	let sec = parseInt(seconds, 10);
 
 	let days = Math.floor(sec / 86400);

@@ -48,7 +48,6 @@ import { HomeIcon } from "../components/HomeIcon";
 import { ArrowBackIcon } from "@chakra-ui/icons";
 import SuggestionSidebar from "../components/SuggestionSidebar";
 import PrimaryButton from "../components/PrimaryButton";
-import NoPostsTag from "../components/NoPostsTag";
 
 function Page() {
 	const navigate = useNavigate();
@@ -109,6 +108,8 @@ function Page() {
 	// initial graph protocol call
 	useEffect(() => {
 		setMarkets([]);
+		setFilteredMarkets([])
+
 		if (feedType == undefined) {
 			return;
 		}
@@ -207,6 +208,7 @@ function Page() {
 	]);
 
 	useEffect(async () => {
+		setGroupDetails({})
 		if (groupId) {
 			let res = await findModeratorsDetails([groupId]);
 			if (res && res.groupsDetails && res.groupsDetails.length > 0) {
