@@ -38,6 +38,7 @@ import {
 	parseDecimalToBN,
 	ZERO_BN,
 	CURR_SYMBOL,
+	useBNInput,
 } from "../utils";
 import {
 	selectGroupsFollowed,
@@ -63,8 +64,14 @@ function SuggestionSidebar() {
 
 	const [popularGroups, setPopularGroups] = useState([]);
 	const [initialized, setInitialized] = useState(false);
-	const [inputEth, setInputEth] = useState(0);
 	const [swapLoading, setSwapLoading] = useState(false);
+	const {
+		input: inputEth,
+		bnValue: inputEthBn,
+		setInput: setInputEth,
+		err: inputEthErr,
+		errText: inputEthErrText,
+	} = useBNInput(validateEthInput);
 
 	useEffect(() => {
 		if (state.status === "Success") {
@@ -102,21 +109,14 @@ function SuggestionSidebar() {
 	}, []);
 
 	function validateEthInput() {
-		if (ethBalance == undefined) {
-			return true;
+		if (ethBalance == undefined || inputEthBn.lte(ethBalance)) {
+			return { valid: true, expStr: "" };
 		}
 
-		if (
-			ethBalance.gte(
-				parseDecimalToBN(
-					inputEth == "" || inputEth == "." ? "0" : inputEth
-				)
-			)
-		) {
-			return true;
-		}
-
-		return false;
+		return {
+			valid: false,
+			expStr: "Insufficient Balance",
+		};
 	}
 
 	return (
@@ -161,7 +161,6 @@ function SuggestionSidebar() {
 								marginTop: 5,
 							}}
 							onChange={(val) => {
-								console.log(val, " daj");
 								setInputEth(val);
 							}}
 							value={inputEth}
@@ -173,26 +172,22 @@ function SuggestionSidebar() {
 						</NumberInput>
 						<Text fontSize={14}>{`ETH`}</Text>
 					</HStack>
-					{validateEthInput() === false ? (
+					{inputEthErr === true ? (
 						<Text
 							style={{
 								fontSize: 12,
 								color: "#EB5757",
 							}}
 						>
-							Insufficient ETH balance
+							{`${inputEthErrText}`}
 						</Text>
 					) : undefined}
 					<PrimaryButton
 						isLoading={swapLoading}
 						loadingText="Processing..."
-						disabled={validateEthInput() === false}
+						disabled={inputEthErr === true}
 						onClick={() => {
-							if (validateEthInput() === false) {
-								return;
-							}
-
-							if (inputEth == "0" || inputEth == "") {
+							if (inputEthErr === true || inputEthBn.isZero()) {
 								return;
 							}
 
@@ -202,7 +197,7 @@ function SuggestionSidebar() {
 
 							sendTransaction({
 								to: addresses.WETH,
-								value: parseDecimalToBN(inputEth),
+								value: inputEthBn,
 								data: fnSig,
 							});
 						}}
