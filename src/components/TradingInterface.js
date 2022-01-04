@@ -304,7 +304,7 @@ function TradingInterface({ market, tradePosition, refreshFn }) {
 						info={formatBNToDecimalCurr(
 							tokenOutAmountBn.sub(inputBuyAmountBn)
 						)}
-						helpText="Your profit if the outcome of which shares you are buying is declared as the winning outcome"
+						helpText="Your profit if the outcome of which shares you are buying is declared as the final outcome"
 					/>
 
 					<PrimaryButton
