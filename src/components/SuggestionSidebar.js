@@ -102,11 +102,17 @@ function SuggestionSidebar() {
 	}, []);
 
 	function validateEthInput() {
-		if (ethBalance == undefined || inputEth == "") {
+		if (ethBalance == undefined) {
 			return true;
 		}
 
-		if (ethBalance.gte(parseDecimalToBN(inputEth))) {
+		if (
+			ethBalance.gte(
+				parseDecimalToBN(
+					inputEth == "" || inputEth == "." ? "0" : inputEth
+				)
+			)
+		) {
 			return true;
 		}
 
@@ -155,6 +161,7 @@ function SuggestionSidebar() {
 								marginTop: 5,
 							}}
 							onChange={(val) => {
+								console.log(val, " daj");
 								setInputEth(val);
 							}}
 							value={inputEth}

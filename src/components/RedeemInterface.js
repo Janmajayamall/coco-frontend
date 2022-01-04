@@ -147,6 +147,7 @@ function RedeemWinsInterface({
 					)
 				)}
 				titleBold={true}
+				helpText="Your profit by buying the right shares + your initial investment"
 			/>
 			{!stakePosition.amount0.isZero() ||
 			!stakePosition.amount1.isZero() ? (
@@ -156,18 +157,20 @@ function RedeemWinsInterface({
 					</Text>
 					{!stakePosition.amount1.isZero() ? (
 						<TwoColTitleInfo
-							title={"In favour of Yes"}
+							title={"In favour of YES"}
 							info={`${formatBNToDecimalCurr(
 								stakePosition.amount1
 							)}`}
+							helpText="Amount you staked favouring YES should be declared as final outcome."
 						/>
 					) : undefined}
 					{!stakePosition.amount0.isZero() ? (
 						<TwoColTitleInfo
-							title={"In favour of No"}
+							title={"In favour of NO"}
 							info={`${formatBNToDecimalCurr(
 								stakePosition.amount0
 							)}`}
+							helpText="Amount you staked favouring NO should be declared as final outcome."
 						/>
 					) : undefined}
 					<TwoColTitleInfo
@@ -175,9 +178,10 @@ function RedeemWinsInterface({
 						info={`${formatBNToDecimalCurr(
 							determineStakeWinnings(market, account)
 						)}`}
+						helpText="Your reward for staking for the right outcome. Note that only user that is last to stake for the right outcome receives reward."
 					/>
 					<TwoColTitleInfo
-						title={"You get back"}
+						title={"You receive from Challenge"}
 						info={`${formatBNToDecimalCurr(
 							determineTotalAmountStakeRedeem(
 								market,
@@ -186,6 +190,7 @@ function RedeemWinsInterface({
 							)
 						)}`}
 						titleBold={true}
+						helpText="Your Challenge winnings + Amount that you staked for the right outcome."
 					/>
 				</Flex>
 			) : undefined}
@@ -207,6 +212,7 @@ function RedeemWinsInterface({
 						)
 					)}`}
 					titleBold={true}
+					helpText="Total amount that you get back"
 				/>
 			</Flex>
 			<PrimaryButton

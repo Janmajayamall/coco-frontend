@@ -1,8 +1,6 @@
 import { useDisclosure } from "@chakra-ui/hooks";
 import { useDispatch, useSelector } from "react-redux";
-import {
-	selectUserProfile,
-} from "../redux/reducers";
+import { selectUserProfile } from "../redux/reducers";
 import {
 	Button,
 	Text,
@@ -160,29 +158,34 @@ function StakingInterface({ market, stakeHistories, refreshFn }) {
 			<TwoColTitleInfo
 				title={"Temporary outcome"}
 				info={`${outcomeDisplayName(tempOutcome)}`}
+				helpText="Outcome that will be declared as the final outcome if not challenged before challenge period ends"
 			/>
 			<TwoColTitleInfo
 				title={"Time left to challenge"}
 				info={`${formatTimeInSeconds(
 					convertBlocksToSeconds(market.optimisticState.blocksLeft)
 				)}`}
+				helpText="Time before which you can challenge the temporary outcome"
 			/>
 			<TwoColTitleInfo
 				title={"Challenges left"}
 				info={`${
 					market.donEscalationLimit - market.donEscalationCount
 				}`}
+				helpText="Challenges can only be made a certain number of time (max. limit), after which moderators declare the final outcome. Challenges left shows number of challenges left to reach max. limit."
 			/>
 			<TwoColTitleInfo
 				title={"Min. amount to challenge"}
 				info={`${formatBNToDecimalCurr(
 					market.lastAmountStaked.mul(TWO_BN)
 				)}`}
+				helpText={`Every consecutive challenge requires amount staked (in ${CURR_SYMBOL}) to be double of the amount staked in last challenge. If there's no previous challenge, then amount staked should be greater than 0 ${CURR_SYMBOL}.`}
 			/>
 
 			<TwoColTitleInfo
-				title={"You think outcome is"}
+				title={"Outcome favoured"}
 				info={`${outcomeDisplayName(favoredOutcome)}`}
+				helpText="Outcome in favour of which you are challenging the last outcome. You think that your favoured outcome should be declared as final outcome."
 			/>
 			<HStack>
 				<NumberInput

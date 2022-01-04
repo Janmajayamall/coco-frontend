@@ -95,7 +95,7 @@ function ApprovalInterface({
 				<Text color={"#FDFDFD"} fontWeight="bold" fontSize={12}>
 					{tokenType === 0
 						? `To spend your ${CURR_SYMBOL} tokens, you will first have to give approval to the app. This is only needed once.`
-						: `To spend your Outcome shares, you will first have to give approval to the app. This is only needed once per group`}
+						: `To spend your YES/NO shares, you will first have to give approval to the app. This is only needed once per group`}
 				</Text>
 			</Box>
 			<PrimaryButton

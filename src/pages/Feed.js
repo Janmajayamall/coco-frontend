@@ -264,6 +264,10 @@ function Page() {
 								w={5}
 								h={5}
 								color="#0B0B0B"
+								_hover={{
+									cursor: "pointer",
+									textDecoration: "underline",
+								}}
 							/>
 							<Heading size="sm">
 								{groupDetails.name ? groupDetails.name : ""}

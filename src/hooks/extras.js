@@ -14,7 +14,6 @@ export function useCheckTokenApprovals(
 	);
 
 	if (tokenType === 0 && erc20TokenAllowance != undefined) {
-        
 		return erc20AmountBn.lte(erc20TokenAllowance);
 	} else if (tokenType === 1 && erc1155TokenApproval != undefined) {
 		return erc1155TokenApproval;

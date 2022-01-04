@@ -304,7 +304,7 @@ function TradingInterface({ market, tradePosition, refreshFn }) {
 						info={formatBNToDecimalCurr(
 							tokenOutAmountBn.sub(inputBuyAmountBn)
 						)}
-						helpText="Your profit if the outcome of which shares you are buying is decided as the final outcome"
+						helpText="Your profit if the outcome of which shares you are buying is declared as the winning outcome"
 					/>
 
 					<PrimaryButton
@@ -423,11 +423,12 @@ function TradingInterface({ market, tradePosition, refreshFn }) {
 					<TwoColTitleInfo
 						title="Your choice"
 						info={tokenActionIndex === 0 ? "NO" : "YES"}
-						helpText="Shares"
+						helpText="Share that you are selling"
 					/>
 					<TwoColTitleInfo
 						title="Estimated amount received"
 						info={formatBNToDecimalCurr(amountCOutBn)}
+						helpText={`Amount of ${CURR_SYMBOL} you will receive after selling`}
 					/>
 					<TwoColTitleInfo
 						title="Avg. sell price"
@@ -435,6 +436,7 @@ function TradingInterface({ market, tradePosition, refreshFn }) {
 							amountCOutBn,
 							inputSellAmountBn
 						)}
+						helpText={`Amount of ${CURR_SYMBOL} you receive per unit of share sold`}
 					/>
 					<PrimaryButton
 						disabled={
