@@ -28,6 +28,7 @@ import {
 	HStack,
 } from "@chakra-ui/react";
 import { CURR_SYMBOL } from "../utils";
+import InfoTip from "./InfoTip";
 
 function TradingInput({
 	slippageValue,
@@ -65,7 +66,6 @@ function TradingInput({
 					</Text>
 				) : undefined}
 			</HStack>
-
 			{err === true ? (
 				<Text
 					marginTop="1"
@@ -77,12 +77,25 @@ function TradingInput({
 					{errText}
 				</Text>
 			) : undefined}
-			<Text
-				marginTop="1"
-				marginBottom="1"
-				fontSize="10"
-				fontWeight="bold"
-			>{`${slippageValue}% slippage`}</Text>
+			<Flex alignItems={"center"}>
+				<Text
+					marginTop="1"
+					marginBottom="1"
+					fontSize="10"
+					fontWeight="bold"
+				>{`${slippageValue}% slippage`}</Text>
+				<InfoTip
+					style={{
+						height: 10,
+						width: 10,
+						marginLeft: 5,
+						color: "#6F6F6F",
+					}}
+					infoText={
+						"Slippage prevents your transaction from executing at unfavorable price caused by other orders."
+					}
+				/>
+			</Flex>
 			<Slider
 				onChange={(val) => {
 					setSlippage(val);

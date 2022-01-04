@@ -5,6 +5,7 @@ import { useNavigate } from "react-router";
 import {
 	followModerator,
 	formatBNToDecimalCurr,
+	formatDecimalToPercentage,
 	generateProfileInitials,
 	roundDecimalStr,
 	sliceAddress,
@@ -205,11 +206,11 @@ function PostDisplay({ market, onImageClick, setRef, ...children }) {
 				<BottomStats
 					marginRight={4}
 					title="Yes"
-					info={`${roundDecimalStr(market.probability1)}`}
+					info={`${formatDecimalToPercentage(market.probability1)}`}
 				/>
 				<BottomStats
 					title="No"
-					info={`${roundDecimalStr(market.probability0)}`}
+					info={`${formatDecimalToPercentage(market.probability0)}`}
 				/>
 			</Flex>
 		</Box>

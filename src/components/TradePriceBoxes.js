@@ -1,10 +1,13 @@
-import { Button, Box, Text, Flex, Spacer } from "@chakra-ui/react";
+import { Button, Box, Text, Flex, Spacer, Icon } from "@chakra-ui/react";
 import {
 	determineOutcome,
 	formatBNToDecimal,
+	formatDecimalToCurr,
+	formatDecimalToPercentage,
 	roundDecimalStr,
 	roundValueTwoDP,
 } from "../utils";
+import InfoTip from "./InfoTip";
 
 function TradePricesBoxes({
 	market,
@@ -41,21 +44,74 @@ function TradePricesBoxes({
 				}}
 				borderRadius={5}
 			>
-				<Flex>
-					<Text>{outcome === 1 ? "YES" : "NO"}</Text>
+				<Flex alignItems={"center"} marginBottom={2}>
+					<Text
+						style={{
+							fontSize: 18,
+							fontWeight: "bold",
+						}}
+					>
+						{outcome === 1 ? "YES" : "NO"}
+					</Text>
+					<InfoTip
+						style={{
+							marginRight: 2,
+							marginLeft: 2,
+							height: 10,
+							width: 10,
+							color: "#6F6F6F",
+						}}
+						infoText={`Price of ${
+							outcome === 1 ? "YES" : "NO"
+						} share`}
+					/>
 					<Spacer />
-					<Text>{`${roundDecimalStr(
+					<Text
+						style={{
+							fontSize: 18,
+							fontWeight: "bold",
+						}}
+					>{`${formatDecimalToCurr(
 						outcome === 1
 							? market.probability1
 							: market.probability0
 					)}`}</Text>
 				</Flex>
-				<Flex>
-					<Text fontSize={12} fontWeight={"bold"}>
+				<Flex alignItems={"center"}>
+					<Text
+						style={{
+							fontSize: 16,
+						}}
+					>
 						You own
 					</Text>
+					<InfoTip
+						style={{
+							marginRight: 2,
+							marginLeft: 2,
+							height: 10,
+							width: 10,
+							color: "#6F6F6F",
+						}}
+						infoText={`Amount of ${
+							outcome === 1 ? "YES" : "NO"
+						} shares you own`}
+					/>
+					{/* <Box
+						style={{
+							borderWidth: 1,
+							borderColor: "#6F6F6F",
+							height: 0,
+							width: "100%",
+						}}
+						bg="red.400" 
+					/> */}
 					<Spacer />
-					<Text fontSize={12} fontWeight={"bold"}>
+					<Text
+						style={{
+							fontSize: 16,
+						}}
+					>
 						{`${formatBNToDecimal(
 							outcome === 1
 								? tradePosition.amount1

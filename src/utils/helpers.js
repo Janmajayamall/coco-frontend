@@ -131,6 +131,15 @@ export function formatBNToDecimalCurr(val, base = 18, dp = 3) {
 	return `${formatBNToDecimal(val, base, true, dp)} ${CURR_SYMBOL}`;
 }
 
+export function formatDecimalToCurr(value, dp = 3) {
+	return `${roundDecimalStr(value, dp)} ${CURR_SYMBOL}`;
+}
+
+export function formatDecimalToPercentage(value, dp = 3) {
+	let roundedValue = roundDecimalStr(value, dp);
+	return `${roundedValue * 100}%`;
+}
+
 export function getDecStrAvgPriceBN(amountIn, amountOut) {
 	if (!BigNumber.isBigNumber(amountIn) || !BigNumber.isBigNumber(amountOut)) {
 		return "0.00";

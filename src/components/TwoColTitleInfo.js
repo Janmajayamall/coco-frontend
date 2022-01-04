@@ -24,13 +24,31 @@ import {
 	SliderThumb,
 	Slider,
 } from "@chakra-ui/react";
+import InfoTip from "./InfoTip";
 
-function TwoColTitleInfo({ title, info, titleBold = false, ...props }) {
+function TwoColTitleInfo({
+	title,
+	info,
+	helpText = "",
+	titleBold = false,
+	...props
+}) {
 	return (
-		<Flex {...props}>
+		<Flex {...props} alignItems={"center"}>
 			<Text fontSize="12" fontWeight={titleBold ? "bold" : "normal"}>
 				{title}
 			</Text>
+			{helpText != "" ? (
+				<InfoTip
+					style={{
+						height: 10,
+						width: 10,
+						color: "#6F6F6F",
+						marginLeft: 4,
+					}}
+					infoText={helpText}
+				/>
+			) : undefined}
 			<Spacer />
 			<Text fontSize="12">{info}</Text>
 		</Flex>

@@ -5,14 +5,7 @@ import {
 	useContractCalls,
 	useContractCall,
 } from "@usedapp/core/packages/core";
-import {
-	marketRouterContract,
-	oracleFactoryContract,
-	oracleContract,
-	tokenDistributorInterface,
-	oracleInterface,
-	wEthInterface,
-} from "../utils";
+import { oracleInterface, wEthInterface } from "../utils";
 
 export function useTokenBalance(account) {
 	const [tokenBalance] =
@@ -40,33 +33,6 @@ export function useTokenAllowance(account) {
 				}
 		) ?? [];
 	return allowance;
-}
-
-export function useClaimedAmount(account) {
-	const [claimedAmount] =
-		useContractCall(
-			account &&
-				addresses.TokenDistributor && {
-					abi: tokenDistributorInterface,
-					address: addresses.TokenDistributor,
-					method: "claims",
-					args: [account],
-				}
-		) ?? [];
-	return claimedAmount;
-}
-
-export function useClaimLimit() {
-	const [claimLimit] =
-		useContractCall(
-			addresses.TokenDistributor && {
-				abi: tokenDistributorInterface,
-				address: addresses.TokenDistributor,
-				method: "claimLimit",
-				args: [],
-			}
-		) ?? [];
-	return claimLimit;
 }
 
 export function useERC1155ApprovalForAll(oracleAddress, account) {

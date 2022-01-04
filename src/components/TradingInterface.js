@@ -19,6 +19,7 @@ import {
 	GRAPH_BUFFER_MS,
 	formatBNToDecimalCurr,
 	minAmountAfterSlippageBn,
+	CURR_SYMBOL,
 } from "../utils";
 import PostDisplay from "../components/PostDisplay";
 import TwoColTitleInfo from "../components/TwoColTitleInfo";
@@ -283,10 +284,12 @@ function TradingInterface({ market, tradePosition, refreshFn }) {
 					<TwoColTitleInfo
 						title="Your choice"
 						info={tokenActionIndex === 0 ? "NO" : "YES"}
+						helpText="Share that you are buying"
 					/>
 					<TwoColTitleInfo
 						title="Estimated shares bought"
 						info={formatBNToDecimal(tokenOutAmountBn)}
+						helpText="Amount of shares that you will receive"
 					/>
 					<TwoColTitleInfo
 						title="Avg. Price per share"
@@ -294,12 +297,14 @@ function TradingInterface({ market, tradePosition, refreshFn }) {
 							inputBuyAmountBn,
 							tokenOutAmountBn
 						)}
+						helpText={`Price in ${CURR_SYMBOL} you are paying per share`}
 					/>
 					<TwoColTitleInfo
 						title="Max. potential profit"
 						info={formatBNToDecimalCurr(
 							tokenOutAmountBn.sub(inputBuyAmountBn)
 						)}
+						helpText="Your profit if the outcome of which shares you are buying is decided as the final outcome"
 					/>
 
 					<PrimaryButton
@@ -418,6 +423,7 @@ function TradingInterface({ market, tradePosition, refreshFn }) {
 					<TwoColTitleInfo
 						title="Your choice"
 						info={tokenActionIndex === 0 ? "NO" : "YES"}
+						helpText="Shares"
 					/>
 					<TwoColTitleInfo
 						title="Estimated amount received"

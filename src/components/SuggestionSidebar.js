@@ -25,16 +25,7 @@ import {
 } from "@chakra-ui/react";
 
 import { useEtherBalance, useEthers } from "@usedapp/core/packages/core";
-import {
-	useCreateNewMarket,
-	useQueryMarketsOrderedByLatest,
-	useQueryExploreMarkets,
-	useQueryMarketByOracles,
-	useClaim,
-	useClaimedAmount,
-	useClaimLimit,
-	useDepositEthToWeth,
-} from "../hooks";
+import { useDepositEthToWeth } from "../hooks";
 
 import Web3 from "web3";
 import { useEffect, useState } from "react";
