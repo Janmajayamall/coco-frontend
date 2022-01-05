@@ -189,6 +189,10 @@ function LoginModal() {
 							style={{
 								...styles.actionText,
 							}}
+							_hover={{
+								cursor: "pointer",
+								textDecoration: "underline",
+							}}
 							onClick={async () => {
 								if (window.ethereum) {
 									await window.ethereum.request({

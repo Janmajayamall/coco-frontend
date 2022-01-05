@@ -295,7 +295,7 @@ function Page() {
 								}
 							)}
 							{InputWithTitle(
-								"Escalation Limit",
+								"Max. no. of Challenge rounds",
 								1,
 								escalationLimit,
 								escalationLimit,

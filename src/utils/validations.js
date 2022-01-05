@@ -36,7 +36,8 @@ export function validateEscalationLimit(val) {
 	if (val < 1) {
 		return {
 			valid: false,
-			expText: "We recommend Escalation limit to be at least 1",
+			expText:
+				"We recommend Max. no. of Challenge rounds to be at least 1",
 		};
 	}
 	return {
