@@ -402,19 +402,29 @@ function Page() {
 										feeNumerator,
 										feeDenominator,
 										escalationLimit,
-										convertHoursToBlocks(
-											chainId,
-											expireHours
-										),
-										convertHoursToBlocks(
-											chainId,
-											bufferHours
-										),
-										convertHoursToBlocks(
-											chainId,
-											resolutionHours
-										)
+										20,
+										20,
+										20
 									);
+
+									// send(
+									// 	true,
+									// 	feeNumerator,
+									// 	feeDenominator,
+									// 	escalationLimit,
+									// 	convertHoursToBlocks(
+									// 		chainId,
+									// 		expireHours
+									// 	),
+									// 	convertHoursToBlocks(
+									// 		chainId,
+									// 		bufferHours
+									// 	),
+									// 	convertHoursToBlocks(
+									// 		chainId,
+									// 		resolutionHours
+									// 	)
+									// );
 								}}
 								title={"Update Configs"}
 							/>

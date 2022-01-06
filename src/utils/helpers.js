@@ -136,8 +136,7 @@ export function formatDecimalToCurr(value, dp = 3) {
 }
 
 export function formatDecimalToPercentage(value, dp = 3) {
-	let roundedValue = roundDecimalStr(value, dp);
-	return `${roundedValue * 100}%`;
+	return `${roundDecimalStr(value * 100, dp)}%`;
 }
 
 export function getDecStrAvgPriceBN(amountIn, amountOut) {
