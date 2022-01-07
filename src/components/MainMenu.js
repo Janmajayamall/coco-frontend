@@ -80,7 +80,12 @@ function MainMenu() {
 						/>
 					</>
 				) : undefined}
-				<Item title={"Guide"} />
+				<Item
+					onClick={() => {
+						window.open("https://docs.cocoverse.club/", "_blank");
+					}}
+					title={"Guide"}
+				/>
 			</MenuList>
 		</Menu>
 	);
