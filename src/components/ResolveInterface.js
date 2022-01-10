@@ -154,7 +154,7 @@ function ResolveInterface({
 						<option value={2}>Undecided</option>
 					</Select>
 					<Text marginBottom={2} fontSize={12} fontWeight="bold">
-						You are seeing this because you manage the group.
+						You are seeing this because you govern the group.
 					</Text>
 					<PrimaryButton
 						isLoading={loading}

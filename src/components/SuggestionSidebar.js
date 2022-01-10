@@ -216,6 +216,7 @@ function SuggestionSidebar() {
 						>{`Need test ETH? Try a faucet`}</Text>
 						<Flex>
 							<Text
+								_hover={{ cursor: "pointer" }}
 								onClick={() => {
 									if (window) {
 										window.open(
@@ -234,6 +235,7 @@ function SuggestionSidebar() {
 								marginRight={1}
 							>{`or`}</Text>
 							<Text
+								_hover={{ cursor: "pointer" }}
 								onClick={() => {
 									if (window) {
 										window.open(

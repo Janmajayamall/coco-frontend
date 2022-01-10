@@ -397,34 +397,34 @@ function Page() {
 									const feeNumerator = Number(fee) * 1000;
 									const feeDenominator = 1000;
 
+									// send(
+									// 	true,
+									// 	feeNumerator,
+									// 	feeDenominator,
+									// 	1,
+									// 	20,
+									// 	20,
+									// 	20
+									// );
+
 									send(
 										true,
 										feeNumerator,
 										feeDenominator,
 										escalationLimit,
-										20,
-										20,
-										20
+										convertHoursToBlocks(
+											chainId,
+											expireHours
+										),
+										convertHoursToBlocks(
+											chainId,
+											bufferHours
+										),
+										convertHoursToBlocks(
+											chainId,
+											resolutionHours
+										)
 									);
-
-									// send(
-									// 	true,
-									// 	feeNumerator,
-									// 	feeDenominator,
-									// 	escalationLimit,
-									// 	convertHoursToBlocks(
-									// 		chainId,
-									// 		expireHours
-									// 	),
-									// 	convertHoursToBlocks(
-									// 		chainId,
-									// 		bufferHours
-									// 	),
-									// 	convertHoursToBlocks(
-									// 		chainId,
-									// 		resolutionHours
-									// 	)
-									// );
 								}}
 								title={"Update Configs"}
 							/>
