@@ -15,8 +15,7 @@ import {
 	newPost,
 	findModerators,
 	getPresignedUrl,
-	validateInitialBetAmount,
-	validateFundingAmount,
+	validateCreationAmount,
 	useBNInput,
 	CURR_SYMBOL,
 	uploadImageFile,
@@ -28,7 +27,7 @@ import {
 	useTokenBalance,
 } from "./../hooks";
 import { useEthers } from "@usedapp/core/packages/core";
-import { utils } from "ethers";
+import { BigNumber, utils } from "ethers";
 import { useNavigate } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { selectUserProfile, sUpdateLoginModalIsOpen } from "../redux/reducers";
@@ -51,18 +50,11 @@ function Page() {
 	const [s3ImageUrl, setS3ImageUrl] = useState(null);
 	const [selectModerator, setSelectModerator] = useState(null);
 	const {
-		input: fundingAmount,
-		bnValue: fundingAmountBn,
-		setInput: setFundingAmount,
-		err: fundingAmountErr,
-		errText: fundingAmountErrText,
-	} = useBNInput();
-	const {
-		input: betAmount,
-		bnValue: betAmountBn,
-		setInput: setBetAmount,
-		err: betAmountErr,
-		errText: betAmountErrText,
+		input: creationAmount,
+		bnValue: creationAmountBn,
+		setInput: setCreationAmount,
+		err: creationAmountErr,
+		errText: creationAmountErrText,
 	} = useBNInput();
 
 	const [moderators, setModerators] = useState([]);
@@ -76,7 +68,7 @@ function Page() {
 		0,
 		account,
 		undefined,
-		fundingAmountBn.add(betAmountBn)
+		creationAmountBn
 	);
 
 	useEffect(async () => {
@@ -138,10 +130,8 @@ function Page() {
 		}
 
 		if (
-			!validateFundingAmount(fundingAmountBn, wEthTokenBalance).valid ||
-			!validateInitialBetAmount(betAmountBn, wEthTokenBalance).valid ||
-			wEthTokenBalance == undefined ||
-			wEthTokenBalance.lt(fundingAmountBn.add(betAmountBn))
+			!validateCreationAmount(creationAmountBn, wEthTokenBalance).valid ||
+			wEthTokenBalance == undefined
 		) {
 			return false;
 		}
@@ -187,8 +177,8 @@ function Page() {
 		send(
 			keccak256(s3ImageUrl),
 			selectModerator,
-			utils.parseEther(String(fundingAmount)),
-			utils.parseEther(String(betAmount)),
+			creationAmountBn.div(BigNumber.from(2)), // liquidity = 0.5 * creation amount
+			creationAmountBn.div(BigNumber.from(2)), // yes bet amount = 0.5 * creation amount
 			1
 		);
 	}
@@ -301,27 +291,12 @@ function Page() {
 						</Flex>
 
 						{InputWithTitle(
-							"Liquidity",
+							"Creation Amount",
 							2,
-							fundingAmount,
-							fundingAmountBn,
-							setFundingAmount,
-							validateFundingAmount,
-							{
-								defaultValue: 1,
-								precision: 3,
-							},
-							wEthTokenBalance,
-							CURR_SYMBOL
-						)}
-
-						{InputWithTitle(
-							"Bet for YES",
-							2,
-							betAmount,
-							betAmountBn,
-							setBetAmount,
-							validateInitialBetAmount,
+							creationAmount,
+							creationAmountBn,
+							setCreationAmount,
+							validateCreationAmount,
 							{
 								defaultValue: 1,
 								precision: 3,
@@ -343,7 +318,7 @@ function Page() {
 						<ApprovalInterface
 							marginTop={5}
 							tokenType={0}
-							erc20AmountBn={fundingAmountBn.add(betAmountBn)}
+							erc20AmountBn={creationAmountBn}
 							onSuccess={() => {
 								toast({
 									title: "Success!",

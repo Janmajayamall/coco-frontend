@@ -172,6 +172,34 @@ export function validateUpdateMarketConfigTxInputs(
 	};
 }
 
+export function validateCreationAmount(val, userBalance) {
+	if (!validateIsBN(val).valid || !validateIsBN(userBalance).valid) {
+		return {
+			valid: false,
+			expText: "Invalid value!",
+		};
+	}
+
+	if (val.lte(ZERO_BN)) {
+		return {
+			valid: false,
+			expText: "Creation amount should be greater than 0",
+		};
+	}
+
+	if (val.gt(userBalance)) {
+		return {
+			valid: false,
+			expText: "Insufficient Balance",
+		};
+	}
+
+	return {
+		valid: true,
+		expText: "",
+	};
+}
+
 export function validateFundingAmount(val, userBalance) {
 	if (!validateIsBN(val).valid || !validateIsBN(userBalance).valid) {
 		return validateIsBN(val);
