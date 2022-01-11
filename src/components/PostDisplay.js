@@ -7,7 +7,6 @@ import {
 	formatBNToDecimalCurr,
 	formatDecimalToPercentage,
 	generateProfileInitials,
-	roundDecimalStr,
 	sliceAddress,
 } from "../utils";
 import { sAddGroupFollow } from "./../redux/reducers";

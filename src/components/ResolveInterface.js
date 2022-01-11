@@ -60,6 +60,7 @@ import {
 	ZERO_DECIMAL_STR,
 	calculateResolveFee,
 	GRAPH_BUFFER_MS,
+	formatBNToDecimalCurr,
 } from "../utils";
 import PostDisplay from "../components/PostDisplay";
 import TwoColTitleInfo from "../components/TwoColTitleInfo";
@@ -128,7 +129,7 @@ function ResolveInterface({
 					</Text>
 					<TwoColTitleInfo
 						title="Fee received"
-						info={formatBNToDecimal(
+						info={formatBNToDecimalCurr(
 							chosenOutcome == ""
 								? ZERO_BN
 								: calculateResolveFee(

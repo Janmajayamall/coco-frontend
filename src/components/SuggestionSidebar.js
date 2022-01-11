@@ -32,7 +32,7 @@ import { useEffect, useState } from "react";
 import {
 	findAllModerators,
 	formatBNToDecimal,
-	formatBNToDecimalCurr,
+
 	getFunctionSignature,
 	ONE_BN,
 	parseDecimalToBN,

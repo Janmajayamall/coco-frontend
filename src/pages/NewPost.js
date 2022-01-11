@@ -299,7 +299,6 @@ function Page() {
 							validateCreationAmount,
 							{
 								defaultValue: 1,
-								precision: 3,
 							},
 							wEthTokenBalance,
 							CURR_SYMBOL

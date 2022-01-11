@@ -75,7 +75,7 @@ export function populateMarketWithMetadata(
 	};
 }
 
-export function roundDecimalStr(value, dp = 3) {
+export function roundDecimalStr(value, dp = 6) {
 	let _value = value;
 	try {
 		if (typeof _value == "string") {
@@ -85,7 +85,7 @@ export function roundDecimalStr(value, dp = 3) {
 		return 0;
 	}
 
-	return _value.toFixed(dp);
+	return parseFloat(_value.toFixed(dp));
 }
 
 export function numStrFormatter(value, digits = 1) {
@@ -119,7 +119,7 @@ export function parseDecimalToBN(val, base = 18) {
 	return ethers.utils.parseUnits(val, base);
 }
 
-export function formatBNToDecimal(val, base = 18, round = true, dp = 3) {
+export function formatBNToDecimal(val, base = 18, round = true, dp = 6) {
 	val = ethers.utils.formatUnits(val, base);
 	if (round === true) {
 		val = roundDecimalStr(val, dp);
@@ -127,15 +127,15 @@ export function formatBNToDecimal(val, base = 18, round = true, dp = 3) {
 	return val;
 }
 
-export function formatBNToDecimalCurr(val, base = 18, dp = 3) {
+export function formatBNToDecimalCurr(val, base = 18, dp = 6) {
 	return `${formatBNToDecimal(val, base, true, dp)} ${CURR_SYMBOL}`;
 }
 
-export function formatDecimalToCurr(value, dp = 3) {
+export function formatDecimalToCurr(value, dp = 6) {
 	return `${roundDecimalStr(value, dp)} ${CURR_SYMBOL}`;
 }
 
-export function formatDecimalToPercentage(value, dp = 3) {
+export function formatDecimalToPercentage(value, dp = 6) {
 	return `${roundDecimalStr(value * 100, dp)}%`;
 }
 

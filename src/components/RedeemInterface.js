@@ -200,7 +200,6 @@ function RedeemWinsInterface({
 						).add(
 							determineTotalAmountStakeRedeem(
 								market,
-
 								stakePosition,
 								account
 							)

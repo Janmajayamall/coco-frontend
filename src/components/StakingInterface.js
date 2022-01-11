@@ -131,8 +131,8 @@ function StakingInterface({ market, stakeHistories, refreshFn }) {
 		if (bnValue.lt(market.lastAmountStaked.mul(TWO_BN))) {
 			return {
 				valid: false,
-				expStr: `Challenge amount should be min ${formatBNToDecimal(
-					market.lastAmountStaked.mul(TWO_BN).toString()
+				expStr: `Challenge amount should be min ${formatBNToDecimalCurr(
+					market.lastAmountStaked.mul(TWO_BN)
 				)}`,
 			};
 		}
