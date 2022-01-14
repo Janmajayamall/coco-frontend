@@ -1,6 +1,6 @@
 import { useSelector } from "react-redux";
 import { selectUserProfile } from "../redux/reducers";
-import { Button, Text, Flex, useToast } from "@chakra-ui/react";
+import { Button, Text, Flex, useToast, UnorderedList } from "@chakra-ui/react";
 import { useEthers } from "@usedapp/core/packages/core";
 import { useEffect } from "react";
 import { useState } from "react";
@@ -20,6 +20,9 @@ import {
 	formatBNToDecimalCurr,
 	minAmountAfterSlippageBn,
 	CURR_SYMBOL,
+	getOutcomeProbabilityFromReserves,
+	ZERO_BN,
+	formatDecimalToPercentage,
 } from "../utils";
 import PostDisplay from "../components/PostDisplay";
 import TwoColTitleInfo from "../components/TwoColTitleInfo";
@@ -79,6 +82,11 @@ function TradingInterface({ market, tradePosition, refreshFn }) {
 
 	const [slippage, setSlippage] = useState(0.5);
 
+	// updated probabilities
+	const [updatedProbabilityObj, setUpdatedProbabilityObj] = useState(
+		undefined
+	);
+
 	// tx loading
 	const [buyLoading, setBuyLoading] = useState(false);
 	const [sellLoading, setSellLoading] = useState(false);
@@ -112,9 +120,25 @@ function TradingInterface({ market, tradePosition, refreshFn }) {
 			tokenActionIndex
 		);
 
-		if (err) {
+		if (err === true) {
 			// TODO set error
+			setUpdatedProbabilityObj(undefined);
 			return;
+		}
+
+		const _updatedProbs = getOutcomeProbabilityFromReserves(
+			market.outcomeReserve0
+				.add(inputBuyAmountBn)
+				.sub(tokenActionIndex == 0 ? amount : ZERO_BN),
+			market.outcomeReserve1
+				.add(inputBuyAmountBn)
+				.sub(tokenActionIndex == 1 ? amount : ZERO_BN)
+		);
+
+		if (_updatedProbs.error === false) {
+			setUpdatedProbabilityObj(_updatedProbs);
+		} else {
+			setUpdatedProbabilityObj(undefined);
 		}
 
 		setTokenOutAmountBn(amount);
@@ -139,7 +163,23 @@ function TradingInterface({ market, tradePosition, refreshFn }) {
 
 		if (err) {
 			// TODO set error
+			setUpdatedProbabilityObj(undefined);
 			return;
+		}
+
+		const _updatedProbs = getOutcomeProbabilityFromReserves(
+			market.outcomeReserve0
+				.add(tokenActionIndex == 0 ? inputSellAmountBn : ZERO_BN)
+				.sub(amount),
+			market.outcomeReserve1
+				.add(tokenActionIndex == 1 ? inputSellAmountBn : ZERO_BN)
+				.sub(amount)
+		);
+
+		if (_updatedProbs.error === false) {
+			setUpdatedProbabilityObj(_updatedProbs);
+		} else {
+			setUpdatedProbabilityObj(undefined);
 		}
 
 		setAmountCOutBn(amount);
@@ -306,6 +346,28 @@ function TradingInterface({ market, tradePosition, refreshFn }) {
 						)}
 						helpText="Your profit if the outcome of which shares you are buying is declared as the final outcome"
 					/>
+					<TwoColTitleInfo
+						title="New YES(%) Prob."
+						info={
+							updatedProbabilityObj != undefined
+								? formatDecimalToPercentage(
+										updatedProbabilityObj.p1
+								  )
+								: "N/A"
+						}
+						helpText="Yes(%) probability of post after you have successfully bought your outcome shares"
+					/>
+					<TwoColTitleInfo
+						title="New NO(%) Prob."
+						info={
+							updatedProbabilityObj != undefined
+								? formatDecimalToPercentage(
+										updatedProbabilityObj.p0
+								  )
+								: "N/A"
+						}
+						helpText="No(%) probability of post after you have successfully bought your outcome shares"
+					/>
 
 					<PrimaryButton
 						disabled={
@@ -438,6 +500,29 @@ function TradingInterface({ market, tradePosition, refreshFn }) {
 						)}
 						helpText={`Amount of ${CURR_SYMBOL} you receive per unit of share sold`}
 					/>
+					<TwoColTitleInfo
+						title="New YES(%) Prob."
+						info={
+							updatedProbabilityObj != undefined
+								? formatDecimalToPercentage(
+										updatedProbabilityObj.p1
+								  )
+								: "N/A"
+						}
+						helpText="Yes(%) probability of post after you have successfully sold your outcome shares"
+					/>
+					<TwoColTitleInfo
+						title="New NO(%) Prob."
+						info={
+							updatedProbabilityObj != undefined
+								? formatDecimalToPercentage(
+										updatedProbabilityObj.p1
+								  )
+								: "N/A"
+						}
+						helpText="No(%) probability of post after you have successfully sold your outcome shares"
+					/>
+
 					<PrimaryButton
 						disabled={
 							!isAuthenticated ||

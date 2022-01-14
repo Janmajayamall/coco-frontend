@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { parse } from "graphql";
 import { ZERO_BN, TWO_BN } from "./constants";
 import { useTab } from "@chakra-ui/tabs";
-import { CURR_SYMBOL } from ".";
+import { CURR_SYMBOL, MULTIPLIER_BASE, MULTIPLIER } from ".";
 
 export function populateMarketWithMetadata(
 	market,
@@ -146,22 +146,12 @@ export function getDecStrAvgPriceBN(amountIn, amountOut) {
 	if (amountIn.isZero() || amountOut.isZero()) {
 		return "0.00";
 	}
-	let val = amountIn.mul(BigNumber.from("1000")).div(amountOut).toString();
-
-	if (val.length == 3) {
-		return "0." + val;
-	}
-	if (val.length == 2) {
-		return "0.0" + val;
-	}
-	if (val.length == 1) {
-		return "0.00" + val;
-	}
-	if (val.length == 0) {
-		return "0.000";
-	}
-
-	return val.slice(0, val.length - 3) + "." + val.slice(val.length - 3);
+	return formatBNToDecimal(
+		amountIn.mul(MULTIPLIER).div(amountOut),
+		MULTIPLIER_BASE,
+		true,
+		6
+	);
 }
 
 export function useBNInput(validationFn) {

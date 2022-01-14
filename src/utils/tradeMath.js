@@ -1,5 +1,7 @@
 import { BigNumber } from "ethers";
+import { MULTIPLIER, MULTIPLIER_BASE } from ".";
 import { ZERO_BN, TWO_BN, FOUR_BN, ONE_BN } from "./constants";
+import { formatBNToDecimal } from "./helpers";
 
 export function isValidTradeEq(r0, r1, a0, a1, a, isBuy) {
 	if (typeof isBuy !== "boolean") {
@@ -150,4 +152,29 @@ export function getAmountCToBuyTokens(r0, r1, a0, a1) {
 	}
 
 	return 0, true;
+}
+
+export function getOutcomeProbabilityFromReserves(r0, r1) {
+	if (!BigNumber.isBigNumber(r0) || !BigNumber.isBigNumber(r1)) {
+		return {
+			p0: ZERO_BN,
+			p1: ZERO_BN,
+			error: true,
+		};
+	}
+	return {
+		p0: formatBNToDecimal(
+			r1.mul(MULTIPLIER).div(r0.add(r1)),
+			MULTIPLIER_BASE,
+			true,
+			6
+		),
+		p1: formatBNToDecimal(
+			r0.mul(MULTIPLIER).div(r0.add(r1)),
+			MULTIPLIER_BASE,
+			true,
+			6
+		),
+		error: false,
+	};
 }

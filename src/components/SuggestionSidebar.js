@@ -32,7 +32,6 @@ import { useEffect, useState } from "react";
 import {
 	findAllModerators,
 	formatBNToDecimal,
-
 	getFunctionSignature,
 	ONE_BN,
 	parseDecimalToBN,
@@ -239,7 +238,7 @@ function SuggestionSidebar() {
 								onClick={() => {
 									if (window) {
 										window.open(
-											"https://faucet.paradigm.xyz/"
+											"https://faucet.rinkeby.io/"
 										);
 									}
 								}}
