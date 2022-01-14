@@ -24,7 +24,6 @@ import {
 	ZERO_BN,
 	formatDecimalToPercentage,
 } from "../utils";
-import PostDisplay from "../components/PostDisplay";
 import TwoColTitleInfo from "../components/TwoColTitleInfo";
 import PrimaryButton from "./PrimaryButton";
 import { BigNumber } from "ethers";
@@ -516,7 +515,7 @@ function TradingInterface({ market, tradePosition, refreshFn }) {
 						info={
 							updatedProbabilityObj != undefined
 								? formatDecimalToPercentage(
-										updatedProbabilityObj.p1
+										updatedProbabilityObj.p0
 								  )
 								: "N/A"
 						}
