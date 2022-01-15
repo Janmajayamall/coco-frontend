@@ -161,7 +161,7 @@ function StakingInterface({ market, stakeHistories, refreshFn }) {
 				helpText="Outcome that will be declared as the final outcome if not challenged before challenge period ends"
 			/>
 			<TwoColTitleInfo
-				title={"Time left to challenge"}
+				title={"Time remaining"}
 				info={`${formatTimeInSeconds(
 					convertBlocksToSeconds(market.optimisticState.blocksLeft)
 				)}`}
