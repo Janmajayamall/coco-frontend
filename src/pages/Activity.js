@@ -214,8 +214,8 @@ function Page() {
 						<option value={1}>Live</option>
 						<option value={2}>Challenge</option>
 						<option value={3}>Resolution</option>
-						<option value={4}>Ended</option>
-						<option value={5}>Pending Claims</option>
+						<option value={4}>Final</option>
+						<option value={5}>Pending Redeem</option>
 						<option value={6}>Created by you</option>
 					</Select>
 				</Flex>

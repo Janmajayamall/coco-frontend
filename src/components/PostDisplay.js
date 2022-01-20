@@ -49,7 +49,7 @@ function PostDisplay({ market, onImageClick, setRef, ...children }) {
 				return "Resolution";
 			}
 			if (val === 4) {
-				return "Ended";
+				return "Final";
 			}
 			return "";
 		}

@@ -323,12 +323,12 @@ function TradingInterface({ market, tradePosition, refreshFn }) {
 					<TwoColTitleInfo
 						title="Your choice"
 						info={tokenActionIndex === 0 ? "NO" : "YES"}
-						helpText="Share that you are buying"
+						helpText="Outcome share that you are buying"
 					/>
 					<TwoColTitleInfo
 						title="Estimated shares bought"
 						info={formatBNToDecimal(tokenOutAmountBn)}
-						helpText="Amount of shares that you will receive"
+						helpText="Number of shares you will receive based on the WETH amount you've entered"
 					/>
 					<TwoColTitleInfo
 						title="Avg. Price per share"
@@ -336,14 +336,14 @@ function TradingInterface({ market, tradePosition, refreshFn }) {
 							inputBuyAmountBn,
 							tokenOutAmountBn
 						)}
-						helpText={`Price in ${CURR_SYMBOL} you are paying per share`}
+						helpText={`Price per outcome share in ${CURR_SYMBOL}`}
 					/>
 					<TwoColTitleInfo
 						title="Max. potential profit"
 						info={formatBNToDecimalCurr(
 							tokenOutAmountBn.sub(inputBuyAmountBn)
 						)}
-						helpText="Your profit if the outcome of which shares you are buying is declared as the final outcome"
+						helpText="Maximum WETH you could win, if your prediction is correct"
 					/>
 					<TwoColTitleInfo
 						title="New YES(%) Prob."
@@ -354,7 +354,7 @@ function TradingInterface({ market, tradePosition, refreshFn }) {
 								  )
 								: "N/A"
 						}
-						helpText="Yes(%) probability of post after you have successfully bought your outcome shares"
+						helpText="Shows how the shares you're buying will impact the YES outcome probability."
 					/>
 					<TwoColTitleInfo
 						title="New NO(%) Prob."
@@ -365,7 +365,7 @@ function TradingInterface({ market, tradePosition, refreshFn }) {
 								  )
 								: "N/A"
 						}
-						helpText="No(%) probability of post after you have successfully bought your outcome shares"
+						helpText="Shows how the shares you're buying will impact the NO probability."
 					/>
 
 					<PrimaryButton
@@ -484,12 +484,12 @@ function TradingInterface({ market, tradePosition, refreshFn }) {
 					<TwoColTitleInfo
 						title="Your choice"
 						info={tokenActionIndex === 0 ? "NO" : "YES"}
-						helpText="Share that you are selling"
+						helpText="Outcome share that you are selling"
 					/>
 					<TwoColTitleInfo
 						title="Estimated amount received"
 						info={formatBNToDecimalCurr(amountCOutBn)}
-						helpText={`Amount of ${CURR_SYMBOL} you will receive after selling`}
+						helpText={`Amount in ${CURR_SYMBOL} you will receive based on Share amount you've entered`}
 					/>
 					<TwoColTitleInfo
 						title="Avg. sell price"
@@ -497,7 +497,7 @@ function TradingInterface({ market, tradePosition, refreshFn }) {
 							amountCOutBn,
 							inputSellAmountBn
 						)}
-						helpText={`Amount of ${CURR_SYMBOL} you receive per unit of share sold`}
+						helpText={`Amount in ${CURR_SYMBOL} you receive per share`}
 					/>
 					<TwoColTitleInfo
 						title="New YES(%) Prob."
@@ -508,7 +508,7 @@ function TradingInterface({ market, tradePosition, refreshFn }) {
 								  )
 								: "N/A"
 						}
-						helpText="Yes(%) probability of post after you have successfully sold your outcome shares"
+						helpText="Shows how the shares you're selling will impact the YES outcome probability."
 					/>
 					<TwoColTitleInfo
 						title="New NO(%) Prob."
@@ -519,7 +519,7 @@ function TradingInterface({ market, tradePosition, refreshFn }) {
 								  )
 								: "N/A"
 						}
-						helpText="No(%) probability of post after you have successfully sold your outcome shares"
+						helpText="Shows how the shares you're selling will impact the NO outcome probability."
 					/>
 
 					<PrimaryButton

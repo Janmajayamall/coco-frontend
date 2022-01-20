@@ -139,7 +139,7 @@ function RedeemWinsInterface({
 				info={}
 			/> */}
 			<TwoColTitleInfo
-				title={"Your trade winnings"}
+				title={"Total from Predictions"}
 				info={formatBNToDecimalCurr(
 					determineTradeWinAmount(
 						tradePosition,
@@ -147,7 +147,7 @@ function RedeemWinsInterface({
 					)
 				)}
 				titleBold={true}
-				helpText="Your profit by buying the right shares + your initial investment"
+				helpText="For every right outcome share you own, you get back 1 WETH. Difference between the price at which you bought your shares and 1, are your winning."
 			/>
 			{/* {!stakePosition.amount0.isZero() ||
 			!stakePosition.amount1.isZero() ? ( */}
@@ -159,14 +159,14 @@ function RedeemWinsInterface({
 				<TwoColTitleInfo
 					title={"In favour of YES"}
 					info={`${formatBNToDecimalCurr(stakePosition.amount1)}`}
-					helpText="Amount you staked favouring YES should be declared as final outcome."
+					helpText="Amount you staked to challenge in favour of a YES outcome."
 				/>
 				{/* ) : undefined} */}
 				{/* {!stakePosition.amount0.isZero() ? ( */}
 				<TwoColTitleInfo
 					title={"In favour of NO"}
 					info={`${formatBNToDecimalCurr(stakePosition.amount0)}`}
-					helpText="Amount you staked favouring NO should be declared as final outcome."
+					helpText="Amount you staked to challenge in favour of a NO outcome."
 				/>
 				{/* ) : undefined} */}
 				<TwoColTitleInfo
@@ -174,10 +174,10 @@ function RedeemWinsInterface({
 					info={`${formatBNToDecimalCurr(
 						determineStakeWinnings(market, account)
 					)}`}
-					helpText="Your reward for staking for the right outcome. Note that only user that is last to stake for the right outcome receives reward."
+					helpText="Your reward if you were last to challenge in favour of the correct outcome, equal to the total staked on the losing outcome minus the resolution fee if applicable."
 				/>
 				<TwoColTitleInfo
-					title={"You receive from Challenge"}
+					title={"Total from Challenge"}
 					info={`${formatBNToDecimalCurr(
 						determineTotalAmountStakeRedeem(
 							market,
@@ -186,7 +186,7 @@ function RedeemWinsInterface({
 						)
 					)}`}
 					titleBold={true}
-					helpText="Your Challenge winnings + Amount that you staked for the right outcome."
+					helpText="Amount staked for the right outcome + Challenge winnings."
 				/>
 			</Flex>
 			{/* : undefined} */}
@@ -206,7 +206,7 @@ function RedeemWinsInterface({
 						)
 					)}`}
 					titleBold={true}
-					helpText="Total amount that you get back"
+					helpText="Your outcome shares + Total from Challenge"
 				/>
 			</Flex>
 			<PrimaryButton
@@ -235,7 +235,7 @@ function RedeemWinsInterface({
 						sendRMaxWS(market.oracle.id, market.marketIdentifier);
 					}
 				}}
-				title={"Claim"}
+				title={"Redeem"}
 				style={{
 					marginTop: 10,
 				}}

@@ -91,9 +91,7 @@ function TradingInput({
 						marginLeft: 5,
 						color: "#6F6F6F",
 					}}
-					infoText={
-						"Slippage prevents your transaction from executing at unfavorable price caused by other orders."
-					}
+					infoText={`The price of shares is approximate, and can change right before (due to other orders in queue) your order is executed. To prevent your order executing at unexpected price, you define slippage. It's usually minimal - but it helps you decide how much of a variance you're willing to put up with.`}
 				/>
 			</Flex>
 			<Slider
