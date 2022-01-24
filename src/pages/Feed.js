@@ -108,7 +108,7 @@ function Page() {
 	// initial graph protocol call
 	useEffect(() => {
 		setMarkets([]);
-		setFilteredMarkets([])
+		setFilteredMarkets([]);
 
 		if (feedType == undefined) {
 			return;
@@ -192,6 +192,7 @@ function Page() {
 			);
 			if (
 				populatedMarket.oracleInfo != undefined &&
+				populatedMarket.marketMetadata != undefined &&
 				populatedMarket.probability1 >= Number(feedThreshold) / 100
 			) {
 				_filteredMarkets.push(populatedMarket);
@@ -208,7 +209,7 @@ function Page() {
 	]);
 
 	useEffect(async () => {
-		setGroupDetails({})
+		setGroupDetails({});
 		if (groupId) {
 			let res = await findModeratorsDetails([groupId]);
 			if (res && res.groupsDetails && res.groupsDetails.length > 0) {
@@ -452,6 +453,7 @@ function Page() {
 					? filteredMarkets.map((market, index) => {
 							return (
 								<PostDisplay
+									key={index}
 									setRef={
 										filteredMarkets.length %
 											FEED_BATCH_COUNT ===

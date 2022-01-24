@@ -223,9 +223,10 @@ function Page() {
 				{loading === false && filteredMarkets.length === 0 ? (
 					<NoPostsTag marginTop={10} />
 				) : undefined}
-				{filteredMarkets.map((market) => {
+				{filteredMarkets.map((market, index) => {
 					return (
 						<PostDisplay
+							key={index}
 							style={{
 								marginBottom: 20,
 							}}

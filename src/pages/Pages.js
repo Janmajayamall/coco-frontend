@@ -140,9 +140,10 @@ function Page() {
 						</Text>
 					</Flex>
 				) : undefined}
-				{markets.map((market) => {
+				{markets.map((market, index) => {
 					return (
 						<PostDisplay
+							key={index}
 							style={{
 								marginBottom: 25,
 								width: "100%",
@@ -169,7 +170,7 @@ function Page() {
 						Your Groups
 					</Heading>
 					{oraclesLoading === true ? <Loader /> : undefined}
-					{oracleIds.map((id) => {
+					{oracleIds.map((id, index) => {
 						const group = oraclesInfoObj[id];
 						if (group == undefined) {
 							return;
@@ -177,6 +178,7 @@ function Page() {
 
 						return (
 							<GroupDisplayName
+								key={index}
 								group={group}
 								followStatusVisible={false}
 								settingsVisible={true}

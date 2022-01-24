@@ -297,7 +297,7 @@ function Page() {
 						</Text>
 					</Flex>
 				) : undefined}
-				{oracleIds.map((id) => {
+				{oracleIds.map((id, index) => {
 					const group = oraclesInfoObj[id];
 					if (group == undefined) {
 						return;
@@ -305,6 +305,7 @@ function Page() {
 
 					return (
 						<GroupDisplayName
+							key={index}
 							group={group}
 							followStatusVisible={false}
 						/>

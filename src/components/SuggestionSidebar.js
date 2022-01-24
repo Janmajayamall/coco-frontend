@@ -131,9 +131,10 @@ function SuggestionSidebar() {
 			</Heading>
 			<Flex flexDirection={"column"}>
 				{initialized == false ? <Loader /> : undefined}
-				{popularGroups.map((group) => {
+				{popularGroups.map((group, index) => {
 					return (
 						<GroupDisplayName
+							key={index}
 							group={group}
 							followStatusVisible={true}
 						/>

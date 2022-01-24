@@ -15,8 +15,8 @@ function ChallengeHistoryTable({ stakeHistories }) {
 						<Th>Outcome favored</Th>
 					</Tr>
 				</Thead>
-				{stakeHistories.map((obj) => (
-					<Tr>
+				{stakeHistories.map((obj, index) => (
+					<Tr key={index}>
 						<Td>{sliceAddress(obj.user.id)}</Td>
 						<Td>{formatDecimalToCurr(obj.amountC)}</Td>
 						<Td>{obj.outcomeStaked === "1" ? "Yes" : "No"}</Td>
