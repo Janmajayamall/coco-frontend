@@ -12,7 +12,7 @@ import { createClient, Provider as URQLProvider } from "urql";
 
 const client = createClient({
 	url:
-		process.env.NODE_ENV !== "production"
+		process.env.NODE_ENV === "production"
 			? "https://api.thegraph.com/subgraphs/name/janmajayamall/meme-curator-subgraphs"
 			: "https://api.thegraph.com/subgraphs/name/janmajayamall/pm-content-test",
 });

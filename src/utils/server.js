@@ -4,7 +4,7 @@ import { generateRequestSignatures } from "./auth";
 
 const baseInstance = axios.create({
 	baseURL:
-		process.env.NODE_ENV !== "production"
+		process.env.NODE_ENV === "production"
 			? "https://backend.cocoverse.club/"
 			: "http://localhost:8080",
 	timeout: 1000,
