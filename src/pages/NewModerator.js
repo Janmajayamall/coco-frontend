@@ -13,8 +13,12 @@ import {
 	validateGroupName,
 	validateUpdateMarketConfigTxInputs,
 	moderatorCheckNameUniqueness,
+	oracleInterface,
+	encodeFunctionCalldata,
+	validateGroupDescription,
+	validateAddresses,
 } from "./../utils";
-import { useCreateNewOracle } from "./../hooks";
+import { useCreateNewOracleProxy } from "./../hooks";
 import { useEthers } from "@usedapp/core/packages/core";
 import { addresses } from "./../contracts";
 import { useQueryOraclesByManager } from "./../hooks";
@@ -42,7 +46,7 @@ function Page() {
 	const dispatch = useDispatch();
 	const { result: oraclesResult } = useQueryOraclesByManager(account);
 
-	const { state, send } = useCreateNewOracle();
+	const { state, send } = useCreateNewOracleProxy();
 
 	const oraclesInfoObj = useSelector(selectOracleInfoObj);
 
@@ -55,6 +59,8 @@ function Page() {
 	const [bufferHours, setBufferHours] = useState(1);
 	const [resolutionHours, setResolutionHours] = useState(1);
 	const [name, setName] = useState("");
+	const [description, setDescription] = useState("");
+	const [moderators, setModerators] = useState([]);
 
 	//	loading states
 	const [createLoading, setCreateLoading] = useState(false);
@@ -86,6 +92,7 @@ function Page() {
 			);
 			const res = await updateModerator(oracleAddress, {
 				name,
+				description,
 			});
 			setCreateLoading(false);
 			if (res != undefined) {
@@ -127,6 +134,9 @@ function Page() {
 			return;
 		}
 
+		// checksum moderator account addresses
+		// const modAccountsChecksummed = [account];
+
 		if (
 			!validateUpdateMarketConfigTxInputs(
 				fee,
@@ -135,7 +145,9 @@ function Page() {
 				bufferHours,
 				resolutionHours
 			).valid ||
-			!validateGroupName(name).valid
+			!validateGroupName(name).valid ||
+			!validateGroupDescription(description).valid ||
+			!validateAddresses([account]).valid
 		) {
 			toast({
 				title: "Invalid Input!",
@@ -161,19 +173,44 @@ function Page() {
 		const feeNumerator = Number(fee) * 1000;
 		const feeDenominator = 1000;
 
+		// addresses.oracleSingleton & addresses.safeSingleton are not undefined
+		if (
+			addresses.OracleSingleton == undefined ||
+			addresses.SafeSingleton == undefined
+		) {
+			setNameExists(true);
+			toast({
+				title: "Something went wrong!",
+				status: "error",
+				isClosable: true,
+			});
+			return;
+		}
+
 		setCreateLoading(true);
 
+		// encoded data for call to oracle updateMarketConfig fn
+		const oracleMarketConfigData = encodeFunctionCalldata(
+			oracleInterface,
+			"updateMarketConfig",
+			[
+				true,
+				feeNumerator,
+				feeDenominator,
+				Number(escalationLimit),
+				convertHoursToBlocks(chainId, Number(expireHours)),
+				convertHoursToBlocks(chainId, Number(bufferHours)),
+				convertHoursToBlocks(chainId, Number(resolutionHours)),
+			]
+		);
+
 		send(
-			account,
-			account,
+			addresses.OracleSingleton,
+			addresses.SafeSingleton,
 			addresses.WETH,
-			true,
-			feeNumerator,
-			feeDenominator,
-			Number(escalationLimit),
-			convertHoursToBlocks(chainId, Number(expireHours)),
-			convertHoursToBlocks(chainId, Number(bufferHours)),
-			convertHoursToBlocks(chainId, Number(resolutionHours))
+			oracleMarketConfigData,
+			[account], // TODO replace this with list of owners specified by the user
+			10 // TODO replace this with the value of safe threshold specified by the user
 		);
 	}
 
@@ -196,6 +233,15 @@ function Page() {
 					name,
 					setName,
 					validateGroupName,
+					{}
+				)}
+				{InputWithTitle(
+					"Punch line",
+					0,
+					description,
+					description,
+					setDescription,
+					validateGroupDescription,
 					{}
 				)}
 				{nameExists === true ? (
@@ -225,7 +271,7 @@ function Page() {
 					}
 				)}
 				{InputWithTitle(
-					"Trading Period (in hrs)",
+					"Prediction Period (in hrs)",
 					1,
 					expireHours,
 					expireHours,
@@ -266,6 +312,34 @@ function Page() {
 					undefined,
 					"Hr"
 				)}
+
+				{InputWithTitle(
+					"Other moderators",
+					1,
+					resolutionHours,
+					resolutionHours,
+					setResolutionHours,
+					validateResolutionHours,
+					{
+						defaultValue: 1,
+						precision: 0,
+					},
+					undefined
+				)}
+				{InputWithTitle(
+					"Safe threshold",
+					1,
+					resolutionHours,
+					resolutionHours,
+					setResolutionHours,
+					validateResolutionHours,
+					{
+						defaultValue: 1,
+						precision: 0,
+					},
+					undefined
+				)}
+
 				<PrimaryButton
 					style={{
 						marginTop: 20,

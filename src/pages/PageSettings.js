@@ -307,7 +307,7 @@ function Page() {
 								}
 							)}
 							{InputWithTitle(
-								"Trading Period (in hrs)",
+								"Prediction Period (in hrs)",
 								1,
 								expireHours,
 								expireHours,

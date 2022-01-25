@@ -5,11 +5,10 @@ import {
 } from "@usedapp/core/packages/core";
 import {
 	marketRouterContract,
-	oracleFactoryContract,
+	oracleProxyFactoryContract,
 	oracleContract,
 	wEthContract,
 } from "../utils";
-import Web3 from "web3";
 
 export function useCreateNewMarket() {
 	const { state, send } = useContractFunction(
@@ -19,9 +18,9 @@ export function useCreateNewMarket() {
 	return { state, send };
 }
 
-export function useCreateNewOracle() {
+export function useCreateNewOracleProxy() {
 	const { state, send } = useContractFunction(
-		oracleFactoryContract,
+		oracleProxyFactoryContract,
 		"createOracle"
 	);
 	return { state, send };

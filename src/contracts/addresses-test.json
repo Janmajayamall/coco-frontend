@@ -1,5 +1,7 @@
 {
-	"OracleFactory": "0xd19d148E3B7636be56806968f05301fd7d983c66",
+	"OracleProxyFactory": "0xd19d148E3B7636be56806968f05301fd7d983c66",
 	"MarketRouter": "0xA34cEc6F2096C55B2Bed0185e67637BF7f4f2AbD",
-	"WETH": "0xebbc3452cc911591e4f18f3b36727df45d6bd1f9"
+	"WETH": "0xebbc3452cc911591e4f18f3b36727df45d6bd1f9",
+	"OracleSingleton": "",
+	"SafeSingleton": ""
 }

@@ -1,6 +1,7 @@
 import { BigNumber } from "@ethersproject/abi/node_modules/@ethersproject/bignumber";
 import { MAX_LENGTH_DESCRIPTION, MAX_LENGTH_NAME, ZERO_BN } from ".";
-
+import { ethers } from "ethers";
+import { getAddress } from "ethers/lib/utils";
 export function validateIsNumber(val) {
 	let value = Number(val);
 	if (Number.isNaN(value)) {
@@ -54,7 +55,7 @@ export function validateExpireHours(val) {
 	if (val < 1) {
 		return {
 			valid: false,
-			expText: "We recommend Trading period to be at least 1",
+			expText: "We recommend Prediction period to be at least 1 hr",
 		};
 	}
 	return {
@@ -71,7 +72,7 @@ export function validateBufferHours(val) {
 	if (val < 1) {
 		return {
 			valid: false,
-			expText: "We recommend Challenge period to be at least 1",
+			expText: "We recommend Challenge period to be at least 1 hr",
 		};
 	}
 	return {
@@ -88,7 +89,7 @@ export function validateResolutionHours(val) {
 	if (val < 1) {
 		return {
 			valid: false,
-			expText: "We recommend Resolution period to be at least 1",
+			expText: "We recommend Resolution period to be at least 1 hr",
 		};
 	}
 	return {
@@ -246,6 +247,36 @@ export function validateInitialBetAmount(val, userBalance) {
 		};
 	}
 
+	return {
+		valid: true,
+		expText: "",
+	};
+}
+export function validateAddress(address) {
+	try {
+		ethers.utils.getAddress(address);
+	} catch (e) {
+		return {
+			valid: false,
+			expText: "Invalid address",
+		};
+	}
+
+	return {
+		valid: true,
+		expText: "",
+	};
+}
+
+export function validateAddresses(addresses) {
+	addresses.forEach((add) => {
+		if (validateAddress(add).valid == false) {
+			return {
+				valid: false,
+				expText: "Invalid address",
+			};
+		}
+	});
 	return {
 		valid: true,
 		expText: "",
