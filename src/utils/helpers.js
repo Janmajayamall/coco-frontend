@@ -375,7 +375,7 @@ export function outcomeDisplayName(outcome) {
 
 export function marketStageDisplayName(stage) {
 	if (stage == 1) {
-		return "TRADING PERIOD";
+		return "PREDICTION PERIOD";
 	} else if (stage == 2) {
 		return "CHALLENGE PERIOD";
 	} else if (stage == 3) {

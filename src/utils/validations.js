@@ -54,7 +54,7 @@ export function validateExpireHours(val) {
 	if (val < 1) {
 		return {
 			valid: false,
-			expText: "We recommend Trading period to be at least 1",
+			expText: "We recommend Prediction period to be at least 1 hr",
 		};
 	}
 	return {
@@ -71,7 +71,7 @@ export function validateBufferHours(val) {
 	if (val < 1) {
 		return {
 			valid: false,
-			expText: "We recommend Challenge period to be at least 1",
+			expText: "We recommend Challenge period to be at least 1 hr",
 		};
 	}
 	return {
@@ -88,7 +88,7 @@ export function validateResolutionHours(val) {
 	if (val < 1) {
 		return {
 			valid: false,
-			expText: "We recommend Resolution period to be at least 1",
+			expText: "We recommend Resolution period to be at least 1 hr",
 		};
 	}
 	return {
