@@ -205,11 +205,17 @@ function PostDisplay({ market, onImageClick, setRef, ...children }) {
 				<BottomStats
 					marginRight={4}
 					title="Yes"
-					info={`${formatDecimalToPercentage(market.probability1)}`}
+					info={`${formatDecimalToPercentage(
+						market.probability1,
+						3
+					)}`}
 				/>
 				<BottomStats
 					title="No"
-					info={`${formatDecimalToPercentage(market.probability0)}`}
+					info={`${formatDecimalToPercentage(
+						market.probability0,
+						3
+					)}`}
 				/>
 			</Flex>
 		</Box>
