@@ -409,12 +409,11 @@ function Page() {
 						marginRight="3"
 					>
 						<Heading size="lg" marginBottom={1}>
-							Skip algos, and see posts people bet you would want
-							to see!
+							Only see posts that people predict you would like!
 						</Heading>
 						<Text>
-							Join groups, make posts, place bets and curate
-							content
+							Join groups, create posts, place predictions, and
+							help curate group feeds.
 						</Text>
 					</Flex>
 				) : undefined}
