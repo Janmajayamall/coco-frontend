@@ -205,7 +205,7 @@ function TradingInterface({ market, tradePosition, refreshFn }) {
 			stateSell.status == "Exception" ||
 			stateSell.status == "Fail"
 		) {
-			displayToast("Metmask err!", "error");
+			displayToast("Metamask err!", "error");
 			setBuyLoading(false);
 			setSellLoading(false);
 		}

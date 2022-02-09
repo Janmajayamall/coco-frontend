@@ -6,7 +6,7 @@ const baseInstance = axios.create({
 	baseURL:
 		process.env.NODE_ENV === "production"
 			? "https://backend.cocoverse.club/"
-			: "http://localhost:8080",
+			: "http://65.108.59.231:8080",
 	timeout: 1000,
 	headers: { "Content-Type": "application/json" },
 });

@@ -118,6 +118,20 @@ function SuggestionSidebar() {
 		};
 	}
 
+	function HelperOption({ text, onClick }) {
+		return (
+			<Flex
+				_hover={{ cursor: "pointer" }}
+				paddingTop={2}
+				paddingBottom={2}
+			>
+				<Text onClick={onClick} fontSize={14}>
+					{text}
+				</Text>
+			</Flex>
+		);
+	}
+
 	return (
 		<Flex
 			width={"25%"}
@@ -129,7 +143,7 @@ function SuggestionSidebar() {
 			<Heading size="md" marginBottom={5}>
 				Explore Groups
 			</Heading>
-			<Flex flexDirection={"column"}>
+			<Flex flexDirection={"column"} paddingBottom={5}>
 				{initialized == false ? <Loader /> : undefined}
 				{popularGroups.map((group, index) => {
 					return (
@@ -252,6 +266,36 @@ function SuggestionSidebar() {
 					</Flex>
 				</Flex>
 			) : undefined}
+
+			<Flex
+				marginTop="1"
+				marginBottom="1"
+				flexDirection="column"
+				padding={5}
+				backgroundColor="gray.100"
+			>
+				<HelperOption
+					text="How to use"
+					onClick={() => {
+						window.open("https://docs.cocoverse.club/", "_blank");
+					}}
+				/>
+				<HelperOption
+					text="Send Feedback"
+					onClick={() => {
+						window.open(
+							"https://airtable.com/shrsVVVLBuawaCDvE",
+							"_blank"
+						);
+					}}
+				/>
+				<HelperOption
+					text="Join COCO on TG"
+					onClick={() => {
+						window.open("https://t.me/cocoverse", "_blank");
+					}}
+				/>
+			</Flex>
 		</Flex>
 	);
 }
