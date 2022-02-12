@@ -182,10 +182,10 @@ export async function uploadImageFile(presignedUrl, imageFile) {
 	} catch (e) {}
 }
 
-export async function findModerators(filter) {
+export async function findGroups(filter) {
 	try {
 		const { data } = await baseInstance.request({
-			url: "/moderator/find",
+			url: "/group/find",
 			method: "POST",
 			data: {
 				filter,

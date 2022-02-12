@@ -4,7 +4,7 @@ import LoginButton from "./components/LoginButton";
 import PostDisplay from "./components/PostDisplay";
 import NewPost from "./pages/NewPost";
 import NewModerator from "./pages/NewModerator";
-import OracleConfig from "./pages/OracleConfig";
+// import OracleConfig from "./pages/OracleConfig";
 import Activity from "./pages/Activity";
 
 import Feed from "./pages/Feed";
@@ -172,7 +172,7 @@ function App() {
 			<Routes>
 				<Route path="/add" element={<NewPost />} />
 				<Route path="/addModerator" element={<NewModerator />} />
-				<Route path="/oracle/:address" element={<OracleConfig />} />
+				{/* <Route path="/oracle/:address" element={<OracleConfig />} /> */}
 				<Route path="/explore" element={<Feed />} />
 				<Route path="/home" element={<Feed />} />
 				<Route path="/group/:groupId" element={<Feed />} />

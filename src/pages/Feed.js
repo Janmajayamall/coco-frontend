@@ -241,7 +241,7 @@ function Page() {
 			}}
 		>
 			<Spacer />
-			<ConfigSidebar />
+
 			<Flex
 				flexDirection="column"
 				width={"50%"}

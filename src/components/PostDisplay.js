@@ -1,4 +1,5 @@
-import { Avatar, Box, Flex, Image, Spacer, Text } from "@chakra-ui/react";
+import { Avatar, Box, Flex, Image, Spacer, Text, Link } from "@chakra-ui/react";
+import { ExternalLinkIcon } from "@chakra-ui/icons";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router";
@@ -21,70 +22,6 @@ function PostDisplay({ market, onImageClick, setRef, ...children }) {
 		return <div />;
 	}
 
-	function MarketStatus({ status }) {
-		function color(val) {
-			if (val === 1) {
-				return "#02B784";
-			}
-			if (val === 2) {
-				return "#EB5757";
-			}
-			if (val === 3) {
-				return "#F2C94C";
-			}
-			if (val === 4) {
-				return "#4F4F4F";
-			}
-			return "#FDFDFD";
-		}
-
-		function text(val) {
-			if (val === 1) {
-				return "Live";
-			}
-			if (val === 2) {
-				return "Challenge";
-			}
-			if (val === 3) {
-				return "Resolution";
-			}
-			if (val === 4) {
-				return "Final";
-			}
-			return "";
-		}
-
-		return (
-			<Flex justifyContent="center" alignItems="center" paddingRight={3}>
-				<Text color={color(status)} fontSize="20" fontWeight="bold">
-					·
-				</Text>
-				<Text
-					color={color(status)}
-					fontSize="16"
-					fontWeight="bold"
-					marginLeft="2"
-				>
-					{text(status)}
-				</Text>
-			</Flex>
-		);
-	}
-
-	function BottomStats({ title, info, ...props }) {
-		return (
-			<Flex flexDirection="column" {...props}>
-				<Text fontSize={14} color={"#828282"}>
-					{title}
-				</Text>
-				<Text fontSize={16} color={"#000000"}>
-					{info}
-				</Text>
-			</Flex>
-		);
-	}
-
-	const id = Math.random() * 1000;
 	return (
 		<Box ref={setRef} {...children}>
 			<Flex flexDirection={"column"} paddingBottom={3} paddingTop={4}>
@@ -146,18 +83,6 @@ function PostDisplay({ market, onImageClick, setRef, ...children }) {
 						) : undefined}
 					</Flex>
 					<Spacer />
-					{/* <Flex
-					backgroundColor="#F3F5F7"
-					alignItems="center"
-					paddingLeft={3}
-					paddingRight={3}
-					borderRadius={5}
-				>
-					<Text>
-						{marketStageDisplayName(market.optimisticState.stage)}
-					</Text>
-				</Flex> */}
-					<MarketStatus status={market.optimisticState.stage} />
 				</Flex>
 
 				<Flex paddingLeft={2}>
@@ -166,57 +91,44 @@ function PostDisplay({ market, onImageClick, setRef, ...children }) {
 					)}`}</Text>
 				</Flex>
 			</Flex>
-			<Flex
-				onClick={() => {
-					if (onImageClick != undefined) {
-						onImageClick(market.marketIdentifier);
-					}
-				}}
-				minHeight={minHeightTrick}
-				maxHeight={500}
-				width={"100%"}
-				justifyContent="center"
-				_hover={{
-					cursor: "pointer",
-				}}
-			>
-				<Image
-					loading={"eager"}
-					onLoad={() => {
-						setMinHeightTrick(0);
+			<Flex flexDirection={"column"}>
+				<Text fontSize={30}>Hello</Text>
+				<Flex
+					onClick={() => {
+						if (onImageClick != undefined) {
+							onImageClick(market.marketIdentifier);
+						}
 					}}
-					fit="contain"
-					src={
-						market.marketMetadata &&
-						market.marketMetadata.eventIdentifierStr
-							? `${market.marketMetadata.eventIdentifierStr}`
-							: ""
-					}
-					alt="Failed to load image"
-				/>
-			</Flex>
-			<Flex marginTop={5} alignItems="flex-start">
-				<BottomStats
-					title="Trade Volume"
-					info={`${formatBNToDecimalCurr(market.totalVolume)}`}
-				/>
-
-				<Spacer />
-				<BottomStats
-					marginRight={4}
-					title="Yes"
-					info={`${formatDecimalToPercentage(
-						market.probability1,
-						3
-					)}`}
-				/>
-				<BottomStats
-					title="No"
-					info={`${formatDecimalToPercentage(
-						market.probability0,
-						3
-					)}`}
-				/>
+					minHeight={minHeightTrick}
+					maxHeight={500}
+					// width={"100%"}
+					justifyContent="center"
+					_hover={{
+						cursor: "pointer",
+					}}
+				>
+					<Image
+						loading={"eager"}
+						onLoad={() => {
+							setMinHeightTrick(0);
+						}}
+						fit="contain"
+						src={
+							market.marketMetadata &&
+							market.marketMetadata.eventIdentifierStr
+								? `${market.marketMetadata.eventIdentifierStr}`
+								: ""
+						}
+						alt="Failed to load image"
+					/>
+				</Flex>
+				<Link
+					href={"https://blog.dshr.org/2022/02/ee380-talk.html"}
+					isExternal
+				>
+					{"https://blog.dshr.org/2022/02/ee380-talk.html"}
+					<ExternalLinkIcon mx="2px" />
+				</Link>
 			</Flex>
 		</Box>
 	);
