@@ -626,3 +626,8 @@ export function postSignTypedDataV4Helper(
 		dataToSign: data,
 	};
 }
+
+// TODO implement this
+export function decodeGroupAddressFromGroupProxyFactoryCall(logs) {
+	return "";
+}

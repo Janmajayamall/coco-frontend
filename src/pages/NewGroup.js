@@ -24,8 +24,10 @@ import {
 	validateUpdateMarketConfigTxInputs,
 	groupCheckNameUniqueness,
 	validateGroupDescription,
+	SAFE_BASE_URL,
+	decodeGroupAddressFromGroupProxyFactoryCall,
 } from "../utils";
-import { useCreateNewOracle } from "../hooks";
+import { useCreateGroupWithSafe, useCreateNewOracle } from "../hooks";
 import { useEthers } from "@usedapp/core/packages/core";
 import { addresses } from "../contracts";
 import { useQueryOraclesByManager } from "../hooks";
@@ -37,6 +39,8 @@ import GroupDisplayName from "../components/GroupDisplayPanel";
 import InputWithTitle from "../components/InputWithTitle";
 import PrimaryButton from "../components/PrimaryButton";
 import { ArrowBackIcon } from "@chakra-ui/icons";
+import { getOwnedSafes } from "@gnosis.pm/safe-react-gateway-sdk";
+import { ethers } from "ethers";
 function Page() {
 	const { chainId, account } = useEthers();
 	const userProfile = useSelector(selectUserProfile);
@@ -51,22 +55,68 @@ function Page() {
 
 	const [oracleIds, setOracleIds] = useState([]);
 
+	const { send, state } = useCreateGroupWithSafe();
+
 	// TODO get and set safes owned by user
+	useEffect(async () => {
+		if (chainId == undefined || account == undefined) {
+			return;
+		}
+		try {
+			const res = await getOwnedSafes(SAFE_BASE_URL, chainId, account);
+			if (res.safes == undefined) {
+				return;
+			}
+			setSafes(res.safes);
+		} catch (e) {
+			console.log(e);
+		}
+	}, [chainId, account]);
 
 	// TODO once you get safes, get other groups managed by the safe
 	// and divide the groups into 2 - (1) Safes with details (2) safe without details
+	useEffect(() => {
+		if (safes.length == 0) {
+			return;
+		}
+
+		// get groups associated with safes from graphql
+
+		// get groups details of the groups & chuck the ones with no details under pending
+	}, [safes]);
+
+	// transitions step to 2 once group proxy contract is deployed
+	useEffect(() => {
+		if (state.status == "Success") {
+			// get group address from tx receipt
+			const groupAddress = decodeGroupAddressFromGroupProxyFactoryCall(
+				state.receipt.logs
+			);
+			setGroupAddress(groupAddress);
+			setStep(2);
+		} else if (state.status == "Exception" || state.status == "Fail") {
+			toast({
+				title: "Metamask Err!",
+				status: "error",
+				isClosable: true,
+			});
+			return;
+		}
+	}, [state]);
 
 	// ui stafe
 	const [step, setStep] = useState(0);
 
 	// gnosis-safe
-	const [safe, selectSafe] = useState("null");
+	const [safes, setSafes] = useState([]);
+	const [safe, selectSafe] = useState(null);
 
 	// states for group configs
 	const [fee, setFee] = useState("0.05");
 	const [escalationLimit, setEscalationLimit] = useState(1);
 
 	// states for group details
+	const [groupAddress, setGroupAddress] = useState("");
 	const [name, setName] = useState("");
 	const [description, setDescription] = useState("");
 
@@ -81,7 +131,7 @@ function Page() {
 		setNameExists(false);
 	}, [name]);
 
-	async function createGroupHepler() {
+	async function createGroupProxyHelper() {
 		if (!isAuthenticated) {
 			toast({
 				title: "Please Sign In!",
@@ -92,8 +142,41 @@ function Page() {
 		}
 
 		if (
-			(!validateGroupName(name).valid,
-			!validateGroupDescription(description).valid)
+			!validateFee(fee) ||
+			!validateEscalationLimit(escalationLimit) ||
+			safe == undefined ||
+			safe == ""
+		) {
+			toast({
+				title: "Invalid Input!",
+				status: "error",
+				isClosable: true,
+			});
+			return;
+		}
+
+		// group market config calldata
+		const groupMarketConfig = ethers.utils
+			.defaultAbiCoder()
+			.encode(["uint256", "uint256"], [fee, escalationLimit]);
+
+		send(safe, addresses.GroupSingleton, addresses.WETH, groupMarketConfig);
+	}
+
+	async function updateGroupDetailsHelper() {
+		if (!isAuthenticated) {
+			toast({
+				title: "Please Sign In!",
+				status: "error",
+				isClosable: true,
+			});
+			return;
+		}
+
+		if (
+			!validateGroupName(name).valid ||
+			!validateGroupDescription(description).valid ||
+			groupAddress == ""
 		) {
 			toast({
 				title: "Invalid Input!",
@@ -124,6 +207,8 @@ function Page() {
 			// TODO throw error
 			return;
 		}
+
+		// TODO navigate to group page
 	}
 
 	return (
@@ -162,12 +247,13 @@ function Page() {
 								selectSafe(e.target.value);
 							}}
 							placeholder="Choose Safe"
+							value={safe}
 						>
-							{[].map((obj) => {
+							{safes.map((safe) => {
 								return (
 									<>
-										<option value={obj.safeAddress}>
-											{`${obj.safeAddress}`}
+										<option value={safe}>
+											{`${safe}`}
 										</option>
 									</>
 								);
@@ -184,9 +270,10 @@ function Page() {
 							loadingText="Processing..."
 							// isLoading={createLoading}
 							onClick={() => {
-								if (safe != undefined) {
-									setStep(1);
+								if (safe == undefined || safe == "") {
+									return;
 								}
+								setStep(1);
 							}}
 							title="Next"
 						/>
@@ -226,8 +313,7 @@ function Page() {
 							loadingText="Processing..."
 							// isLoading={createLoading}
 							onClick={() => {
-								// TODO validate values
-								setStep(2);
+								createGroupProxyHelper();
 							}}
 							title="Next"
 						/>
@@ -270,7 +356,7 @@ function Page() {
 							}}
 							loadingText="Processing..."
 							isLoading={createLoading}
-							onClick={createGroupHepler}
+							onClick={updateGroupDetailsHelper}
 							title="Submit"
 						/>{" "}
 					</>

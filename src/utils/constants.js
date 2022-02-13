@@ -13,3 +13,4 @@ export const MAX_LENGTH_DESCRIPTION = 500;
 export const MAX_UINT_256 = constants.MaxUint256;
 export const CURR_SYMBOL = "WETH";
 export const FEED_BATCH_COUNT = 100;
+export const SAFE_BASE_URL = "http://18.159.101.163:8000/cgw";

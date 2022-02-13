@@ -1,13 +1,20 @@
 import { addresses } from "./../contracts";
 import { utils, Contract } from "ethers";
 import GroupRouterAbi from "../contracts/abis/GroupRouter.json";
-import OracleFactoryAbi from "../contracts/abis/OracleFactory.json";
+import GroupProxyFactoryAbi from "../contracts/abis/OracleFactory.json"; // TODO change it GroupProxyFactoryAbi
 import GroupAbi from "../contracts/abis/Group.json";
 import ERC20Abi from "../contracts/abis/ERC20.json";
 
-export const oracleFactoryInterface = new utils.Interface(OracleFactoryAbi);
+export const groupProxyFactoryInterface = new utils.Interface(
+	GroupProxyFactoryAbi
+);
 export const erc20Interface = new utils.Interface(ERC20Abi);
 export const groupInterface = new utils.Interface(GroupAbi);
+
+export const groupProxyFactoryContract = new Contract(
+	addresses.GroupProxyFactory,
+	groupProxyFactoryInterface
+);
 
 export const groupRouterContract = new Contract(
 	addresses.GroupRouter,

@@ -9,8 +9,17 @@ import {
 	oracleContract,
 	erc20Contract,
 	groupContract,
+	groupProxyFactoryContract,
 } from "../utils";
 import Web3 from "web3";
+
+export function useCreateGroupWithSafe() {
+	const { state, send } = useContractFunction(
+		groupProxyFactoryContract,
+		"createGroupWithSafe"
+	);
+	return { state, send };
+}
 
 export function useCreateAndBetOnMarket() {
 	const { state, send } = useContractFunction(
