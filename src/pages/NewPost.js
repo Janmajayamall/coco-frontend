@@ -53,7 +53,7 @@ function Page() {
 	const [imageFile, setImageFile] = useState(null);
 	const [s3ImageUrl, setS3ImageUrl] = useState(null);
 
-	const [selectGroup, setSelectGroup] = useState(null);
+	const [selectGroup, setSelectGroup] = useState("0xjdiowajdaio");
 
 	const [groups, setGroups] = useState([]);
 	const [newPostLoading, setNewPostLoading] = useState(false);
@@ -126,12 +126,33 @@ function Page() {
 		setS3ImageUrl(s3Url);
 	}
 
+	async function postHelper() {
+		// TODO validity checks
+
+		// create post body
+		let bodyObject = {
+			creatorColdAddress: "userProfile.creatorColdAddress",
+			groupAddress: selectGroup,
+			postType,
+			link,
+			imageUrl: s3ImageUrl,
+			title,
+			timestamp: new Date().getTime().toString(),
+		};
+
+		let res = await newPost(selectGroup, bodyObject);
+		if (res == undefined) {
+			// TODO throw error
+			return;
+		}
+	}
+
 	return (
 		<Flex flexDirection="column">
-			<Flex padding={10} justifyContent="center">
-				<Heading size="lg">New post</Heading>
+			<Flex padding={10} justifyContent="flex-start">
+				<Heading size="lg">Create post</Heading>
 			</Flex>
-			{isAuthenticated !== true ? (
+			{/* {false ? (
 				<Flex justifyContent="center">
 					<PrimaryButton
 						title="Please Sign In"
@@ -140,8 +161,9 @@ function Page() {
 						}}
 					/>
 				</Flex>
-			) : undefined}
-			{isAuthenticated === true ? (
+			) : undefined} */}
+			<Flex flexDirection={"row"}>
+				<Spacer />
 				<Flex width={"50%"} flexDirection={"column"}>
 					<Flex width="100%" flexDirection="column">
 						<Select
@@ -149,7 +171,7 @@ function Page() {
 								setSelectErr(false);
 								setSelectGroup(e.target.value);
 							}}
-							placeholder="Select Group"
+							placeholder="Choose Group"
 						>
 							{groups.map((obj) => {
 								return (
@@ -173,21 +195,32 @@ function Page() {
 						) : undefined}
 					</Flex>
 					<Flex>
-						<Text
-							onClick={() => {
-								setPostType(0);
-							}}
-						>
-							Image
-						</Text>
-						<Text
-							onClick={() => {
-								setPostType(1);
-							}}
-						>
-							Link
-						</Text>
+						<Flex padding={5} borderColor="blackAlpha.100">
+							<Text
+								onClick={() => {
+									setPostType(0);
+								}}
+							>
+								Image
+							</Text>
+						</Flex>
+						<Flex padding={5} borderColor="blackAlpha.100">
+							<Text
+								onClick={() => {
+									setPostType(1);
+								}}
+							>
+								Link
+							</Text>
+						</Flex>
 					</Flex>
+					<Input
+						placeholder="Title"
+						value={title}
+						onChange={(e) => {
+							setTitle(e.target.value);
+						}}
+					/>
 					{postType == 0 ? (
 						<Flex
 							flexDirection="column"
@@ -245,20 +278,26 @@ function Page() {
 							) : undefined}
 						</Flex>
 					) : undefined}
-					{postType == 1 ? <Input /> : undefined}
-					<Flex
-						width="40%"
-						flexDirection="column"
-						alignItems="center"
-					>
+					{postType == 1 ? (
+						<Input
+							placeholder="Link"
+							value={link}
+							onChange={(e) => {
+								setLink(e.target.value);
+							}}
+						/>
+					) : undefined}
+					<Flex width={"30%"}>
 						<PrimaryButton
 							title={"Post"}
 							isLoading={newPostLoading}
 							loadingText="Processing..."
-							onClick={uploadImageHelper}
+							onClick={postHelper}
 							style={{
 								marginTop: 20,
+								flexDirection: "row",
 							}}
+
 							// disabled={!tokenApproval || !isAuthenticated}
 						/>
 						{/* <ApprovalInterface
@@ -283,7 +322,21 @@ function Page() {
 					</Flex>
 					<Spacer />
 				</Flex>
-			) : undefined}
+				<Spacer />
+				<Flex>
+					<Flex
+						marginTop="1"
+						marginBottom="1"
+						flexDirection="column"
+						padding={5}
+						backgroundColor="gray.100"
+					>
+						<Text>Ready to post?</Text>
+						<Text>Put in some rules</Text>
+					</Flex>
+				</Flex>
+				<Spacer />
+			</Flex>
 		</Flex>
 	);
 }

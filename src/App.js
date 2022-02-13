@@ -3,7 +3,7 @@ import ConnectButton from "./components/ConnectButton";
 import LoginButton from "./components/LoginButton";
 import PostDisplay from "./components/PostDisplay";
 import NewPost from "./pages/NewPost";
-import NewModerator from "./pages/NewModerator";
+import NewModerator from "./pages/_NewGroup";
 // import OracleConfig from "./pages/OracleConfig";
 import Activity from "./pages/Activity";
 
@@ -56,7 +56,6 @@ import {
 	getUser,
 	findAllFollows,
 	filterOracleIdsFromMarketsGraph,
-	findModeratorsByIdArr,
 	filterMarketIdentifiersFromMarketsGraph,
 	findPostsByMarketIdentifierArr,
 	populateMarketWithMetadata,
@@ -76,18 +75,20 @@ import {
 	selectRinkebyLatestBlockNumber,
 } from "./redux/reducers";
 import { useDispatch, useSelector } from "react-redux";
-import { Route, Routes, useNavigate } from "react-router";
+import { useLocation, Route, Routes, useNavigate } from "react-router";
 import LoginModal from "./components/LoginModal";
 import PostTradeModal from "./components/PostTradeModal";
 import MainMenu from "./components/MainMenu";
 import CocoFull from "./Coco-full.svg";
+import { FireIcon } from "./components/FireIcon";
+import { HomeIcon } from "./components/HomeIcon";
 
 const web3 = new Web3();
 
 function App() {
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
-
+	const location = useLocation();
 	const { account } = useEthers();
 
 	const rinkebyLatestBlockNumber = useSelector(
@@ -162,6 +163,62 @@ function App() {
 							}}
 						/>
 
+						<Spacer />
+						<Flex justifyContent="center" margin={5}>
+							<IconButton
+								onClick={() => {
+									if (location.pathname == "/explore") {
+										return;
+									}
+									navigate("/explore");
+								}}
+								style={
+									location.pathname == "/explore"
+										? {
+												border: "2px",
+												borderStyle: "solid",
+												borderColor: "blue.400",
+												backgroundColor: "blue.400",
+										  }
+										: {
+												backgroundColor: "#FDFDFD",
+										  }
+								}
+								margin="1"
+								icon={
+									<FireIcon
+										// fill={feedType == 0 ? "#FDFDFD" : "#0B0B0B"}
+										fill={"#0B0B0B"}
+										w={8}
+										h={8}
+									/>
+								}
+							/>
+
+							<IconButton
+								onClick={() => {
+									if (location.pathname == "/home") {
+										return;
+									}
+									navigate("/home");
+								}}
+								borderRadius={10}
+								style={
+									location.pathname == "/home"
+										? {
+												border: "2px",
+												borderStyle: "solid",
+												borderColor: "blue.400",
+												backgroundColor: "blue.400",
+										  }
+										: {
+												backgroundColor: "#FDFDFD",
+										  }
+								}
+								margin="1"
+								icon={<HomeIcon fill={"#0B0B0B"} w={8} h={8} />}
+							/>
+						</Flex>
 						<Spacer />
 						<ConnectButton />
 						<MainMenu />

@@ -3,7 +3,7 @@ import { Heading, Flex, Text, Box, useToast, Spacer } from "@chakra-ui/react";
 import {
 	convertHoursToBlocks,
 	retrieveOracleAddressFormLogs,
-	updateModerator,
+	updateGroup,
 	stateSetupOraclesInfo,
 	validateEscalationLimit,
 	validateExpireHours,
@@ -12,12 +12,12 @@ import {
 	validateFee,
 	validateGroupName,
 	validateUpdateMarketConfigTxInputs,
-	moderatorCheckNameUniqueness,
-} from "./../utils";
-import { useCreateNewOracle } from "./../hooks";
+	groupCheckNameUniqueness,
+} from "../utils";
+import { useCreateNewOracle } from "../hooks";
 import { useEthers } from "@usedapp/core/packages/core";
-import { addresses } from "./../contracts";
-import { useQueryOraclesByManager } from "./../hooks";
+import { addresses } from "../contracts";
+import { useQueryOraclesByManager } from "../hooks";
 import { useNavigate } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { selectOracleInfoObj, selectUserProfile } from "../redux/reducers";
@@ -26,12 +26,7 @@ import GroupDisplayName from "../components/GroupDisplayPanel";
 import InputWithTitle from "../components/InputWithTitle";
 import PrimaryButton from "../components/PrimaryButton";
 
-/**
- * @note For the sake of simplicity, at least for now, oracles from UI have following constraints
- * 1. manager == delegate.
- * 2. Buffer blocks cannot be smaller than an hour
- * 3. Escalation limit cannot be zero
- */
+
 function Page() {
 	const { chainId, account } = useEthers();
 	const userProfile = useSelector(selectUserProfile);
@@ -84,7 +79,7 @@ function Page() {
 			const oracleAddress = retrieveOracleAddressFormLogs(
 				state.receipt.logs
 			);
-			const res = await updateModerator(oracleAddress, {
+			const res = await updateGroup(oracleAddress, {
 				name,
 			});
 			setCreateLoading(false);
@@ -146,7 +141,7 @@ function Page() {
 		}
 
 		// check name uniqueness
-		let res = await moderatorCheckNameUniqueness(name);
+		let res = await groupCheckNameUniqueness(name);
 		if (res == undefined || res.isNameUnique === false) {
 			setNameExists(true);
 			toast({

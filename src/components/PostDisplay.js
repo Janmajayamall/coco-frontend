@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router";
 import {
-	followModerator,
+	followGroup,
 	formatBNToDecimalCurr,
 	formatDecimalToPercentage,
 	generateProfileInitials,
@@ -12,13 +12,15 @@ import {
 } from "../utils";
 import { sAddGroupFollow } from "./../redux/reducers";
 
-function PostDisplay({ market, onImageClick, setRef, ...children }) {
+function PostDisplay({ post, onImageClick, setRef, ...children }) {
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
 
 	const [minHeightTrick, setMinHeightTrick] = useState(300);
 
-	if (!market || !market.oracleInfo) {
+	const postBody = post ? JSON.parse(post.body) : undefined;
+
+	if (!post) {
 		return <div />;
 	}
 
@@ -30,13 +32,13 @@ function PostDisplay({ market, onImageClick, setRef, ...children }) {
 						<Avatar
 							size="sm"
 							name={generateProfileInitials(
-								market.oracleInfo.name
+								"market.oracleInfo.name"
 							)}
 						/>
 						<Text
-							onClick={() => {
-								navigate(`/group/${market.oracle.id}`);
-							}}
+							// onClick={() => {
+							// 	navigate(`/group/${market.oracle.id}`);
+							// }}
 							fontSize="16"
 							fontWeight="bold"
 							marginLeft="2"
@@ -46,9 +48,9 @@ function PostDisplay({ market, onImageClick, setRef, ...children }) {
 								textDecoration: "underline",
 							}}
 						>
-							{market.oracleInfo.name}
+							{"market.oracleInfo.name"}
 						</Text>
-						{market.following === false ? (
+						{/* {market.following === false ? (
 							<>
 								<Text
 									fontSize="20"
@@ -62,7 +64,7 @@ function PostDisplay({ market, onImageClick, setRef, ...children }) {
 										if (market.following === true) {
 											return;
 										}
-										const res = await followModerator(
+										const res = await followGroup(
 											market.oracle.id
 										);
 
@@ -80,53 +82,47 @@ function PostDisplay({ market, onImageClick, setRef, ...children }) {
 									Join
 								</Text>
 							</>
-						) : undefined}
+						) : undefined} */}
 					</Flex>
 					<Spacer />
 				</Flex>
 
 				<Flex paddingLeft={2}>
 					<Text fontSize={14} color="#4F4F4F">{`By ${sliceAddress(
-						market.creator
+						post.creatorColdAddress
 					)}`}</Text>
 				</Flex>
 			</Flex>
 			<Flex flexDirection={"column"}>
-				<Text fontSize={30}>Hello</Text>
-				<Flex
-					onClick={() => {
-						if (onImageClick != undefined) {
-							onImageClick(market.marketIdentifier);
-						}
-					}}
-					minHeight={minHeightTrick}
-					maxHeight={500}
-					// width={"100%"}
-					justifyContent="center"
-					_hover={{
-						cursor: "pointer",
-					}}
-				>
-					<Image
-						loading={"eager"}
-						onLoad={() => {
-							setMinHeightTrick(0);
+				<Text fontSize={30}>{postBody.title}</Text>
+				{postBody.postType == 0 ? (
+					<Flex
+						// onClick={() => {
+						// 	if (onImageClick != undefined) {
+						// 		onImageClick(market.marketIdentifier);
+						// 	}
+						// }}
+						minHeight={minHeightTrick}
+						maxHeight={500}
+						// width={"100%"}
+						justifyContent="center"
+						_hover={{
+							cursor: "pointer",
 						}}
-						fit="contain"
-						src={
-							market.marketMetadata &&
-							market.marketMetadata.eventIdentifierStr
-								? `${market.marketMetadata.eventIdentifierStr}`
-								: ""
-						}
-						alt="Failed to load image"
-					/>
-				</Flex>
-				<Link
-					href={"https://blog.dshr.org/2022/02/ee380-talk.html"}
-					isExternal
-				>
-					{"https://blog.dshr.org/2022/02/ee380-talk.html"}
+					>
+						<Image
+							loading={"eager"}
+							onLoad={() => {
+								setMinHeightTrick(0);
+							}}
+							fit="contain"
+							src={postBody.imageUrl}
+							alt="Failed to load image"
+						/>
+					</Flex>
+				) : undefined}
+				<Link href={postBody.link} isExternal>
+					{postBody.link}
 					<ExternalLinkIcon mx="2px" />
 				</Link>
 			</Flex>

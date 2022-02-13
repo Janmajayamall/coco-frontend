@@ -32,7 +32,6 @@ import {
 	determineMarketState,
 	filterMarketIdentifiersFromMarketsGraph,
 	filterOracleIdsFromMarketsGraph,
-	findModeratorsByIdArr,
 	findPostsByMarketIdentifierArr,
 	formatBNToDecimal,
 	getAmountCBySellTokenAmount,

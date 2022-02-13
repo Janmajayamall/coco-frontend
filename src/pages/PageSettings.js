@@ -24,7 +24,8 @@ import {
 	validateGroupDescription,
 	generateProfileInitials,
 	isValidAddress,
-	moderatorCheckNameUniqueness,
+	groupCheckNameUniqueness,
+	updateGroup,
 } from "../utils";
 import { useQueryOracleById, useUpdateMarketConfig } from "../hooks";
 import { useEthers } from "@usedapp/core/packages/core";
@@ -234,7 +235,7 @@ function Page() {
 								}
 
 								// check name uniqueness
-								let res = await moderatorCheckNameUniqueness(
+								let res = await groupCheckNameUniqueness(
 									name,
 									oracleData.id
 								);
@@ -253,7 +254,7 @@ function Page() {
 								}
 
 								setLoadingUpdateMetadata(true);
-								res = await updateModerator(oracleData.id, {
+								res = await updateGroup(oracleData.id, {
 									name,
 									description,
 								});

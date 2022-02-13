@@ -98,13 +98,13 @@ function SuggestionSidebar() {
 			return;
 		}
 		// const ignoreList = Object.keys(groupsFollowed);
-		let res = await findAllModerators();
+		// let res = await findAllModerators();
 
-		if (res == undefined) {
-			return;
-		}
-		setPopularGroups(res.moderators);
-		setInitialized(true);
+		// if (res == undefined) {
+		// 	return;
+		// }
+		// setPopularGroups(res.moderators);
+		// setInitialized(true);
 	}, []);
 
 	function validateEthInput() {

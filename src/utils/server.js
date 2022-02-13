@@ -1,6 +1,7 @@
 import axios from "axios";
 
 import { generateRequestSignatures } from "./auth";
+import { utils as etherUtils, utils } from "ethers";
 
 const baseInstance = axios.create({
 	baseURL:
@@ -63,10 +64,15 @@ export async function loginUser(keySignature, hotAddress, accountNonce) {
 	} catch (e) {}
 }
 
-export async function newPost(oracleAddress, eventIdentifierStr) {
+export async function newPost(groupAddress, bodyObj) {
+	// calculate market identifier
+	let body = JSON.stringify(bodyObj);
+	let marketIdentifier = etherUtils.keccak256(etherUtils.toUtf8Bytes(body));
+	console.log(etherUtils.toUtf8Bytes(body), marketIdentifier);
 	const msg = {
-		oracleAddress,
-		eventIdentifierStr,
+		groupAddress,
+		marketIdentifier,
+		body,
 	};
 	const signatures = generateRequestSignatures(msg);
 
@@ -122,9 +128,9 @@ export async function findPostsByMarketIdentifierArr(identifiers) {
 	} catch (e) {}
 }
 
-export async function updateModerator(oracleAddress, details) {
+export async function updateGroup(groupAddress, details) {
 	const msg = {
-		oracleAddress,
+		groupAddress,
 		details,
 	};
 	const signatures = generateRequestSignatures(msg);
@@ -134,7 +140,7 @@ export async function updateModerator(oracleAddress, details) {
 
 	try {
 		const { data } = await baseInstance.request({
-			url: "/moderator/update",
+			url: "/group/update",
 			method: "POST",
 			data: {
 				signatures,
@@ -196,16 +202,16 @@ export async function findGroups(filter) {
 	} catch (e) {}
 }
 
-export async function findModeratorsByIdArr(ids) {
+export async function findGroupsByIdArr(ids) {
 	const filter = {
-		oracleAddress: {
+		groupAddress: {
 			$in: ids,
 		},
 	};
 
 	try {
 		const { data } = await baseInstance.request({
-			url: "/moderator/find",
+			url: "/group/find",
 			method: "POST",
 			data: {
 				filter,
@@ -216,10 +222,10 @@ export async function findModeratorsByIdArr(ids) {
 	} catch (e) {}
 }
 
-export async function findPopularModerators(ignoreList) {
+export async function findPopularGroups(ignoreList) {
 	try {
 		const { data } = await baseInstance.request({
-			url: "/moderator/popular",
+			url: "/group/popular",
 			method: "POST",
 			data: {
 				ignoreList,
@@ -230,10 +236,10 @@ export async function findPopularModerators(ignoreList) {
 	} catch (e) {}
 }
 
-export async function findAllModerators() {
+export async function findAllGroups() {
 	try {
 		const { data } = await baseInstance.request({
-			url: "/moderator/all",
+			url: "/group/all",
 			method: "POST",
 			data: {},
 		});
@@ -242,13 +248,13 @@ export async function findAllModerators() {
 	} catch (e) {}
 }
 
-export async function findModeratorsDetails(moderatorIds) {
+export async function findGroupsDetails(groupIds) {
 	try {
 		const { data } = await baseInstance.request({
-			url: "/moderator/findDetails",
+			url: "/group/findDetails",
 			method: "POST",
 			data: {
-				moderatorIds,
+				groupIds,
 			},
 		});
 
@@ -256,9 +262,9 @@ export async function findModeratorsDetails(moderatorIds) {
 	} catch (e) {}
 }
 
-export async function followModerator(moderatorAddress) {
+export async function followGroup(groupAddress) {
 	const msg = {
-		moderatorAddress,
+		groupAddress,
 	};
 	const signatures = generateRequestSignatures(msg);
 	if (!signatures) {
@@ -279,9 +285,9 @@ export async function followModerator(moderatorAddress) {
 	} catch (e) {}
 }
 
-export async function unfollowModerator(moderatorAddress) {
+export async function unfollowGroup(groupAddress) {
 	const msg = {
-		moderatorAddress,
+		groupAddress,
 	};
 	const signatures = generateRequestSignatures(msg);
 	if (!signatures) {
@@ -336,17 +342,14 @@ export async function getRinkebyLatestBlockNumber() {
 	} catch (e) {}
 }
 
-export async function moderatorCheckNameUniqueness(
-	name,
-	oracleAddress = undefined
-) {
+export async function groupCheckNameUniqueness(name, groupAddress = undefined) {
 	try {
 		const { data } = await baseInstance.request({
-			url: "/moderator/checkNameUniqueness",
+			url: "/group/checkNameUniqueness",
 			method: "POST",
 			data: {
 				name,
-				oracleAddress,
+				groupAddress,
 			},
 		});
 

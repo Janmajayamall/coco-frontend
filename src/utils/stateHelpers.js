@@ -1,7 +1,7 @@
 import {
 	filterMarketIdentifiersFromMarketsGraph,
 	filterOracleIdsFromMarketsGraph,
-	findModeratorsByIdArr,
+	findGroupsByIdArr,
 	findPostsByMarketIdentifierArr,
 } from ".";
 import {
@@ -10,7 +10,7 @@ import {
 } from "../redux/reducers";
 
 export async function stateSetupOraclesInfo(oracleIds, dispatch) {
-	let res = await findModeratorsByIdArr(oracleIds);
+	let res = await findGroupsByIdArr(oracleIds);
 
 	if (res == undefined) {
 		return;

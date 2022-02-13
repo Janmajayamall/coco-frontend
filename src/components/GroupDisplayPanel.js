@@ -7,11 +7,7 @@ import {
 	IconButton,
 } from "@chakra-ui/react";
 import { SettingsIcon } from "@chakra-ui/icons";
-import {
-	followModerator,
-	unfollowModerator,
-	generateProfileInitials,
-} from "../utils";
+import { followGroup, unfollowGroup, generateProfileInitials } from "../utils";
 import {
 	selectGroupsFollowed,
 	sAddGroupFollow,
@@ -46,9 +42,7 @@ function GroupDisplayName({ group, followStatusVisible, settingsVisible }) {
 				groupsFollowed[group.oracleAddress] !== true ? (
 					<Button
 						onClick={async () => {
-							const res = await followModerator(
-								group.oracleAddress
-							);
+							const res = await followGroup(group.oracleAddress);
 							if (res == undefined) {
 								return;
 							}
@@ -61,7 +55,7 @@ function GroupDisplayName({ group, followStatusVisible, settingsVisible }) {
 				) : (
 					<Button
 						onClick={async () => {
-							const res = await unfollowModerator(
+							const res = await unfollowGroup(
 								group.oracleAddress
 							);
 							if (res == undefined) {
