@@ -1,7 +1,7 @@
 import axios from "axios";
 
 import { generateRequestSignatures } from "./auth";
-import { utils as etherUtils, utils } from "ethers";
+import { getMarketIdentifierOfPost } from ".";
 
 const baseInstance = axios.create({
 	baseURL:
@@ -61,18 +61,24 @@ export async function loginUser(keySignature, hotAddress, accountNonce) {
 		});
 
 		return data.response;
-	} catch (e) {}
+	} catch (e) {
+		console.log(e);
+	}
 }
 
-export async function newPost(groupAddress, bodyObj) {
-	// calculate market identifier
-	let body = JSON.stringify(bodyObj);
-	let marketIdentifier = etherUtils.keccak256(etherUtils.toUtf8Bytes(body));
-	console.log(etherUtils.toUtf8Bytes(body), marketIdentifier);
+export async function newPost(
+	groupAddress,
+	marketIdentifier,
+	body,
+	marketSignature,
+	marketData
+) {
 	const msg = {
 		groupAddress,
 		marketIdentifier,
 		body,
+		marketSignature,
+		marketData,
 	};
 	const signatures = generateRequestSignatures(msg);
 

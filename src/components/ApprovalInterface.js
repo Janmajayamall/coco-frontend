@@ -4,7 +4,9 @@ import {
 	useTokenAllowance,
 	useERC1155ApprovalForAll,
 	useERC1155SetApprovalForAll,
-	useTokenApprove,
+	useERC20Approve,
+	useERC20TokenAllowanceWrapper,
+	useERC1155ApprovalForAllWrapper,
 } from "./../hooks";
 import { useEthers } from "@usedapp/core/packages/core";
 import { useEffect, useState } from "react";
@@ -17,37 +19,41 @@ import { addresses } from "../contracts";
  */
 function ApprovalInterface({
 	tokenType,
-	erc1155Address,
 	onSuccess,
 	onFail,
-	erc20AmountBn,
+	erc1155Address = undefined,
+	erc20Address = undefined,
+	erc20AmountBn = undefined,
 	...props
 }) {
 	const { account } = useEthers();
 
-	const erc20TokenAllowance = useTokenAllowance(account);
-	const erc1155TokenApproval = useERC1155ApprovalForAll(
+	const erc20TokenAllowance = useERC20TokenAllowanceWrapper(
+		erc20Address,
+		account,
+		addresses.GroupRouter,
+		erc20AmountBn
+	);
+	const erc1155TokenApproval = useERC1155ApprovalForAllWrapper(
 		erc1155Address,
-		account
+		account,
+		addresses.GroupRouter
 	);
 
 	const {
 		state: stateERC1155,
 		send: sendERC1155,
 	} = useERC1155SetApprovalForAll(erc1155Address);
-	const { state: stateToken, send: sendToken } = useTokenApprove();
+	const { state: stateToken, send: sendToken } = useERC20Approve(
+		erc20Address
+	);
 
 	const [loading, setLoading] = useState(false);
 
 	function isDisabled() {
-		if (tokenType === 0 && erc20TokenAllowance != undefined) {
-			let amount = erc20AmountBn;
-			if (!BigNumber.isBigNumber(amount)) {
-				amount = ZERO_BN;
-			}
-			return amount.lte(erc20TokenAllowance);
-		}
-		if (tokenType === 1 && erc1155TokenApproval != undefined) {
+		if (tokenType === 0) {
+			return erc20TokenAllowance;
+		} else if (tokenType === 1) {
 			return erc1155TokenApproval;
 		}
 
@@ -111,9 +117,9 @@ function ApprovalInterface({
 					setLoading(true);
 
 					if (tokenType === 0) {
-						sendToken(addresses.MarketRouter, MAX_UINT_256);
+						sendToken(addresses.GroupRouter, MAX_UINT_256);
 					} else if (tokenType === 1) {
-						sendERC1155(addresses.MarketRouter, true);
+						sendERC1155(addresses.GroupRouter, true);
 					} else {
 						setLoading(false);
 					}

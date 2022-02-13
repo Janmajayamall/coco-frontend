@@ -21,11 +21,15 @@ import {
 	uploadImageFile,
 	GRAPH_BUFFER_MS,
 	findGroups,
+	CREATION_AMOUNT,
+	postSignTypedDataV4Helper,
+	getMarketIdentifierOfPost,
+	TWO_BN,
 } from "./../utils";
 import {
 	useCreateNewMarket,
-	useCheckTokenApprovals,
-	useTokenBalance,
+	useERC20TokenAllowanceWrapper,
+	useERC20TokenBalance,
 } from "./../hooks";
 import { useEthers } from "@usedapp/core/packages/core";
 import { BigNumber, utils } from "ethers";
@@ -35,17 +39,25 @@ import { selectUserProfile, sUpdateLoginModalIsOpen } from "../redux/reducers";
 import InputWithTitle from "../components/InputWithTitle";
 import PrimaryButton from "../components/PrimaryButton";
 import ApprovalInterface from "../components/ApprovalInterface";
+import { addresses } from "../contracts";
 
 function Page() {
-	const { account } = useEthers();
+	const { account, chainId } = useEthers();
 	const userProfile = useSelector(selectUserProfile);
+	console.log(userProfile, " User Profile");
 	const isAuthenticated = account && userProfile ? true : false;
 
 	const toast = useToast();
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
 
-	// const wEthTokenBalance = useTokenBalance(account);
+	const wEthTokenBalance = useERC20TokenBalance(account, addresses.WETH);
+	const wETHTokenAllowance = useERC20TokenAllowanceWrapper(
+		addresses.WETH,
+		account,
+		addresses.GroupRouter,
+		CREATION_AMOUNT.mul(TWO_BN)
+	);
 
 	const [title, setTitle] = useState("");
 	const [link, setLink] = useState("");
@@ -53,23 +65,20 @@ function Page() {
 	const [imageFile, setImageFile] = useState(null);
 	const [s3ImageUrl, setS3ImageUrl] = useState(null);
 
-	const [selectGroup, setSelectGroup] = useState("0xjdiowajdaio");
+	const [selectGroup, setSelectGroup] = useState(null);
 
 	const [groups, setGroups] = useState([]);
 	const [newPostLoading, setNewPostLoading] = useState(false);
 	const [selectErr, setSelectErr] = useState(false);
 	const [imageErr, setImageErr] = useState(false);
 
-	// const tokenApproval = useCheckTokenApprovals(
-	// 	0,
-	// 	account,
-	// 	undefined,
-	// 	creationAmountBn
-	// );
-
 	useEffect(async () => {
 		let res = await findGroups({});
-		// setGroups(res.groups);
+		if (res == undefined) {
+			// TODO throw error
+			return;
+		}
+		setGroups(res.groups);
 	}, []);
 
 	function validateFile(file) {
@@ -129,18 +138,45 @@ function Page() {
 	async function postHelper() {
 		// TODO validity checks
 
+		// make sure token approval is given
+
+		// make sure sufficient balance if present
+
 		// create post body
+		let groupAddress = selectGroup;
 		let bodyObject = {
-			creatorColdAddress: "userProfile.creatorColdAddress",
-			groupAddress: selectGroup,
+			creatorColdAddress: userProfile.coldAddress,
+			groupAddress: groupAddress,
 			postType,
 			link,
 			imageUrl: s3ImageUrl,
 			title,
 			timestamp: new Date().getTime().toString(),
 		};
+		let marketIdentifier = getMarketIdentifierOfPost(bodyObject);
 
-		let res = await newPost(selectGroup, bodyObject);
+		// signature for on-chain market
+		const { marketData, dataToSign } = postSignTypedDataV4Helper(
+			groupAddress,
+			marketIdentifier,
+			CREATION_AMOUNT,
+			CREATION_AMOUNT,
+			chainId
+		);
+		const accounts = await window.ethereum.enable();
+		const marketSignature = await window.ethereum.request({
+			method: "eth_signTypedData_v4",
+			params: [accounts[0], dataToSign],
+		});
+		console.log(marketSignature, " Post helper data to sign ");
+
+		let res = await newPost(
+			selectGroup,
+			marketIdentifier,
+			JSON.stringify(bodyObject),
+			marketSignature,
+			JSON.stringify(marketData)
+		);
 		if (res == undefined) {
 			// TODO throw error
 			return;
@@ -300,10 +336,11 @@ function Page() {
 
 							// disabled={!tokenApproval || !isAuthenticated}
 						/>
-						{/* <ApprovalInterface
+						<ApprovalInterface
 							marginTop={5}
 							tokenType={0}
-							erc20AmountBn={creationAmountBn}
+							erc20Address={addresses.WETH}
+							erc20AmountBn={CREATION_AMOUNT.mul(TWO_BN)}
 							onSuccess={() => {
 								toast({
 									title: "Success!",
@@ -318,7 +355,7 @@ function Page() {
 									isClosable: true,
 								});
 							}}
-						/> */}
+						/>
 					</Flex>
 					<Spacer />
 				</Flex>

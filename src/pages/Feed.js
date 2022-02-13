@@ -81,7 +81,6 @@ function Page() {
 	// get all posts depending on feedType
 	useEffect(async () => {
 		let res = await findPosts({});
-		console.log(resolvePath);
 		if (res == undefined) {
 			// TODO throw error
 			return;

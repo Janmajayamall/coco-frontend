@@ -26,11 +26,7 @@ import {
 	ZERO_BN,
 } from "../utils";
 import PostDisplay from "../components/PostDisplay";
-import TradingInterface from "../components/TradingInterface";
 import { useParams } from "react-router";
-import StakingInterface from "../components/StakingInterface";
-import RedeemWinsInterface from "../components/RedeemInterface";
-import ResolveInterface from "../components/ResolveInterface";
 import Loader from "../components/Loader";
 
 function Page() {
@@ -182,90 +178,6 @@ function Page() {
 				) : undefined}
 			</Flex>
 
-			<Flex width="20%" marginLeft={5} flexDirection="column">
-				{loadingMarket == false && market ? (
-					<>
-						{market.optimisticState.blocksLeft !== 0 ? (
-							<Flex
-								flexDirection="column"
-								backgroundColor="#F3F5F7"
-								padding={2}
-								marginTop={5}
-								borderRadius={10}
-								alignItems="center"
-							>
-								<Text fontSize={14} fontWeight="bold">
-									{`Period ends in ${formatTimeInSeconds(
-										convertBlocksToSeconds(
-											market.optimisticState.blocksLeft
-										)
-									)}`}
-								</Text>
-							</Flex>
-						) : undefined}
-						{market.optimisticState.stage === 1 ? (
-							<TradingInterface
-								market={market}
-								tradePosition={tradePosition}
-								erc1155ApprovalForAll={erc1155ApprovalForAll}
-								refreshFn={refreshPost}
-							/>
-						) : undefined}
-						{market.optimisticState.stage === 2 ? (
-							<StakingInterface
-								market={market}
-								tradePosition={tradePosition}
-								stakeHistories={stakeHistories}
-								stakePosition={stakePosition}
-								refreshFn={refreshPost}
-							/>
-						) : undefined}
-						{market.optimisticState.stage === 4 ? (
-							<RedeemWinsInterface
-								market={market}
-								tradePosition={tradePosition}
-								stakeHistories={stakeHistories}
-								stakePosition={stakePosition}
-								erc1155ApprovalForAll={erc1155ApprovalForAll}
-								refreshFn={refreshPost}
-							/>
-						) : undefined}
-						{market && market.optimisticState.stage === 3 ? (
-							<ResolveInterface
-								market={market}
-								stakeHistories={stakeHistories}
-								tradePosition={tradePosition}
-								refreshFn={refreshPost}
-							/>
-						) : undefined}
-						{/* <ResolveInterface
-							market={market}
-							tradePosition={tradePosition}
-							stakeHistories={stakeHistories}
-						/> */}
-						{/* <TradingInterface
-							market={market}
-							tradePosition={tradePosition}
-							erc1155ApprovalForAll={erc1155ApprovalForAll}
-						/> */}
-						{/* <StakingInterface
-							market={market}
-							tradePosition={tradePosition}
-							stakeHistories={stakeHistories}
-							stakePosition={stakePosition}
-						/> */}
-						{/* <RedeemWinsInterface
-							market={market}
-							tradePosition={tradePosition}
-							stakeHistories={stakeHistories}
-							stakePosition={stakePosition}
-							erc1155ApprovalForAll={erc1155ApprovalForAll}
-						/> */}
-					</>
-				) : (
-					<Loader />
-				)}
-			</Flex>
 			<Spacer />
 		</Flex>
 	);

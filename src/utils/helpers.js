@@ -1,4 +1,4 @@
-import { BigNumber, ethers, utils } from "ethers";
+import { BigNumber, ethers, utils as etherUtils } from "ethers";
 import { useState } from "react";
 import { useEffect } from "react";
 import { parse } from "graphql";
@@ -568,4 +568,61 @@ export function minAmountAfterSlippageBn(bnAmount, slippagePercentage) {
 		.mul(remainingValuePer)
 		.div(BigNumber.from("10000"));
 	return minValueBn;
+}
+
+export function getMarketIdentifierOfPost(postBodyObj) {
+	return etherUtils.keccak256(
+		etherUtils.toUtf8Bytes(JSON.stringify(postBodyObj))
+	);
+}
+
+export function postSignTypedDataV4Helper(
+	groupAddress,
+	marketIdentifier,
+	fundingAmountBn,
+	amount1Bn,
+	chainId
+) {
+	const domain = [
+		{ name: "name", type: "string" },
+		{ name: "version", type: "string" },
+		{ name: "chainId", type: "uint256" },
+		{ name: "verifyingContract", type: "address" },
+	];
+
+	const marketData = [
+		{ name: "group", type: "address" },
+		{ name: "marketIdentifier", type: "bytes32" },
+		{ name: "fundingAmount", type: "uint256" },
+		{ name: "amount1", type: "uint256" },
+	];
+
+	const domainData = {
+		name: "Group Router",
+		version: "v1",
+		chainId: parseInt(chainId),
+		verifyingContract: "0x1C56346CD2A2Bf3202F771f50d3D14a367B48070", // TODO change this contract address to GroupRouter address
+	};
+
+	const message = {
+		group: groupAddress,
+		marketIdentifier,
+		fundingAmount: fundingAmountBn.toString(),
+		amount1: amount1Bn.toString(),
+	};
+
+	const data = JSON.stringify({
+		types: {
+			EIP712Domain: domain,
+			MarketData: marketData,
+		},
+		domain: domainData,
+		primaryType: "MarketData",
+		message: message,
+	});
+
+	return {
+		marketData: message,
+		dataToSign: data,
+	};
 }

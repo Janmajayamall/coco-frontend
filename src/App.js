@@ -4,6 +4,7 @@ import LoginButton from "./components/LoginButton";
 import PostDisplay from "./components/PostDisplay";
 import NewPost from "./pages/NewPost";
 import NewModerator from "./pages/_NewGroup";
+import NewGroup from "./pages/NewGroup";
 // import OracleConfig from "./pages/OracleConfig";
 import Activity from "./pages/Activity";
 
@@ -77,7 +78,6 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, Route, Routes, useNavigate } from "react-router";
 import LoginModal from "./components/LoginModal";
-import PostTradeModal from "./components/PostTradeModal";
 import MainMenu from "./components/MainMenu";
 import CocoFull from "./Coco-full.svg";
 import { FireIcon } from "./components/FireIcon";
@@ -228,7 +228,7 @@ function App() {
 			<LoginModal />
 			<Routes>
 				<Route path="/add" element={<NewPost />} />
-				<Route path="/addModerator" element={<NewModerator />} />
+				<Route path="/addGroup" element={<NewGroup />} />
 				{/* <Route path="/oracle/:address" element={<OracleConfig />} /> */}
 				<Route path="/explore" element={<Feed />} />
 				<Route path="/home" element={<Feed />} />

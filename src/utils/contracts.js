@@ -1,26 +1,23 @@
 import { addresses } from "./../contracts";
 import { utils, Contract } from "ethers";
-import MarkerRouterAbi from "../contracts/abis/MarketRouter.json";
+import GroupRouterAbi from "../contracts/abis/GroupRouter.json";
 import OracleFactoryAbi from "../contracts/abis/OracleFactory.json";
-import OracleAbi from "../contracts/abis/Oracle.json";
-import WETHAbi from "../contracts/abis/WETH.json";
+import GroupAbi from "../contracts/abis/Group.json";
+import ERC20Abi from "../contracts/abis/ERC20.json";
 
 export const oracleFactoryInterface = new utils.Interface(OracleFactoryAbi);
-export const wEthInterface = new utils.Interface(WETHAbi);
-export const oracleInterface = new utils.Interface(OracleAbi);
+export const erc20Interface = new utils.Interface(ERC20Abi);
+export const groupInterface = new utils.Interface(GroupAbi);
 
-export const marketRouterContract = new Contract(
-	addresses.MarketRouter,
-	new utils.Interface(MarkerRouterAbi)
+export const groupRouterContract = new Contract(
+	addresses.GroupRouter,
+	new utils.Interface(GroupRouterAbi)
 );
 export const oracleFactoryContract = new Contract(
 	addresses.OracleFactory,
 	oracleFactoryInterface
 );
 
-export const wEthContract = new Contract(
-	addresses.WETH,
-	new utils.Interface(WETHAbi)
-);
-export const oracleContract = (address) =>
-	new Contract(address, new utils.Interface(OracleAbi));
+export const erc20Contract = (erc20Address) =>
+	new Contract(erc20Address, erc20Interface);
+export const groupContract = (address) => new Contract(address, groupInterface);

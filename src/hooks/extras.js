@@ -1,22 +1,32 @@
 import { ZERO_BN } from "../utils";
-import { useTokenAllowance, useERC1155ApprovalForAll } from "./useContractCall";
+import {
+	useERC20TokenAllowance,
+	useERC1155ApprovalForAll,
+} from "./useContractCall";
 
-export function useCheckTokenApprovals(
-	tokenType,
+export function useERC20TokenAllowanceWrapper(
+	erc20Address,
 	account,
-	erc1155Address = undefined,
-	erc20AmountBn = ZERO_BN
+	approvalToAddress,
+	erc20AmountBn
 ) {
-	const erc20TokenAllowance = useTokenAllowance(account);
-	const erc1155TokenApproval = useERC1155ApprovalForAll(
-		erc1155Address,
-		account
+	let allowance = useERC20TokenAllowance(
+		erc20Address,
+		account,
+		approvalToAddress
 	);
+	return allowance == undefined ? true : erc20AmountBn.lte(account);
+}
 
-	if (tokenType === 0 && erc20TokenAllowance != undefined) {
-		return erc20AmountBn.lte(erc20TokenAllowance);
-	} else if (tokenType === 1 && erc1155TokenApproval != undefined) {
-		return erc1155TokenApproval;
-	}
-	return true;
+export function useERC1155ApprovalForAllWrapper(
+	groupAddress,
+	account,
+	approvalToAddress
+) {
+	let approval = useERC1155ApprovalForAll(
+		groupAddress,
+		account,
+		approvalToAddress
+	);
+	return approval == undefined ? true : approval;
 }

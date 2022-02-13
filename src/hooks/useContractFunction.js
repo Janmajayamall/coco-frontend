@@ -4,99 +4,57 @@ import {
 	useSendTransaction,
 } from "@usedapp/core/packages/core";
 import {
-	marketRouterContract,
+	groupRouterContract,
 	oracleFactoryContract,
 	oracleContract,
-	wEthContract,
+	erc20Contract,
+	groupContract,
 } from "../utils";
 import Web3 from "web3";
 
-export function useCreateNewMarket() {
+export function useCreateAndBetOnMarket() {
 	const { state, send } = useContractFunction(
-		marketRouterContract,
-		"createFundBetOnMarket"
+		groupRouterContract,
+		"createAndBetOnMarket"
 	);
 	return { state, send };
 }
 
-export function useCreateNewOracle() {
+export function useBuyMinOutcomeTokensWithFixedAmount() {
 	const { state, send } = useContractFunction(
-		oracleFactoryContract,
-		"createOracle"
+		groupRouterContract,
+		"buyMinOutcomeTokensWithFixedAmount"
 	);
 	return { state, send };
 }
 
-export function useBuyMinTokensForExactCTokens() {
+export function useRedeemWins() {
 	const { state, send } = useContractFunction(
-		marketRouterContract,
-		"buyMinTokensForExactCTokens"
+		groupRouterContract,
+		"redeemWins"
 	);
 	return { state, send };
 }
 
-export function useSellExactTokensForMinCTokens() {
+export function useRedeemStake() {
 	const { state, send } = useContractFunction(
-		marketRouterContract,
-		"sellExactTokensForMinCTokens"
-	);
-	return { state, send };
-}
-
-export function useStakeForOutcome() {
-	const { state, send } = useContractFunction(
-		marketRouterContract,
-		"stakeForOutcome"
-	);
-	return { state, send };
-}
-
-export function useRedeemWinning() {
-	const { state, send } = useContractFunction(
-		marketRouterContract,
-		"redeemWinning"
-	);
-	return { state, send };
-}
-
-export function useRedeemWinningBothOutcomes() {
-	const { state, send } = useContractFunction(
-		marketRouterContract,
-		"redeemWinningBothOutcomes"
-	);
-	return { state, send };
-}
-
-export function useRedeemMaxWinning() {
-	const { state, send } = useContractFunction(
-		marketRouterContract,
-		"redeemMaxWinning"
-	);
-	return { state, send };
-}
-
-export function useRedeemMaxWinningAndStake() {
-	const { state, send } = useContractFunction(
-		marketRouterContract,
-		"redeemMaxWinningAndStake"
-	);
-	return { state, send };
-}
-
-export function useRedeemStake(oracleAddress) {
-	const { state, send } = useContractFunction(
-		oracleAddress ? oracleContract(oracleAddress) : undefined,
+		groupRouterContract,
 		"redeemStake"
 	);
-	return {
-		state,
-		send,
-	};
+	return { state, send };
 }
 
-export function useERC1155SetApprovalForAll(oracleAddress) {
+export function useRedeemWinsAndStake() {
 	const { state, send } = useContractFunction(
-		oracleAddress ? oracleContract(oracleAddress) : undefined,
+		groupRouterContract,
+		"redeemWinsAndStake"
+	);
+	return { state, send };
+}
+
+export function useERC1155SetApprovalForAll(groupAddress) {
+	const { state, send } = useContractFunction(
+		groupContract(groupAddress),
 		"setApprovalForAll"
 	);
 
@@ -106,32 +64,11 @@ export function useERC1155SetApprovalForAll(oracleAddress) {
 	};
 }
 
-export function useSetOutcome(oracleAddress) {
+export function useERC20Approve(erc20Address) {
 	const { state, send } = useContractFunction(
-		oracleAddress ? oracleContract(oracleAddress) : undefined,
-		"setOutcome"
+		erc20Contract(erc20Address),
+		"approve"
 	);
-
-	return {
-		state,
-		send,
-	};
-}
-
-export function useUpdateMarketConfig(oracleAddress) {
-	const { state, send } = useContractFunction(
-		oracleAddress ? oracleContract(oracleAddress) : undefined,
-		"updateMarketConfig"
-	);
-
-	return {
-		state,
-		send,
-	};
-}
-
-export function useTokenApprove() {
-	const { state, send } = useContractFunction(wEthContract, "approve");
 	return {
 		state,
 		send,

@@ -1,19 +1,13 @@
-import { addresses } from "../contracts";
-import {
-	useEthers,
-	useContractFunction,
-	useContractCalls,
-	useContractCall,
-} from "@usedapp/core/packages/core";
-import { oracleInterface, wEthInterface } from "../utils";
+import { useContractCall } from "@usedapp/core/packages/core";
+import { erc20Interface, groupInterface } from "../utils";
 
-export function useTokenBalance(account) {
+export function useERC20TokenBalance(account, erc20Address) {
 	const [tokenBalance] =
 		useContractCall(
 			account &&
-				addresses.WETH && {
-					abi: wEthInterface,
-					address: addresses.WETH,
+				erc20Address && {
+					abi: erc20Interface,
+					address: erc20Address,
 					method: "balanceOf",
 					args: [account],
 				}
@@ -21,30 +15,30 @@ export function useTokenBalance(account) {
 	return tokenBalance;
 }
 
-export function useTokenAllowance(account) {
+export function useERC20TokenAllowance(erc20Address, account, routerAddress) {
 	const [allowance] =
 		useContractCall(
 			account &&
-				addresses.WETH && {
-					abi: wEthInterface,
-					address: addresses.WETH,
+				erc20Address && {
+					abi: erc20Interface,
+					address: erc20Address,
 					method: "allowance",
-					args: [account, addresses.MarketRouter],
+					args: [account, routerAddress],
 				}
 		) ?? [];
 	return allowance;
 }
 
-export function useERC1155ApprovalForAll(oracleAddress, account) {
+export function useERC1155ApprovalForAll(groupAddress, account, routerAddress) {
 	const [approval] =
 		useContractCall(
 			account &&
-				oracleAddress &&
-				addresses.MarketRouter && {
-					abi: oracleInterface,
-					address: oracleAddress,
+				groupAddress &&
+				routerAddress && {
+					abi: groupInterface,
+					address: groupAddress,
 					method: "isApprovedForAll",
-					args: [account, addresses.MarketRouter],
+					args: [account, routerAddress],
 				}
 		) ?? [];
 	return approval;

@@ -43,7 +43,7 @@ import TradePriceBoxes from "./TradePriceBoxes";
 import ChallengeHistoryTable from "./ChallengeHistoryTable";
 import ApprovalInterface from "./ApprovalInterface";
 
-function StakingInterface({ market, stakeHistories, refreshFn }) {
+function ChallengeInterface({ market, refreshFn }) {
 	const { account } = useEthers();
 	const toast = useToast();
 	const userProfile = useSelector(selectUserProfile);
@@ -167,13 +167,13 @@ function StakingInterface({ market, stakeHistories, refreshFn }) {
 				)}`}
 				helpText="Time before which you can challenge the temporary outcome"
 			/>
-			<TwoColTitleInfo
+			{/* <TwoColTitleInfo
 				title={"Challenges left"}
 				info={`${
 					market.donEscalationLimit - market.donEscalationCount
 				}`}
 				helpText="Challenges can only be made a certain number of time (max. limit), after which moderators declare the final outcome. Challenges left shows number of challenges left to reach max. limit."
-			/>
+			/> */}
 			<TwoColTitleInfo
 				title={"Min. amount to challenge"}
 				info={`${formatBNToDecimalCurr(
@@ -245,9 +245,7 @@ function StakingInterface({ market, stakeHistories, refreshFn }) {
 				}}
 			/>
 
-			<ChallengeHistoryTable stakeHistories={stakeHistories} />
-
-			<ApprovalInterface
+			{/* <ApprovalInterface
 				marginTop={5}
 				tokenType={0}
 				erc20AmountBn={bnValue}
@@ -265,9 +263,9 @@ function StakingInterface({ market, stakeHistories, refreshFn }) {
 						isClosable: true,
 					});
 				}}
-			/>
+			/> */}
 		</Flex>
 	);
 }
 
-export default StakingInterface;
+export default ChallengeInterface;

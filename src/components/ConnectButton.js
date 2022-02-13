@@ -5,9 +5,10 @@ import {
 	selectUserProfile,
 	sUpdateLoginModalIsOpen,
 } from "./../redux/reducers";
-import { useTokenBalance } from "./../hooks";
+import { useERC20TokenBalance } from "./../hooks";
 import { formatBNToDecimalCurr, sliceAddress } from "../utils";
 import PrimaryButton from "./PrimaryButton";
+import { addresses } from "../contracts";
 
 /**
  * Authentication = (userProfile && account (from MM)) != undefined
@@ -17,7 +18,7 @@ function ConnectButton() {
 	const dispatch = useDispatch();
 
 	const { account } = useEthers();
-	const tokenBalance = useTokenBalance(account);
+	const tokenBalance = useERC20TokenBalance(account, addresses.WETH);
 
 	return (
 		<Flex m={2}>
