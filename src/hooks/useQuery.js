@@ -1,5 +1,22 @@
 import { useQuery } from "urql";
 
+const QueryGroupsByManagers = `
+	query ($managers: [Bytes!]!) {
+		groups(where:{manager_in:$managers}){
+			id
+			groupFactory
+			fee
+			donBuffer
+			resolutionBuffer
+			isActive
+			donReservesLimit
+			collateralToken
+			manager
+			markets
+		}
+	}
+`;
+
 const QueryExploreMarkets = `
 	query ($first: Int!, $skip: Int!, $timestamp: BigInt!) {
 		markets(first: $first, skip: $skip, orderBy: totalVolume, orderDirection: desc, where:{timestamp_gt: $timestamp}){
@@ -350,6 +367,20 @@ const QueryFeedByModeratorList = `
       }
     }
 `;
+
+export function useQueryGroupsByManagers(managers, pause) {
+	const [result, reexecuteQuery] = useQuery({
+		query: QueryGroupsByManagers,
+		variables: {
+			managers,
+		},
+		pause,
+	});
+	return {
+		result,
+		reexecuteQuery,
+	};
+}
 
 export function useQueryExploreMarkets(first, skip, timestamp, pause) {
 	const [result, reexecuteQuery] = useQuery({

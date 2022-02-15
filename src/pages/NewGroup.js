@@ -17,7 +17,7 @@ import {
 	stateSetupOraclesInfo,
 	validateEscalationLimit,
 	validateExpireHours,
-	validateBufferHours,
+	validateResolutionBufferHours,
 	validateResolutionHours,
 	validateFee,
 	validateGroupName,
@@ -26,11 +26,22 @@ import {
 	validateGroupDescription,
 	SAFE_BASE_URL,
 	decodeGroupAddressFromGroupProxyFactoryCall,
+	useBNInput,
+	validateDonReservesLimit,
+	validateDonBufferHours,
+	CURR_SYMBOL,
+	parseDecimalToBN,
+	parseHoursToSeconds,
+	findGroupsByIdArr,
 } from "../utils";
-import { useCreateGroupWithSafe, useCreateNewOracle } from "../hooks";
+import {
+	useCreateGroupWithSafe,
+	useCreateNewOracle,
+	useQueryGroupsByManagers,
+} from "../hooks";
 import { useEthers } from "@usedapp/core/packages/core";
 import { addresses } from "../contracts";
-import { useQueryOraclesByManager } from "../hooks";
+
 import { useNavigate } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { selectOracleInfoObj, selectUserProfile } from "../redux/reducers";
@@ -45,64 +56,17 @@ function Page() {
 	const { chainId, account } = useEthers();
 	const userProfile = useSelector(selectUserProfile);
 	const isAuthenticated = account && userProfile ? true : false;
-
 	const toast = useToast();
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
-	const { result: oraclesResult } = useQueryOraclesByManager(account);
 
 	const oraclesInfoObj = useSelector(selectOracleInfoObj);
 
-	const [oracleIds, setOracleIds] = useState([]);
-
 	const { send, state } = useCreateGroupWithSafe();
 
-	// TODO get and set safes owned by user
-	useEffect(async () => {
-		if (chainId == undefined || account == undefined) {
-			return;
-		}
-		try {
-			const res = await getOwnedSafes(SAFE_BASE_URL, chainId, account);
-			if (res.safes == undefined) {
-				return;
-			}
-			setSafes(res.safes);
-		} catch (e) {
-			console.log(e);
-		}
-	}, [chainId, account]);
-
-	// TODO once you get safes, get other groups managed by the safe
-	// and divide the groups into 2 - (1) Safes with details (2) safe without details
-	useEffect(() => {
-		if (safes.length == 0) {
-			return;
-		}
-
-		// get groups associated with safes from graphql
-
-		// get groups details of the groups & chuck the ones with no details under pending
-	}, [safes]);
-
-	// transitions step to 2 once group proxy contract is deployed
-	useEffect(() => {
-		if (state.status == "Success") {
-			// get group address from tx receipt
-			const groupAddress = decodeGroupAddressFromGroupProxyFactoryCall(
-				state.receipt.logs
-			);
-			setGroupAddress(groupAddress);
-			setStep(2);
-		} else if (state.status == "Exception" || state.status == "Fail") {
-			toast({
-				title: "Metamask Err!",
-				status: "error",
-				isClosable: true,
-			});
-			return;
-		}
-	}, [state]);
+	// groups already managed by user
+	const [groupsWithDetails, setGroupsWithDetails] = useState([]);
+	const [groupsWithoutDetailsIds, setGroupsWithoutDetailsIds] = useState([]);
 
 	// ui stafe
 	const [step, setStep] = useState(0);
@@ -111,9 +75,25 @@ function Page() {
 	const [safes, setSafes] = useState([]);
 	const [safe, selectSafe] = useState(null);
 
+	// queries groups by managers
+	// (i.e. safes of which user is an owner)
+	// from theGraph's index
+	const {
+		result: rGroupsByManagers,
+		reexecuteQuery: reexecuteGroupsByManagers,
+	} = useQueryGroupsByManagers(safes, false);
+
 	// states for group configs
-	const [fee, setFee] = useState("0.05");
-	const [escalationLimit, setEscalationLimit] = useState(1);
+	const [feeDec, setFeeDec] = useState("0.05");
+	const [donBufferHr, setDonBufferHr] = useState(1);
+	const [resolutionBufferHr, setResolutionBufferHr] = useState(1);
+	const {
+		input: donReservesLimit,
+		bnValue: donReservesLimitBN,
+		setInput: setDonReservesLimit,
+		err: donReservesErr,
+		errText: donReservesErrText,
+	} = useBNInput(validateDonReservesLimit);
 
 	// states for group details
 	const [groupAddress, setGroupAddress] = useState("");
@@ -126,6 +106,91 @@ function Page() {
 
 	// err states
 	const [nameExists, setNameExists] = useState(false);
+
+	// sget and set safes owned by user
+	useEffect(async () => {
+		if (chainId == undefined || account == undefined) {
+			return;
+		}
+		try {
+			const res = await getOwnedSafes(SAFE_BASE_URL, chainId, account);
+			if (res.safes == undefined) {
+				return;
+			}
+			const _safes = res.safes.map((v) => v.toLowerCase());
+			setSafes(_safes);
+		} catch (e) {
+			console.log(e);
+		}
+	}, [chainId, account]);
+
+	useEffect(() => {
+		if (safes.length == 0) {
+			return;
+		}
+
+		// get groups associated with safes (i.e. as manager) from graphql
+		reexecuteGroupsByManagers();
+	}, [safes]);
+
+	// whenever rGroupsByManagers changes
+	// get groups details from the backend
+	// and divide them into the following -
+	// (1) With details (under groups)
+	// (2) Without details (under pending groups)
+	useEffect(async () => {
+		if (rGroupsByManagers && rGroupsByManagers.data) {
+			const groupIds = rGroupsByManagers.data.groups.map(
+				(group) => group.id
+			);
+
+			let res = await findGroupsByIdArr(groupIds);
+			let groupsWithDetails = [];
+			console.log(res, "res");
+			if (res != undefined) {
+				groupsWithDetails = res.groups;
+			}
+			const groupsWithoutDetailsIds = groupIds.filter(
+				(_id) => !groupsWithDetails.find((_g) => _g.groupAddress == _id)
+			);
+			setGroupsWithDetails(groupsWithDetails);
+			setGroupsWithoutDetailsIds(groupsWithoutDetailsIds);
+		}
+	}, [rGroupsByManagers]);
+
+	// transitions step to 2 once group proxy contract is deployed
+	useEffect(() => {
+		console.log(state, " createGroupWithSafe");
+		if (state.status == "Success") {
+			// get group address from tx receipt
+			let groupAddress;
+			state.receipt.events.forEach((event) => {
+				console.log(event);
+				if (
+					event.address.toLowerCase() ==
+					addresses.GroupProxyFactory.toLowerCase()
+				) {
+					console.log("Yay grabbed it");
+					groupAddress = event.args[0].toLowerCase();
+				}
+			});
+
+			if (groupAddress == "") {
+				// TODO throw error
+				return;
+			}
+
+			setGroupAddress(groupAddress); // addresses are always small
+			setStep(2);
+		} else if (state.status == "Exception" || state.status == "Fail") {
+			toast({
+				title: "Metamask Err!",
+				status: "error",
+				isClosable: true,
+			});
+			return;
+		}
+	}, [state]);
 
 	useEffect(() => {
 		setNameExists(false);
@@ -142,8 +207,10 @@ function Page() {
 		}
 
 		if (
-			!validateFee(fee) ||
-			!validateEscalationLimit(escalationLimit) ||
+			!validateFee(feeDec).valid ||
+			!validateDonBufferHours(donBufferHr).valid ||
+			!validateResolutionBufferHours(resolutionBufferHr).valid ||
+			!validateDonReservesLimit(donReservesLimitBN).valid ||
 			safe == undefined ||
 			safe == ""
 		) {
@@ -155,12 +222,32 @@ function Page() {
 			return;
 		}
 
-		// group market config calldata
-		const groupMarketConfig = ethers.utils
-			.defaultAbiCoder()
-			.encode(["uint256", "uint256"], [fee, escalationLimit]);
+		// create input
+		const feeBN = parseDecimalToBN(feeDec);
+		const donBufferSecs = parseHoursToSeconds(donBufferHr);
+		const resolutionBufferSecs = parseHoursToSeconds(resolutionBufferHr);
 
-		send(safe, addresses.GroupSingleton, addresses.WETH, groupMarketConfig);
+		// group market config calldata
+		const groupGlobalConfig = ethers.utils.defaultAbiCoder.encode(
+			["bool", "uint64", "uint64", "uint64"],
+			[true, feeBN, donBufferSecs, resolutionBufferSecs]
+		);
+
+		console.log(
+			feeBN,
+			donBufferSecs,
+			resolutionBufferSecs,
+			donReservesLimitBN,
+			groupGlobalConfig
+		);
+
+		send(
+			safe,
+			addresses.GroupSingleton,
+			addresses.WETH,
+			donReservesLimitBN,
+			groupGlobalConfig
+		);
 	}
 
 	async function updateGroupDetailsHelper() {
@@ -187,7 +274,7 @@ function Page() {
 		}
 
 		// check name uniqueness
-		let res = await groupCheckNameUniqueness(name);
+		let res = await groupCheckNameUniqueness(name, groupAddress);
 		if (res == undefined || res.isNameUnique === false) {
 			setNameExists(true);
 			toast({
@@ -198,7 +285,7 @@ function Page() {
 			return;
 		}
 
-		res = await updateGroup("0x281984198203109310391", {
+		res = await updateGroup(groupAddress, {
 			name,
 			description,
 		});
@@ -285,9 +372,9 @@ function Page() {
 						{InputWithTitle(
 							"Fee",
 							1,
-							fee,
-							fee,
-							setFee,
+							feeDec,
+							feeDec,
+							setFeeDec,
 							validateFee,
 							{
 								defaultValue: 0.05,
@@ -295,16 +382,46 @@ function Page() {
 							}
 						)}
 						{InputWithTitle(
-							"Max. no. of Challenge rounds",
+							"Challenge Buffer period",
 							1,
-							escalationLimit,
-							escalationLimit,
-							setEscalationLimit,
-							validateEscalationLimit,
+							donBufferHr,
+							donBufferHr,
+							setDonBufferHr,
+							validateDonBufferHours,
 							{
 								defaultValue: 1,
 								precision: 0,
-							}
+							},
+							undefined,
+							"Hrs"
+						)}
+						{InputWithTitle(
+							"Resolution period",
+							1,
+							resolutionBufferHr,
+							resolutionBufferHr,
+							setResolutionBufferHr,
+							validateResolutionBufferHours,
+							{
+								defaultValue: 1,
+								precision: 0,
+							},
+							undefined,
+							"Hrs"
+						)}
+						{InputWithTitle(
+							"Max. Challange Limit",
+							1,
+							donReservesLimit,
+							donReservesLimitBN,
+							setDonReservesLimit,
+							validateDonReservesLimit,
+							{
+								defaultValue: 1000,
+								precision: 0,
+							},
+							undefined,
+							CURR_SYMBOL
 						)}
 						<PrimaryButton
 							style={{
@@ -375,20 +492,15 @@ function Page() {
 				<Heading size="md" marginBottom={5}>
 					Your Groups
 				</Heading>
-				{oraclesLoading === true ? <Loader /> : undefined}
-				{oraclesLoading === false && oracleIds.length === 0 ? (
+				{/* {oraclesLoading === true ? <Loader /> : undefined} */}
+				{/* {oraclesLoading === false && oracleIds.length === 0 ? (
 					<Flex>
 						<Text fontSize={14} fontWeight="bold">
 							You manage 0 groups
 						</Text>
-					</Flex>
-				) : undefined}
-				{oracleIds.map((id, index) => {
-					const group = oraclesInfoObj[id];
-					if (group == undefined) {
-						return;
-					}
-
+					</Flex> 
+				) : undefined} */}
+				{groupsWithDetails.map((group, index) => {
 					return (
 						<GroupDisplayName
 							key={index}
@@ -396,6 +508,13 @@ function Page() {
 							followStatusVisible={false}
 						/>
 					);
+				})}
+
+				<Heading size="md" marginTop={10}>
+					Pending Groups
+				</Heading>
+				{groupsWithoutDetailsIds.map((id, index) => {
+					return <Text>{id}</Text>;
 				})}
 			</Flex>
 		</Flex>

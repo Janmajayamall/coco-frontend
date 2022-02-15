@@ -363,6 +363,10 @@ export function formatTimeInSeconds(seconds) {
 	return `${sec}s`;
 }
 
+export function parseHoursToSeconds(hr) {
+	return hr * 60 * 60;
+}
+
 export function outcomeDisplayName(outcome) {
 	if (outcome == 0) {
 		return "NO";

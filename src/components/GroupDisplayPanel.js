@@ -27,7 +27,7 @@ function GroupDisplayName({ group, followStatusVisible, settingsVisible }) {
 
 			<Text
 				onClick={() => {
-					navigate(`/group/${group.oracleAddress}`);
+					navigate(`/group/${group.groupAddress}`);
 				}}
 				fontSize="14"
 				fontWeight="bold"

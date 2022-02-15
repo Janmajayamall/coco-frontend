@@ -19,7 +19,8 @@ export function useERC20TokenAllowance(erc20Address, account, routerAddress) {
 	const [allowance] =
 		useContractCall(
 			account &&
-				erc20Address && {
+				erc20Address &&
+				routerAddress && {
 					abi: erc20Interface,
 					address: erc20Address,
 					method: "allowance",

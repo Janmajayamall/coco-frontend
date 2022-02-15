@@ -63,7 +63,7 @@ export function validateExpireHours(val) {
 	};
 }
 
-export function validateBufferHours(val) {
+export function validateDonBufferHours(val) {
 	let isNum = validateIsNumber(val);
 	if (!isNum.valid) {
 		return isNum;
@@ -71,7 +71,7 @@ export function validateBufferHours(val) {
 	if (val < 1) {
 		return {
 			valid: false,
-			expText: "We recommend Challenge period to be at least 1 hr",
+			expText: "We recommend buffer period to be at least 1 hr",
 		};
 	}
 	return {
@@ -80,7 +80,7 @@ export function validateBufferHours(val) {
 	};
 }
 
-export function validateResolutionHours(val) {
+export function validateResolutionBufferHours(val) {
 	let isNum = validateIsNumber(val);
 	if (!isNum.valid) {
 		return isNum;
@@ -99,7 +99,38 @@ export function validateResolutionHours(val) {
 
 export function validateFee(val) {
 	let isNum = validateIsNumber(val);
-	return isNum;
+	if (isNum.valid == false) {
+		return isNum;
+	}
+
+	if (val >= 1) {
+		return {
+			valid: false,
+			expText: "Fee cannot be >= 1",
+		};
+	}
+
+	return {
+		valid: true,
+		expText: "",
+	};
+}
+
+export function validateDonReservesLimit(val) {
+	if (!validateIsBN(val).valid) {
+		return validateIsBN(val);
+	}
+
+	if (val.lte(ZERO_BN)) {
+		return {
+			valid: false,
+			expText: "Value cannot be zero",
+		};
+	}
+	return {
+		valid: true,
+		expText: "",
+	};
 }
 
 export function validateGroupName(val) {
@@ -154,18 +185,18 @@ export function validateUpdateMarketConfigTxInputs(
 	bufferHours,
 	resolutionHours
 ) {
-	if (
-		validateFee(fee).valid &&
-		validateEscalationLimit(escalationLimit).valid &&
-		validateBufferHours(bufferHours).valid &&
-		validateExpireHours(expireHours).valid &&
-		validateResolutionHours(resolutionHours).valid
-	) {
-		return {
-			valid: true,
-			expText: "",
-		};
-	}
+	// if (
+	// 	validateFee(fee).valid &&
+	// 	validateEscalationLimit(escalationLimit).valid &&
+	// 	validateBufferHours(bufferHours).valid &&
+	// 	validateExpireHours(expireHours).valid &&
+	// 	validateResolutionHours(resolutionHours).valid
+	// ) {
+	// 	return {
+	// 		valid: true,
+	// 		expText: "",
+	// 	};
+	// }
 	return {
 		valid: false,
 		expText: "Invalid inputs!",

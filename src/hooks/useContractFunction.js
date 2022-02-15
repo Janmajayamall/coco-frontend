@@ -5,7 +5,6 @@ import {
 } from "@usedapp/core/packages/core";
 import {
 	groupRouterContract,
-	oracleFactoryContract,
 	oracleContract,
 	erc20Contract,
 	groupContract,
