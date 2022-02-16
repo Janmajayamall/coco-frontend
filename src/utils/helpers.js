@@ -4,76 +4,44 @@ import { useEffect } from "react";
 import { parse } from "graphql";
 import { ZERO_BN, TWO_BN } from "./constants";
 import { useTab } from "@chakra-ui/tabs";
-import { CURR_SYMBOL, MULTIPLIER_BASE, MULTIPLIER } from ".";
+import { CURR_SYMBOL, MULTIPLIER_BASE, MULTIPLIER, ONE_BN } from ".";
+import { addresses } from "./../contracts";
 
-export function populateMarketWithMetadata(
-	market,
-	oraclesInfo,
-	marketsMetadata,
-	groupsFollowed,
-	latestBlockNumber
-) {
-	let _market = {
-		...market,
+export function formatMarketData(market, onChain) {
+	if (onChain == true) {
+		const stakes = market.stakes.map((stake) => {
+			return {
+				...stake,
+				donEscalationIndex: Number(stake.donEscalationIndex),
+				amount: parseDecimalToBN(stake.amount),
+				outcome: Number(stake.outcome),
+			};
+		});
 
-		outcomeReserve0: parseDecimalToBN(market.outcomeReserve0),
-		outcomeReserve1: parseDecimalToBN(market.outcomeReserve1),
-		probability0: Number(market.probability0),
-		probability1: Number(market.probability1),
-		stakingReserve0: parseDecimalToBN(market.stakingReserve0),
-		stakingReserve1: parseDecimalToBN(market.stakingReserve1),
+		return {
+			...market,
 
-		feeNumerator: Number(market.feeNumerator),
-		feeDenominator: Number(market.feeDenominator),
-		fee: Number(market.fee),
-		expireAtBlock: Number(market.expireAtBlock),
-		donBufferEndsAtBlock: Number(market.donBufferEndsAtBlock),
-		resolutionEndsAtBlock: Number(market.resolutionEndsAtBlock),
-		donBufferBlocks: Number(market.donBufferBlocks),
-		resolutionBufferBlocks: Number(market.resolutionBufferBlocks),
-		donEscalationCount: Number(market.donEscalationCount),
-		donEscalationLimit: Number(market.donEscalationLimit),
-		outcome: Number(market.outcome),
-		stage: Number(market.stage),
-
-		lastAmountStaked: parseDecimalToBN(market.lastAmountStaked),
-		lastOutcomeStaked: Number(market.lastOutcomeStaked),
-
-		tradeVolume: parseDecimalToBN(market.tradeVolume),
-		stakeVolume: parseDecimalToBN(market.stakeVolume),
-		totalVolume: parseDecimalToBN(market.totalVolume),
-
-		oracleInfo: oraclesInfo[market.oracle.id],
-		marketMetadata: marketsMetadata[market.marketIdentifier],
-		following: groupsFollowed[market.oracle.id] ? true : false,
-	};
-
-	let optimisticState = determineOptimisticMarketState(
-		_market,
-		latestBlockNumber
-	);
-
-	return {
-		..._market,
-		optimisticState,
-		probability0:
-			optimisticState.stage !== 4 || _market.stage === 4
-				? _market.probability0
-				: optimisticState.outcome === 2
-				? 0.5
-				: optimisticState.outcome === 0
-				? 1
-				: 0,
-		probability1:
-			optimisticState.stage !== 4 || _market.stage === 4
-				? _market.probability1
-				: optimisticState.outcome === 2
-				? 0.5
-				: optimisticState.outcome === 1
-				? 1
-				: 0,
-	};
+			reserve0: parseDecimalToBN(market.reserve0),
+			reserve1: parseDecimalToBN(market.reserve1),
+			donBufferEndsAt: Number(market.donBufferEndsAt),
+			donBuffer: Number(market.donBuffer),
+			resolutionBufferEndsAt: Number(market.resolutionBufferEndsAt),
+			resolutionBuffer: Number(market.resolutionBuffer),
+			lastAmountStaked: parseDecimalToBN(market.lastAmountStaked),
+			fee: parseDecimalToBN(market.fee),
+			outcome: Number(market.outcome),
+			donEscalationCount: Number(market.donEscalationCount),
+			stakes: stakes,
+		};
+	} else {
+		return {
+			...market,
+			amount1: BigNumber.from(market.amount1),
+		};
+	}
 }
+
+export function populateMarketWithMetadata() {}
 
 export function roundDecimalStr(value, dp = 6) {
 	let _value = value;
@@ -367,6 +335,10 @@ export function parseHoursToSeconds(hr) {
 	return hr * 60 * 60;
 }
 
+export function parseSecondsToHours(seconds) {
+	return seconds / 3600;
+}
+
 export function outcomeDisplayName(outcome) {
 	if (outcome == 0) {
 		return "NO";
@@ -583,7 +555,6 @@ export function getMarketIdentifierOfPost(postBodyObj) {
 export function postSignTypedDataV4Helper(
 	groupAddress,
 	marketIdentifier,
-	fundingAmountBn,
 	amount1Bn,
 	chainId
 ) {
@@ -597,22 +568,20 @@ export function postSignTypedDataV4Helper(
 	const marketData = [
 		{ name: "group", type: "address" },
 		{ name: "marketIdentifier", type: "bytes32" },
-		{ name: "fundingAmount", type: "uint256" },
 		{ name: "amount1", type: "uint256" },
 	];
 
 	const domainData = {
 		name: "Group Router",
 		version: "v1",
-		chainId: parseInt(chainId),
-		verifyingContract: "0x1C56346CD2A2Bf3202F771f50d3D14a367B48070", // TODO change this contract address to GroupRouter address
+		chainId: chainId,
+		verifyingContract: addresses.GroupRouter, // TODO change this contract address to GroupRouter address
 	};
 
 	const message = {
 		group: groupAddress,
 		marketIdentifier,
-		fundingAmount: fundingAmountBn.toString(),
-		amount1: amount1Bn.toString(),
+		amount1: amount1Bn,
 	};
 
 	const data = JSON.stringify({
@@ -634,4 +603,56 @@ export function postSignTypedDataV4Helper(
 // TODO implement this
 export function decodeGroupAddressFromGroupProxyFactoryCall(logs) {
 	return "";
+}
+
+export function findUserStakes(stakes, account) {
+	const userStakes = {
+		0: ZERO_BN,
+		1: ONE_BN,
+	};
+	stakes.forEach((stake) => {
+		if (stake.user.id.toLowerCase() == account.toLowerCase()) {
+			userStakes[stake.outcome] = userStakes[stake.outcome].add(
+				stake.amount
+			);
+		}
+	});
+	return userStakes;
+}
+
+export function calculateRedeemObj(market, account, userPositions) {
+	let total = ZERO_BN;
+	let wins = ZERO_BN;
+
+	if (!market || !account || !userPositions) {
+		return {
+			total,
+			wins,
+		};
+	}
+
+	// user gets back their stake on the right outcome
+	total = total.add(
+		market.outcoem == 0 ? userPositions.amount0 : userPositions.amount1
+	);
+
+	if (
+		market.outcome == 0 &&
+		market.staker0.toLowerCase() == account.toLowerCase()
+	) {
+		total = total.add(market.reserve1);
+		wins = market.reserve1;
+	}
+	if (
+		market.ouctome == 1 &&
+		market.staker1.toLowerCase() == account.toLowerCase()
+	) {
+		total = total.add(market.reserve0);
+		wins = market.reserve0;
+	}
+
+	return {
+		total,
+		wins,
+	};
 }

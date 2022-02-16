@@ -1,6 +1,6 @@
 {
-	"GroupSingleton": "0xbe0484dcccc05b8b11c5f6526ae041498bc1bd85",
+	"GroupSingleton": "0xe8db346e1287f0044cac91a11e7d90dbd307da78",
 	"GroupProxyFactory": "0x1f7e73cefe7562fd2461e966cdfbc40645a6a3a4",
-	"GroupRouter": "0x693346084446e287074402f420157120b2da5237",
+	"GroupRouter": "0x71aee0888a12359bb2198ce58f3694b0b9b6450d",
 	"WETH": "0xc99ce855c5051fed2b9a84595f312ef3832e38c8"
 }

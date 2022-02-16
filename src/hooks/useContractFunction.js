@@ -20,6 +20,22 @@ export function useCreateGroupWithSafe() {
 	return { state, send };
 }
 
+export function useCreateAndChallengeMarket() {
+	const { state, send } = useContractFunction(
+		groupRouterContract,
+		"createAndChallengeMarket"
+	);
+	return { state, send };
+}
+
+export function useChallenge() {
+	const { state, send } = useContractFunction(
+		groupRouterContract,
+		"challenge"
+	);
+	return { state, send };
+}
+
 export function useCreateAndBetOnMarket() {
 	const { state, send } = useContractFunction(
 		groupRouterContract,

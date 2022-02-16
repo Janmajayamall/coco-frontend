@@ -25,13 +25,14 @@ import {
 	postSignTypedDataV4Helper,
 	getMarketIdentifierOfPost,
 	TWO_BN,
+	ONE_BN,
 } from "./../utils";
 import {
 	useCreateNewMarket,
 	useERC20TokenAllowanceWrapper,
 	useERC20TokenBalance,
 } from "./../hooks";
-import { useEthers } from "@usedapp/core/packages/core";
+import { ChainStateProvider, useEthers } from "@usedapp/core/packages/core";
 import { BigNumber, utils } from "ethers";
 import { useNavigate } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
@@ -44,7 +45,7 @@ import { addresses } from "../contracts";
 function Page() {
 	const { account, chainId } = useEthers();
 	const userProfile = useSelector(selectUserProfile);
-	console.log(userProfile, " User Profile");
+
 	const isAuthenticated = account && userProfile ? true : false;
 
 	const toast = useToast();
@@ -56,8 +57,10 @@ function Page() {
 		addresses.WETH,
 		account,
 		addresses.GroupRouter,
-		CREATION_AMOUNT.mul(TWO_BN)
+		CREATION_AMOUNT.add(ONE_BN)
 	);
+
+	console.log(wETHTokenAllowance, " token allowance");
 
 	const [title, setTitle] = useState("");
 	const [link, setLink] = useState("");
@@ -159,16 +162,25 @@ function Page() {
 		const { marketData, dataToSign } = postSignTypedDataV4Helper(
 			groupAddress,
 			marketIdentifier,
-			CREATION_AMOUNT,
-			CREATION_AMOUNT,
-			chainId
+			CREATION_AMOUNT.toString(),
+			421611
 		);
 		const accounts = await window.ethereum.enable();
 		const marketSignature = await window.ethereum.request({
-			method: "eth_signTypedData_v4",
+			method: "eth_signTypedData_v3",
 			params: [accounts[0], dataToSign],
 		});
-		console.log(marketSignature, " Post helper data to sign ");
+		console.log(dataToSign);
+		console.log(marketSignature);
+		// console.log(marketSignature, " Post helper data to sign ");
+		// console.log(
+		// 	selectGroup,
+		// 	marketIdentifier,
+		// 	JSON.stringify(bodyObject),
+		// 	marketSignature,
+		// 	JSON.stringify(marketData),
+		// 	chainId
+		// );
 
 		let res = await newPost(
 			selectGroup,
@@ -340,7 +352,7 @@ function Page() {
 							marginTop={5}
 							tokenType={0}
 							erc20Address={addresses.WETH}
-							erc20AmountBn={CREATION_AMOUNT.mul(TWO_BN)}
+							erc20AmountBn={CREATION_AMOUNT.add(ONE_BN)}
 							onSuccess={() => {
 								toast({
 									title: "Success!",

@@ -265,7 +265,9 @@ export async function findGroupsDetails(groupIds) {
 		});
 
 		return data.response;
-	} catch (e) {}
+	} catch (e) {
+		console.log(e, " ghjk");
+	}
 }
 
 export async function followGroup(groupAddress) {

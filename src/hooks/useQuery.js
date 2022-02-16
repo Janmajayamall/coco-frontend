@@ -17,6 +17,69 @@ const QueryGroupsByManagers = `
 	}
 `;
 
+const QueryGroupById = `
+	query ($groupId: ID!) {
+		group(id: $groupId){
+			id
+			groupFactory
+			fee
+			donBuffer
+			resolutionBuffer
+			isActive
+			donReservesLimit
+			collateralToken
+			manager
+			markets
+		}
+	}
+`;
+
+const QueryMarketByMarketIdentifier = `
+	query ($marketIdentifier: Bytes!) {
+		market(id:$marketIdentifier){
+			id
+			group {
+				id
+			}
+			marketIdentifier
+			reserve0
+			reserve1
+			donBufferEndsAt
+			donBuffer
+			resolutionBufferEndsAt
+			resolutionBuffer
+			staker0
+			staker1
+			lastAmountStaked
+			tokenC
+			fee
+			outcome
+			donEscalationCount
+			stakes {
+				id
+				user {
+					id
+				}
+				donEscalationIndex
+				amount
+				outcome
+			}
+		}
+	}
+`;
+
+const QueryUserPositionsByMarketIdentifier = `
+	query($user: Bytes!, $marketIdentifier: Bytes!) {
+		userPositions(where: {user: $user, market: $marketIdentifier}){
+			id
+			stakeId0
+			stakeId1
+			amount0
+			amount1
+		}
+	}
+`;
+
 const QueryExploreMarkets = `
 	query ($first: Int!, $skip: Int!, $timestamp: BigInt!) {
 		markets(first: $first, skip: $skip, orderBy: totalVolume, orderDirection: desc, where:{timestamp_gt: $timestamp}){
@@ -93,52 +156,6 @@ const QueryMarketsByOracles = `
 			oracle{
      			id
     		}
-			tradeVolume
-			stakeVolume
-			totalVolume
-		}
-	}
-`;
-
-const QueryMarketByMarketIdentifier = `
-	query ($marketIdentifier: Bytes!) {
-		market(id: $marketIdentifier) {
-			id
-			creator
-			eventIdentifier
-			marketIdentifier
-			outcomeReserve0
-			outcomeReserve1
-			probability0
-			probability1
-			stakingReserve0
-			stakingReserve1
-			tokenC
-			feeNumerator
-			feeDenominator
-			fee
-			expireAtBlock
-			donBufferEndsAtBlock
-			resolutionEndsAtBlock
-			donBufferBlocks
-			resolutionBufferBlocks
-			donEscalationCount
-			donEscalationLimit
-			outcome
-			stage
-			staker0
-			staker1
-			lastAmountStaked
-			lastOutcomeStaked
-			timestamp
-			oracle{
-     			id
-				delegate
-    		}
-			oToken0Id
-			oToken1Id
-			sToken0Id
-			sToken1Id
 			tradeVolume
 			stakeVolume
 			totalVolume
@@ -373,6 +390,39 @@ export function useQueryGroupsByManagers(managers, pause) {
 		query: QueryGroupsByManagers,
 		variables: {
 			managers,
+		},
+		pause,
+	});
+	return {
+		result,
+		reexecuteQuery,
+	};
+}
+
+export function useQueryGroupById(groupId, pause) {
+	const [result, reexecuteQuery] = useQuery({
+		query: QueryGroupById,
+		variables: {
+			groupId,
+		},
+		pause,
+	});
+	return {
+		result,
+		reexecuteQuery,
+	};
+}
+
+export function useQueryUserPositionsByMarketIdentifier(
+	user,
+	marketIdentifier,
+	pause
+) {
+	const [result, reexecuteQuery] = useQuery({
+		query: QueryUserPositionsByMarketIdentifier,
+		variables: {
+			user,
+			marketIdentifier,
 		},
 		pause,
 	});

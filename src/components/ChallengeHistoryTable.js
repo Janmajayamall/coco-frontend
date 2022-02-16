@@ -1,7 +1,17 @@
 import { Text, Flex, Table, Thead, Tr, Th, Td } from "@chakra-ui/react";
-import { formatDecimalToCurr, sliceAddress } from "../utils";
+import {
+	formatBNToDecimalCurr,
+	formatDecimalToCurr,
+	sliceAddress,
+} from "../utils";
 
-function ChallengeHistoryTable({ stakeHistories }) {
+function ChallengeHistoryTable({ stakes }) {
+	[].sort();
+	console.log(stakes, " mkmk");
+	stakes = stakes.sort(
+		(a, b) => -1 * (a.donEscalationIndex - b.donEscalationIndex)
+	);
+
 	return (
 		<Flex marginTop={5} flexDirection="column">
 			<Text fontSize={16} fontWeight={"bold"}>
@@ -15,15 +25,15 @@ function ChallengeHistoryTable({ stakeHistories }) {
 						<Th>Outcome favored</Th>
 					</Tr>
 				</Thead>
-				{stakeHistories.map((obj, index) => (
+				{stakes.map((obj, index) => (
 					<Tr key={index}>
 						<Td>{sliceAddress(obj.user.id)}</Td>
-						<Td>{formatDecimalToCurr(obj.amountC)}</Td>
-						<Td>{obj.outcomeStaked === "1" ? "Yes" : "No"}</Td>
+						<Td>{formatBNToDecimalCurr(obj.amount)}</Td>
+						<Td>{obj.outcome === 1 ? "Yes" : "No"}</Td>
 					</Tr>
 				))}
 			</Table>
-			{stakeHistories.length === 0 ? (
+			{stakes.length === 0 ? (
 				<Flex justifyContent="center" padding={5}>
 					<Text fontSize={10}>No Challenges</Text>
 				</Flex>

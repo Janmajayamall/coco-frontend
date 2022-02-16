@@ -53,6 +53,11 @@
 				"type": "bytes"
 			},
 			{
+				"internalType": "enum GroupSigning.Scheme",
+				"name": "signatureScheme",
+				"type": "uint8"
+			},
+			{
 				"internalType": "uint256",
 				"name": "challengeAmount",
 				"type": "uint256"

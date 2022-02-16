@@ -80,7 +80,8 @@ function Page() {
 
 	// get all posts depending on feedType
 	useEffect(async () => {
-		let res = await findPosts({});
+		let res = await findPosts({ marketIdentifier: { $ne: "" } });
+		console.log(res, "posts");
 		if (res == undefined) {
 			// TODO throw error
 			return;
@@ -122,6 +123,13 @@ function Page() {
 				borderColor={"#E0E0E0"}
 			>
 				{posts.map((post, index) => {
+					// if post does not have
+					// corresponding group info
+					// then return
+					if (post.group.length == 0){
+						return
+					}
+
 					return (
 						<PostDisplay
 							key={index}
@@ -130,7 +138,8 @@ function Page() {
 							// 		? index === filteredMarkets.length - 1
 							// 			? observe
 							// 			: null
-							// 		: null
+							// 		: null.
+							
 							// }
 							style={{
 								marginBottom: 45,

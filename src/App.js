@@ -11,7 +11,7 @@ import Activity from "./pages/Activity";
 import Feed from "./pages/Feed";
 import Post from "./pages/Post";
 import Pages from "./pages/Pages";
-import PageSettings from "./pages/PageSettings";
+import PageSettings from "./pages/GroupSettings";
 import {
 	Button,
 	Box,
@@ -90,32 +90,6 @@ function App() {
 	const dispatch = useDispatch();
 	const location = useLocation();
 	const { account } = useEthers();
-
-	const rinkebyLatestBlockNumber = useSelector(
-		selectRinkebyLatestBlockNumber
-	);
-
-	useEffect(async () => {
-		let res = await getRinkebyLatestBlockNumber();
-
-		if (res == undefined) {
-			return;
-		}
-		dispatch(sUpdateRinkebyLatestBlockNumber(res.rinkebyLatestBlockNumber));
-	}, []);
-
-	useEffect(() => {
-		const interval = setInterval(async () => {
-			let res = await getRinkebyLatestBlockNumber();
-			if (res == undefined) {
-				return;
-			}
-			dispatch(
-				sUpdateRinkebyLatestBlockNumber(res.rinkebyLatestBlockNumber)
-			);
-		}, 30000);
-		return () => clearInterval(interval);
-	}, [rinkebyLatestBlockNumber]);
 
 	useEffect(async () => {
 		let res = await getUser();

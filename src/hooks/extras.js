@@ -15,7 +15,8 @@ export function useERC20TokenAllowanceWrapper(
 		account,
 		approvalToAddress
 	);
-	return allowance == undefined ? true : erc20AmountBn.lte(account);
+
+	return allowance == undefined ? true : erc20AmountBn.lte(allowance);
 }
 
 export function useERC1155ApprovalForAllWrapper(

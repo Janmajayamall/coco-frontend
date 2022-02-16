@@ -19,8 +19,9 @@ function PostDisplay({ post, onImageClick, setRef, ...children }) {
 	const [minHeightTrick, setMinHeightTrick] = useState(300);
 
 	const postBody = post ? JSON.parse(post.body) : undefined;
+	const group = post && post.group.length != 0 ? post.group[0] : undefined;
 
-	if (!post) {
+	if (!post || !group) {
 		return <div />;
 	}
 
@@ -31,9 +32,7 @@ function PostDisplay({ post, onImageClick, setRef, ...children }) {
 					<Flex alignItems="center">
 						<Avatar
 							size="sm"
-							name={generateProfileInitials(
-								"market.oracleInfo.name"
-							)}
+							name={generateProfileInitials(group.name)}
 						/>
 						<Text
 							// onClick={() => {
@@ -48,7 +47,7 @@ function PostDisplay({ post, onImageClick, setRef, ...children }) {
 								textDecoration: "underline",
 							}}
 						>
-							{"market.oracleInfo.name"}
+							{group.name}
 						</Text>
 						{/* {market.following === false ? (
 							<>

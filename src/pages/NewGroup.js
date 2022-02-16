@@ -33,6 +33,8 @@ import {
 	parseDecimalToBN,
 	parseHoursToSeconds,
 	findGroupsByIdArr,
+	sliceAddress,
+	safeService,
 } from "../utils";
 import {
 	useCreateGroupWithSafe,
@@ -81,7 +83,10 @@ function Page() {
 	const {
 		result: rGroupsByManagers,
 		reexecuteQuery: reexecuteGroupsByManagers,
-	} = useQueryGroupsByManagers(safes, false);
+	} = useQueryGroupsByManagers(
+		safes.map((id) => id.toLowerCase()),
+		false
+	);
 
 	// states for group configs
 	const [feeDec, setFeeDec] = useState("0.05");
@@ -113,7 +118,7 @@ function Page() {
 			return;
 		}
 		try {
-			const res = await getOwnedSafes(SAFE_BASE_URL, chainId, account);
+			const res = await safeService.getSafesByOwner(account);
 			if (res.safes == undefined) {
 				return;
 			}
@@ -146,7 +151,7 @@ function Page() {
 
 			let res = await findGroupsByIdArr(groupIds);
 			let groupsWithDetails = [];
-			console.log(res, "res");
+			console.log(res, "res groups");
 			if (res != undefined) {
 				groupsWithDetails = res.groups;
 			}
@@ -509,13 +514,28 @@ function Page() {
 						/>
 					);
 				})}
-
 				<Heading size="md" marginTop={10}>
 					Pending Groups
 				</Heading>
-				{groupsWithoutDetailsIds.map((id, index) => {
-					return <Text>{id}</Text>;
-				})}
+				{/* {groupsWithoutDetailsIds.map((id, index) => {
+					return <Text fontSize={}>{id}</Text>;
+				})} */}
+				<Flex backgroundColor="gray.100" borderRadius={5} padding={1}>
+					{groupsWithoutDetailsIds.map((id, index) => {
+						return (
+							<Text
+								fontSize={15}
+								fontWeight={"bold"}
+								_hover={{
+									cursor: "pointer",
+									textDecoration: "underline",
+								}}
+							>
+								{sliceAddress(id)}
+							</Text>
+						);
+					})}
+				</Flex>
 			</Flex>
 		</Flex>
 	);
