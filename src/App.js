@@ -125,6 +125,7 @@ function App() {
 		setGroups(res.groups);
 	}, []);
 
+	console.log(process.env.NODE_ENV, " this is node ENV");
 	return (
 		<div>
 			<HeaderWarning />
