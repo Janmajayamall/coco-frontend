@@ -125,8 +125,6 @@ function App() {
 		setGroups(res.groups);
 	}, []);
 
-	console.log(process.env.NODE_ENV, " this is node ENV");
-	console.log(process.env.REACT_APP_VERCEL_ENV, " this is node ENV VERCEL");
 	return (
 		<div>
 			<HeaderWarning />

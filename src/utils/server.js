@@ -5,7 +5,7 @@ import { getMarketIdentifierOfPost } from ".";
 
 const baseInstance = axios.create({
 	baseURL:
-		process.env.NODE_ENV === "production"
+		process.env.REACT_APP_VERCEL_ENV === "production"
 			? "https://backend.cocoverse.club/"
 			: "http://65.108.59.231:8080",
 	timeout: 10000,
