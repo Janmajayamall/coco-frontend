@@ -8,7 +8,7 @@ const baseInstance = axios.create({
 		process.env.NODE_ENV === "production"
 			? "https://backend.cocoverse.club/"
 			: "http://65.108.59.231:8080",
-	timeout: 1000,
+	timeout: 10000,
 	headers: { "Content-Type": "application/json" },
 });
 
@@ -114,6 +114,43 @@ export async function findPosts(filter) {
 
 		return data.response;
 	} catch (e) {}
+}
+
+export async function getExploreFeed() {
+	try {
+		const { data } = await baseInstance.request({
+			url: "/post/exploreFeed",
+			method: "POST",
+			data: {},
+		});
+
+		return data.response;
+	} catch (e) {
+		console.log(e);
+	}
+}
+
+export async function getHomeFeed() {
+	const msg = {
+		value: "upload",
+	};
+	const signatures = generateRequestSignatures(msg);
+	if (!signatures) {
+		return;
+	}
+	try {
+		const { data } = await baseInstance.request({
+			url: "/post/homeFeed",
+			method: "POST",
+			data: {
+				signatures,
+				msg,
+			},
+		});
+		return data.response;
+	} catch (e) {
+		console.log(e);
+	}
 }
 
 export async function findPostsByMarketIdentifierArr(identifiers) {

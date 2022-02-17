@@ -63,6 +63,7 @@ import {
 	findPopularModerators,
 	followModerator,
 	getRinkebyLatestBlockNumber,
+	COLORS,
 } from "./utils";
 import {
 	sUpdateProfile,
@@ -108,7 +109,11 @@ function App() {
 	return (
 		<div>
 			<HeaderWarning />
-			<Flex borderBottom="1px" borderColor="#BDBDBD">
+			<Flex
+				borderBottom="1px"
+				borderColor="#BDBDBD"
+				backgroundColor={COLORS.PRIMARY}
+			>
 				<Flex
 					style={{
 						width: "100%",
@@ -200,19 +205,28 @@ function App() {
 				</Flex>
 			</Flex>
 			<LoginModal />
-			<Routes>
-				<Route path="/add" element={<NewPost />} />
-				<Route path="/addGroup" element={<NewGroup />} />
-				{/* <Route path="/oracle/:address" element={<OracleConfig />} /> */}
-				<Route path="/explore" element={<Feed />} />
-				<Route path="/home" element={<Feed />} />
-				<Route path="/group/:groupId" element={<Feed />} />
-				<Route path="/" element={<Feed />} />
-				<Route path="/post/:postId" element={<Post />} />
-				<Route path="/groups" element={<Pages />} />
-				<Route path="/settings/:pageId" element={<PageSettings />} />
-				<Route path="/activity" element={<Activity />} />
-			</Routes>
+			<Flex width={"100%"}>
+				<Spacer />
+				<Flex width={"70%"}>
+					<Routes>
+						<Route path="/add" element={<NewPost />} />
+						<Route path="/addGroup" element={<NewGroup />} />
+						{/* <Route path="/oracle/:address" element={<OracleConfig />} /> */}
+						<Route path="/explore" element={<Feed />} />
+						<Route path="/home" element={<Feed />} />
+						<Route path="/group/:groupId" element={<Feed />} />
+						<Route path="/" element={<Feed />} />
+						<Route path="/post/:postId" element={<Post />} />
+						<Route path="/groups" element={<Pages />} />
+						<Route
+							path="/settings/:pageId"
+							element={<PageSettings />}
+						/>
+						<Route path="/activity" element={<Activity />} />
+					</Routes>
+				</Flex>
+				<Spacer />
+			</Flex>
 		</div>
 	);
 }

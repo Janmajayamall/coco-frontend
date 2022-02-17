@@ -1,5 +1,11 @@
 import { BigNumber } from "@ethersproject/abi/node_modules/@ethersproject/bignumber";
-import { MAX_LENGTH_DESCRIPTION, MAX_LENGTH_NAME, ZERO_BN } from ".";
+import {
+	MAX_LENGTH_DESCRIPTION,
+	MAX_LENGTH_NAME,
+	MAX_LENGTH_TITLE,
+	MAX_LENGTH_LINK,
+	ZERO_BN,
+} from ".";
 
 export function validateIsNumber(val) {
 	let value = Number(val);
@@ -130,6 +136,55 @@ export function validateDonReservesLimit(val) {
 	return {
 		valid: true,
 		expText: "",
+	};
+}
+
+export function validatePostTitle(val) {
+	if (typeof val != "string") {
+		return {
+			valid: false,
+			expText: "Invalid Input!",
+		};
+	}
+
+	if (val == "") {
+		return {
+			valid: false,
+			expText: "Title cannot be empty",
+		};
+	}
+
+	if (val.length > MAX_LENGTH_TITLE) {
+		return {
+			valid: false,
+			expText: "Title cannot be greater than 250 characters in length",
+		};
+	}
+
+	return {
+		valid: true,
+		expTex: "",
+	};
+}
+
+export function validateLinkURL(val) {
+	if (typeof val != "string") {
+		return {
+			valid: false,
+			expText: "Invalid Input!",
+		};
+	}
+
+	if (val == "" || val.length > MAX_LENGTH_LINK) {
+		return {
+			valid: false,
+			expText: "Invalid link",
+		};
+	}
+
+	return {
+		valid: true,
+		expTex: "",
 	};
 }
 

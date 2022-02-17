@@ -37,6 +37,7 @@ import {
 	formatDecimalToCurr,
 	formatMarketData,
 	calculateRedeemObj,
+	COLORS,
 } from "../utils";
 import PostDisplay from "../components/PostDisplay";
 import { useParams } from "react-router";
@@ -256,18 +257,18 @@ function Page() {
 	}
 
 	return (
-		<Flex style={{ maxWidth: 1650, marginTop: 5 }}>
-			<Spacer />
-			<Flex width="50%" flexDirection={"column"} marginRight={5}>
+		<Flex width={"100%"}>
+			<Flex width="70%" flexDirection={"column"} marginRight={5}>
 				{/* {loadingMarket == true ? <Loader /> : undefined} */}
 				<PostDisplay post={post} />
 				<ChallengeHistoryTable stakes={stakes} />
 			</Flex>
-			<Flex width="20%" flexDirection={"column"}>
+			<Flex width="30%" flexDirection={"column"}>
 				<Flex
 					flexDirection={"column"}
 					padding={2}
-					backgroundColor="gray.100"
+					backgroundColor={COLORS.PRIMARY}
+					borderRadius={8}
 					marginTop={5}
 					marginBottom={5}
 				>
@@ -288,147 +289,164 @@ function Page() {
 					</Text>
 					<Text>5. Blah blah all the rules</Text>
 				</Flex>
-				{marketState < 2 ? (
-					<>
-						<Text>Challenge the post</Text>
-						<Text>{temporaryOutcome == 1 ? "YES" : "NO"}</Text>
-						<Text>{`Min. Amount to Challenge: ${formatBNToDecimalCurr(
-							currentAmountBn.mul(TWO_BN)
-						)}`}</Text>
-						{timeLeftToChallenge != undefined ? (
-							<Text>{`Time left to challenge ${formatTimeInSeconds(
-								timeLeftToChallenge
+				<Flex
+					flexDirection={"column"}
+					padding={2}
+					backgroundColor={COLORS.PRIMARY}
+					borderRadius={8}
+				>
+					{marketState < 2 ? (
+						<>
+							<Text>Challenge the post</Text>
+							<Text>{temporaryOutcome == 1 ? "YES" : "NO"}</Text>
+							<Text>{`Min. Amount to Challenge: ${formatBNToDecimalCurr(
+								currentAmountBn.mul(TWO_BN)
 							)}`}</Text>
-						) : undefined}
+							{timeLeftToChallenge != undefined ? (
+								<Text>{`Time left to challenge ${formatTimeInSeconds(
+									timeLeftToChallenge
+								)}`}</Text>
+							) : undefined}
 
-						<NumberInput
-							onChange={(val) => {
-								setInput(val);
-							}}
-							placeholder="Amount"
-							fontSize={14}
-							value={input}
-							marginTop={3}
-						>
-							<NumberInputField />
-						</NumberInput>
-						{err === true ? (
-							<Text
-								marginTop="1"
-								marginBottom="1"
-								fontSize="10"
-								fontWeight="bold"
-								color="red.300"
+							<NumberInput
+								onChange={(val) => {
+									setInput(val);
+								}}
+								placeholder="Amount"
+								fontSize={14}
+								value={input}
+								marginTop={3}
 							>
-								{errText}
-							</Text>
-						) : undefined}
-						<PrimaryButton
-							loadingText="Processing..."
-							// isLoading={stakeLoading}
-							disabled={!isAuthenticated || !wETHTokenAllowance}
-							onClick={() => {
-								if (!isAuthenticated || !wETHTokenAllowance) {
-									return;
+								<NumberInputField />
+							</NumberInput>
+							{err === true ? (
+								<Text
+									marginTop="1"
+									marginBottom="1"
+									fontSize="10"
+									fontWeight="bold"
+									color="red.300"
+								>
+									{errText}
+								</Text>
+							) : undefined}
+							<PrimaryButton
+								loadingText="Processing..."
+								// isLoading={stakeLoading}
+								disabled={
+									!isAuthenticated || !wETHTokenAllowance
 								}
+								onClick={() => {
+									if (
+										!isAuthenticated ||
+										!wETHTokenAllowance
+									) {
+										return;
+									}
 
-								const newOutcome = 1 - temporaryOutcome;
+									const newOutcome = 1 - temporaryOutcome;
 
-								// validate values
-								if (
-									!validateInput(bnValue).valid ||
-									groupAddress == undefined ||
-									newOutcome > 1 ||
-									newOutcome < 0 ||
-									marketIdentifier == undefined ||
-									marketData == undefined
-								) {
-									// TODO throw error
-									return;
-								}
+									// validate values
+									if (
+										!validateInput(bnValue).valid ||
+										groupAddress == undefined ||
+										newOutcome > 1 ||
+										newOutcome < 0 ||
+										marketIdentifier == undefined ||
+										marketData == undefined
+									) {
+										// TODO throw error
+										return;
+									}
 
-								if (marketData.onChain == true) {
-									// call challenge
-									sendChallenge(
-										groupAddress,
-										marketIdentifier,
-										newOutcome,
-										bnValue
-									);
-								} else {
-									sendCreateAndChallenge(
-										[
-											marketData.group,
-											marketData.marketIdentifier,
-											marketData.amount1,
-										],
-										post.marketSignature,
-										0,
-										bnValue
-									);
+									if (marketData.onChain == true) {
+										// call challenge
+										sendChallenge(
+											groupAddress,
+											marketIdentifier,
+											newOutcome,
+											bnValue
+										);
+									} else {
+										sendCreateAndChallenge(
+											[
+												marketData.group,
+												marketData.marketIdentifier,
+												marketData.amount1,
+											],
+											post.marketSignature,
+											0,
+											bnValue
+										);
+									}
+								}}
+								// title={`Outcome is ${outcomeDisplayName(
+								// 	favoredOutcome
+								// )}, I challenge`}
+								title="Challenge"
+								style={{
+									marginTop: 5,
+								}}
+							/>
+						</>
+					) : undefined}
+					{marketState == 2 ? (
+						<Text>
+							Post final outcome is under review by moderators
+						</Text>
+					) : undefined}
+					{marketState == 3 ? (
+						<>
+							<Text>Post was challennged</Text>
+							<Text>{`Final outcome: ${
+								temporaryOutcome == 0 ? "NO" : "YES"
+							}`}</Text>
+							<Text>Your challenges</Text>
+							<Text>{`In favour of YES: ${formatBNToDecimalCurr(
+								userPositions != undefined
+									? userPositions.amount1
+									: ZERO_BN
+							)}`}</Text>
+							<Text>{`In favour of NO: ${formatBNToDecimalCurr(
+								userPositions != undefined
+									? userPositions.amount0
+									: ZERO_BN
+							)}`}</Text>
+							<Text>{`You win ${formatBNToDecimalCurr(
+								calculateRedeemObj(
+									marketData,
+									account,
+									userPositions
+								).wins
+							)}`}</Text>
+							<Text>{`You get back ${formatBNToDecimalCurr(
+								calculateRedeemObj(
+									marketData,
+									account,
+									userPositions
+								).total
+							)}`}</Text>
+							<PrimaryButton
+								loadingText="Processing..."
+								disabled={
+									!isAuthenticated || !wETHTokenAllowance
 								}
-							}}
-							// title={`Outcome is ${outcomeDisplayName(
-							// 	favoredOutcome
-							// )}, I challenge`}
-							title="Challenge"
-							style={{
-								marginTop: 5,
-							}}
-						/>
-					</>
-				) : undefined}
-				{marketState == 2 ? (
-					<Text>
-						Post final outcome is under review by moderators
-					</Text>
-				) : undefined}
-				{marketState == 3 ? (
-					<>
-						<Text>Post was challennged</Text>
-						<Text>{`Final outcome: ${
-							temporaryOutcome == 0 ? "NO" : "YES"
-						}`}</Text>
-						<Text>Your challenges</Text>
-						<Text>{`In favour of YES: ${formatBNToDecimalCurr(
-							userPositions != undefined
-								? userPositions.amount1
-								: ZERO_BN
-						)}`}</Text>
-						<Text>{`In favour of NO: ${formatBNToDecimalCurr(
-							userPositions != undefined
-								? userPositions.amount0
-								: ZERO_BN
-						)}`}</Text>
-						<Text>{`You win ${formatBNToDecimalCurr(
-							calculateRedeemObj(
-								marketData,
-								account,
-								userPositions
-							).wins
-						)}`}</Text>
-						<Text>{`You get back ${formatBNToDecimalCurr(
-							calculateRedeemObj(
-								marketData,
-								account,
-								userPositions
-							).total
-						)}`}</Text>
-						<PrimaryButton
-							loadingText="Processing..."
-							disabled={!isAuthenticated || !wETHTokenAllowance}
-							onClick={() => {
-								if (!isAuthenticated || !wETHTokenAllowance) {
-									return;
-								}
-							}}
-							title="Redeeem"
-							style={{
-								marginTop: 5,
-							}}
-						/>
-					</>
-				) : undefined}
+								onClick={() => {
+									if (
+										!isAuthenticated ||
+										!wETHTokenAllowance
+									) {
+										return;
+									}
+								}}
+								title="Redeeem"
+								style={{
+									marginTop: 5,
+								}}
+							/>
+						</>
+					) : undefined}
+				</Flex>
 				<ApprovalInterface
 					marginTop={5}
 					tokenType={0}
@@ -450,7 +468,6 @@ function Page() {
 					}}
 				/>
 			</Flex>
-			<Spacer />
 		</Flex>
 	);
 }

@@ -11,7 +11,7 @@ import {
 import { useEthers } from "@usedapp/core/packages/core";
 import { useEffect, useState } from "react";
 import { BigNumber } from "@ethersproject/abi/node_modules/@ethersproject/bignumber";
-import { CURR_SYMBOL, MAX_UINT_256, ZERO_BN } from "../utils";
+import { CURR_SYMBOL, MAX_UINT_256, ZERO_BN, COLORS } from "../utils";
 import { addresses } from "../contracts";
 
 /**
@@ -89,7 +89,12 @@ function ApprovalInterface({
 	}
 
 	return (
-		<Flex flexDirection={"column"} {...props}>
+		<Flex
+			backgroundColor={COLORS.PRIMARY}
+			borderRadius={8}
+			flexDirection={"column"}
+			{...props}
+		>
 			<Box
 				padding={2}
 				// borderColor="blue.400"

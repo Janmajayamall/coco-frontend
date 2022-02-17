@@ -29,6 +29,8 @@ import {
 	isValidAddress,
 	FEED_BATCH_COUNT,
 	findPosts,
+	getExploreFeed,
+	getHomeFeed,
 } from "../utils";
 import {
 	selectOracleInfoObj,
@@ -80,14 +82,18 @@ function Page() {
 
 	// get all posts depending on feedType
 	useEffect(async () => {
-		let res = await findPosts({ marketIdentifier: { $ne: "" } });
-		console.log(res, "posts");
+		let res;
+		if (feedType == 0) {
+			res = await getExploreFeed();
+		} else if (feedType == 1) {
+			res = await getHomeFeed();
+		}
 		if (res == undefined) {
 			// TODO throw error
 			return;
 		}
 		setPosts(res.posts);
-	}, []);
+	}, [feedType]);
 
 	// infinite scroll
 	// const { observe } = useInView({
@@ -104,30 +110,21 @@ function Page() {
 	// });
 
 	return (
-		<Flex
-			style={{
-				paddingRight: 20,
-				paddingLeft: 20,
-			}}
-		>
-			<Spacer />
-
+		<Flex width={"100%"}>
 			<Flex
 				flexDirection="column"
-				width={"50%"}
+				width={"70%"}
 				minHeight="100vh"
 				paddingRight={21}
 				paddingLeft={21}
-				borderRightWidth={1}
-				borderLeftWidth={1}
 				borderColor={"#E0E0E0"}
 			>
 				{posts.map((post, index) => {
 					// if post does not have
 					// corresponding group info
 					// then return
-					if (post.group.length == 0){
-						return
+					if (post.group.length == 0) {
+						return;
 					}
 
 					return (
@@ -139,7 +136,7 @@ function Page() {
 							// 			? observe
 							// 			: null
 							// 		: null.
-							
+
 							// }
 							style={{
 								marginBottom: 45,
@@ -154,7 +151,6 @@ function Page() {
 				})}
 			</Flex>
 			<SuggestionSidebar />
-			<Spacer />
 		</Flex>
 	);
 }

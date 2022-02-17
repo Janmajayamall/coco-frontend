@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router";
 import {
+	COLORS,
 	followGroup,
 	formatBNToDecimalCurr,
 	formatDecimalToPercentage,
@@ -26,8 +27,14 @@ function PostDisplay({ post, onImageClick, setRef, ...children }) {
 	}
 
 	return (
-		<Box ref={setRef} {...children}>
-			<Flex flexDirection={"column"} paddingBottom={3} paddingTop={4}>
+		<Box
+			ref={setRef}
+			{...children}
+			backgroundColor={COLORS.PRIMARY}
+			padding={4}
+			borderRadius={5}
+		>
+			<Flex flexDirection={"column"}>
 				<Flex paddingBottom={1}>
 					<Flex alignItems="center">
 						<Avatar

@@ -9,12 +9,26 @@ import { Provider } from "react-redux";
 import { store } from "./redux/store";
 import { BrowserRouter as Router } from "react-router-dom";
 import { createClient, Provider as URQLProvider } from "urql";
+import { extendTheme } from "@chakra-ui/react";
+import { mode } from "@chakra-ui/theme-tools";
 
+// setting up theGraph's endpoint
 const client = createClient({
 	url:
 		process.env.NODE_ENV === "production"
 			? "https://api.thegraph.com/subgraphs/name/janmajayamall/meme-curator-subgraphs"
 			: "https://api.thegraph.com/subgraphs/name/janmajayamall/pm-content-test",
+});
+
+// chakra ui theme
+const theme = extendTheme({
+	styles: {
+		global: (props) => ({
+			body: {
+				bg: mode("#edf2f7", "#edf2f7")(props),
+			},
+		}),
+	},
 });
 
 ReactDOM.render(
@@ -32,7 +46,7 @@ ReactDOM.render(
 						},
 					}}
 				>
-					<ChakraProvider>
+					<ChakraProvider theme={theme}>
 						<Router>
 							<App />
 						</Router>

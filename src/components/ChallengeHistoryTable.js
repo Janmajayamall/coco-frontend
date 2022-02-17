@@ -3,6 +3,7 @@ import {
 	formatBNToDecimalCurr,
 	formatDecimalToCurr,
 	sliceAddress,
+	COLORS,
 } from "../utils";
 
 function ChallengeHistoryTable({ stakes }) {
@@ -13,8 +14,14 @@ function ChallengeHistoryTable({ stakes }) {
 	);
 
 	return (
-		<Flex marginTop={5} flexDirection="column">
-			<Text fontSize={16} fontWeight={"bold"}>
+		<Flex
+			backgroundColor={COLORS.PRIMARY}
+			marginTop={5}
+			flexDirection="column"
+			padding={3}
+			borderRadius={8}
+		>
+			<Text marginBottom={3} fontSize={16} fontWeight={"bold"}>
 				Past Challenges
 			</Text>
 			<Table size="sm">

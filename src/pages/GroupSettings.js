@@ -42,6 +42,7 @@ import {
 	createSafeTx,
 	generateProfileInitials,
 	numStrFormatter,
+	COLORS,
 } from "../utils";
 import {
 	useCreateGroupWithSafe,
@@ -128,11 +129,11 @@ function Page() {
 	// get group details
 	useEffect(async () => {
 		const res = await findGroupsDetails([groupId.toLowerCase()]);
-		if (res == undefined || res.groupDetails.length == 0) {
+		if (res == undefined || res.groupsDetails.length == 0) {
 			// TODO throw error
 			return;
 		}
-		const _groupDetails = res.groupDetails[0];
+		const _groupDetails = res.groupsDetails[0];
 		console.log(_groupDetails);
 
 		// set things up for editing
@@ -320,50 +321,63 @@ function Page() {
 	}
 
 	return (
-		<Flex minHeight="100vh">
-			<Flex
-				width="80%"
-				flexDirection="row"
-				paddingRight={20}
-				paddingLeft={20}
-				paddingTop={10}
-			>
-				<Spacer />
-				<Flex flexDirection="column">
+		<Flex width="100%" minHeight="100vh">
+			<Flex width="70%" flexDirection="row" padding={5}>
+				<Flex width={"49%"} flexDirection="column">
 					{groupDetails != null ? (
-						<Flex marginBottom={5}>
-							<Avatar
-								size="md"
-								name={generateProfileInitials(
-									groupDetails.name
-								)}
-								marginRight={5}
-							/>
-							<Box marginRight={5}>
-								<Text fontSize="md">
-									{numStrFormatter(
-										groupDetails.followCount
-											? groupDetails.followCount
-											: 0
+						<Flex
+							padding={2}
+							backgroundColor={COLORS.PRIMARY}
+							borderRadius={8}
+							marginBottom={4}
+							flexDirection={"column"}
+						>
+							<Flex marginBottom={1}>
+								<Avatar
+									size="md"
+									name={generateProfileInitials(
+										groupDetails.name
 									)}
-								</Text>
-								<Text fontSize="sm">members</Text>
-							</Box>
-							<Box marginRight={5}>
+									marginRight={5}
+								/>
+								<Box marginRight={5}>
+									<Text fontSize="md">
+										{numStrFormatter(
+											groupDetails.followCount
+												? groupDetails.followCount
+												: 0
+										)}
+									</Text>
+									<Text fontSize="sm">members</Text>
+								</Box>
+								<Box marginRight={5}>
+									<Text fontSize="md">
+										{numStrFormatter(
+											groupDetails.postCount
+												? groupDetails.postCount
+												: 0
+										)}
+									</Text>
+									<Text fontSize="sm">contributions</Text>
+								</Box>
+							</Flex>
+							<Flex>
 								<Text fontSize="md">
-									{numStrFormatter(
-										groupDetails.postCount
-											? groupDetails.postCount
-											: 0
-									)}
+									{groupDetails.description}
 								</Text>
-								<Text fontSize="sm">contributions</Text>
-							</Box>
+							</Flex>
 						</Flex>
 					) : (
 						<Loader />
 					)}
-					<Flex flexDirection="column" padding={2} width={"100%"}>
+					<Flex
+						padding={2}
+						backgroundColor={COLORS.PRIMARY}
+						borderRadius={8}
+						flexDirection="column"
+						padding={2}
+						width={"100%"}
+					>
 						<Text fontSize={20} fontWeight={"bold"}>
 							Edit details
 						</Text>
@@ -407,8 +421,15 @@ function Page() {
 					</Flex>
 				</Flex>
 				<Spacer />
-				<Flex flexDirection="column">
-					<Flex flexDirection="column" padding={2}>
+				<Flex width={"49%"} flexDirection="column">
+					<Flex
+						padding={2}
+						backgroundColor={COLORS.PRIMARY}
+						borderRadius={8}
+						flexDirection="column"
+						padding={2}
+						marginBottom={4}
+					>
 						<Text fontSize={20} fontWeight={"bold"}>
 							Edit configurations
 						</Text>
@@ -478,7 +499,13 @@ function Page() {
 							title="Next"
 						/>
 					</Flex>
-					<Flex flexDirection="column" padding={2}>
+					<Flex
+						padding={2}
+						backgroundColor={COLORS.PRIMARY}
+						borderRadius={8}
+						flexDirection="column"
+						padding={2}
+					>
 						<Text fontSize={20} fontWeight={"bold"}>
 							Edit Max. Challenge limit
 						</Text>
@@ -511,13 +538,13 @@ function Page() {
 					</Flex>
 				</Flex>
 			</Flex>
-			<Spacer />
-			<Flex width="20%" flexDirection={"column"}>
+
+			<Flex width="30%" padding={5} flexDirection={"column"}>
 				<Flex
 					flexDirection={"column"}
 					padding={2}
-					backgroundColor="gray.100"
-					marginTop={5}
+					backgroundColor={COLORS.PRIMARY}
+					borderRadius={8}
 					marginBottom={5}
 				>
 					<Text fontWeight={"bold"}>How to edit?</Text>
@@ -532,7 +559,6 @@ function Page() {
 					</Text>
 				</Flex>
 			</Flex>
-			<Spacer />
 		</Flex>
 	);
 }

@@ -26,6 +26,9 @@ import {
 	getMarketIdentifierOfPost,
 	TWO_BN,
 	ONE_BN,
+	COLORS,
+	validatePostTitle,
+	validateLinkURL,
 } from "./../utils";
 import {
 	useCreateNewMarket,
@@ -64,9 +67,8 @@ function Page() {
 
 	const [title, setTitle] = useState("");
 	const [link, setLink] = useState("");
-	const [postType, setPostType] = useState("");
+	const [postType, setPostType] = useState(0);
 	const [imageFile, setImageFile] = useState(null);
-	const [s3ImageUrl, setS3ImageUrl] = useState(null);
 
 	const [selectGroup, setSelectGroup] = useState(null);
 
@@ -94,113 +96,163 @@ function Page() {
 		return true;
 	}
 
-	// function validateInputs() {
-	// 	if (selectGroup == undefined || selectGroup == "") {
-	// 		setSelectErr(true);
-	// 		return false;
-	// 	}
-	// 	if (imageFile == undefined) {
-	// 		setImageErr(true);
-	// 		return false;
-	// 	}
-
-	// 	if (
-	// 		!validateCreationAmount(creationAmountBn, wEthTokenBalance).valid ||
-	// 		wEthTokenBalance == undefined
-	// 	) {
-	// 		return false;
-	// 	}
-
-	// 	return true;
-	// }
-
-	async function uploadImageHelper() {
-		// if (!isAuthenticated || !tokenApproval) {
-		// 	return;
-		// }
-
-		// start new post loading
-		setNewPostLoading(true);
-
-		// validate inputs
-		// if (!validateInputs()) {
-		// 	setNewPostLoading(false);
-		// 	return;
-		// }
-
-		const { presignedUrl } = await getPresignedUrl();
-		const s3Url = await uploadImageFile(presignedUrl, imageFile);
-
-		if (s3Url == undefined) {
-			setNewPostLoading(false);
-		}
-
-		setS3ImageUrl(s3Url);
-	}
-
 	async function postHelper() {
-		// TODO validity checks
+		try {
+			// throw error if user isn't authenticated
+			if (!isAuthenticated) {
+				toast({
+					title: "Please Sign In!",
+					status: "error",
+					isClosable: true,
+				});
+				throw Error();
+			}
 
-		// make sure token approval is given
+			// start new post loading
+			setNewPostLoading(true);
 
-		// make sure sufficient balance if present
+			// Checks:
+			// valid group is selected
+			// user profile exists
+			// postType is either 0 or 1
+			// post title is valid
+			if (
+				selectGroup == undefined ||
+				selectGroup == "" ||
+				userProfile == undefined ||
+				postType > 1 ||
+				postType < 0 ||
+				validatePostTitle(title).valid == false
+			) {
+				// set select group error
+				if (selectGroup == undefined || selectGroup == "") {
+					setSelectErr(true);
+				}
+				toast({
+					title: "Invalid Input!",
+					status: "error",
+					isClosable: true,
+				});
+				throw Error();
+			}
 
-		// create post body
-		let groupAddress = selectGroup;
-		let bodyObject = {
-			creatorColdAddress: userProfile.coldAddress,
-			groupAddress: groupAddress,
-			postType,
-			link,
-			imageUrl: s3ImageUrl,
-			title,
-			timestamp: new Date().getTime().toString(),
-		};
-		let marketIdentifier = getMarketIdentifierOfPost(bodyObject);
+			// If postType == 0 then upload image file.
+			// If image file is null image file will not
+			// be uploaded. The next check takes care of throwing
+			// error.
+			let s3Url = "";
+			if (postType == 0 && imageFile != undefined) {
+				const { presignedUrl } = await getPresignedUrl();
+				s3Url = await uploadImageFile(presignedUrl, imageFile);
+			}
 
-		// signature for on-chain market
-		const { marketData, dataToSign } = postSignTypedDataV4Helper(
-			groupAddress,
-			marketIdentifier,
-			CREATION_AMOUNT.toString(),
-			421611
-		);
-		const accounts = await window.ethereum.enable();
-		const marketSignature = await window.ethereum.request({
-			method: "eth_signTypedData_v3",
-			params: [accounts[0], dataToSign],
-		});
-		console.log(dataToSign);
-		console.log(marketSignature);
-		// console.log(marketSignature, " Post helper data to sign ");
-		// console.log(
-		// 	selectGroup,
-		// 	marketIdentifier,
-		// 	JSON.stringify(bodyObject),
-		// 	marketSignature,
-		// 	JSON.stringify(marketData),
-		// 	chainId
-		// );
+			// Checks
+			// if postType == 0, then s3Ur exists OR
+			// if postType == 1, then link is valid
+			if (
+				(postType == 0 && (s3Url == undefined || s3Url == "")) ||
+				(postType == 1 && validateLinkURL(link).valid == false)
+			) {
+				toast({
+					title: "Invalid Input!",
+					status: "error",
+					isClosable: true,
+				});
+				throw Error();
+			}
 
-		let res = await newPost(
-			selectGroup,
-			marketIdentifier,
-			JSON.stringify(bodyObject),
-			marketSignature,
-			JSON.stringify(marketData)
-		);
-		if (res == undefined) {
-			// TODO throw error
-			return;
+			// checks that token approval is given
+			if (wETHTokenAllowance == false) {
+				toast({
+					title:
+						"Please give WETH approval to app before proceeding!",
+					status: "error",
+					isClosable: true,
+				});
+				throw Error();
+			}
+
+			// checks that sufficient balance if present
+			if (CREATION_AMOUNT.add(ONE_BN).gt(wEthTokenBalance)) {
+				toast({
+					title:
+						"min. of 0.05 WETH required! Refer to rules on the side",
+					status: "error",
+					isClosable: true,
+				});
+				throw Error();
+			}
+
+			// create post body
+			let groupAddress = selectGroup;
+			let bodyObject = {
+				creatorColdAddress: userProfile.coldAddress,
+				groupAddress: groupAddress,
+				postType,
+				link,
+				imageUrl: s3Url,
+				title,
+				timestamp: new Date().getTime().toString(),
+			};
+			let marketIdentifier = getMarketIdentifierOfPost(bodyObject);
+
+			// signature for on-chain market
+			const { marketData, dataToSign } = postSignTypedDataV4Helper(
+				groupAddress,
+				marketIdentifier,
+				CREATION_AMOUNT.toString(),
+				421611
+			);
+			const accounts = await window.ethereum.enable();
+			const marketSignature = await window.ethereum.request({
+				method: "eth_signTypedData_v3",
+				params: [accounts[0], dataToSign],
+			});
+			console.log(dataToSign);
+			console.log(marketSignature);
+			// console.log(marketSignature, " Post helper data to sign ");
+			// console.log(
+			// 	selectGroup,
+			// 	marketIdentifier,
+			// 	JSON.stringify(bodyObject),
+			// 	marketSignature,
+			// 	JSON.stringify(marketData),
+			// 	chainId
+			// );
+
+			let res = await newPost(
+				selectGroup,
+				marketIdentifier,
+				JSON.stringify(bodyObject),
+				marketSignature,
+				JSON.stringify(marketData)
+			);
+			if (res == undefined) {
+				toast({
+					title: "Something went wrong!",
+					status: "error",
+					isClosable: true,
+				});
+				throw Error();
+			}
+		} catch (e) {
+			setNewPostLoading(false);
 		}
 	}
 
 	return (
-		<Flex flexDirection="column">
-			<Flex padding={10} justifyContent="flex-start">
-				<Heading size="lg">Create post</Heading>
-			</Flex>
-			{/* {false ? (
+		<Flex width={"100%"}>
+			<Flex width={"70%"} padding={5} flexDirection={"column"}>
+				<Flex
+					padding={2}
+					backgroundColor={COLORS.PRIMARY}
+					borderRadius={8}
+					justifyContent="flex-start"
+					marginBottom={4}
+				>
+					<Heading size="md">Create post</Heading>
+				</Flex>
+				{/* {false ? (
 				<Flex justifyContent="center">
 					<PrimaryButton
 						title="Please Sign In"
@@ -210,70 +262,87 @@ function Page() {
 					/>
 				</Flex>
 			) : undefined} */}
-			<Flex flexDirection={"row"}>
-				<Spacer />
-				<Flex width={"50%"} flexDirection={"column"}>
-					<Flex width="100%" flexDirection="column">
-						<Select
-							onChange={(e) => {
-								setSelectErr(false);
-								setSelectGroup(e.target.value);
+				<Flex
+					padding={2}
+					backgroundColor={COLORS.PRIMARY}
+					borderRadius={8}
+					flexDirection={"column"}
+				>
+					<Select
+						onChange={(e) => {
+							setSelectErr(false);
+							setSelectGroup(e.target.value);
+						}}
+						placeholder="Choose Group"
+					>
+						{groups.map((obj) => {
+							return (
+								<>
+									<option value={obj.groupAddress}>
+										{`${obj.name}`}
+									</option>
+								</>
+							);
+						})}
+					</Select>
+					{selectErr === true ? (
+						<Text
+							style={{
+								fontSize: 12,
+								color: "#EB5757",
 							}}
-							placeholder="Choose Group"
 						>
-							{groups.map((obj) => {
-								return (
-									<>
-										<option value={obj.groupAddress}>
-											{`${obj.name}`}
-										</option>
-									</>
-								);
-							})}
-						</Select>
-						{selectErr === true ? (
-							<Text
-								style={{
-									fontSize: 12,
-									color: "#EB5757",
-								}}
-							>
-								Please select a group
-							</Text>
-						) : undefined}
-					</Flex>
+							Please select a group
+						</Text>
+					) : undefined}
 					<Flex>
-						<Flex padding={5} borderColor="blackAlpha.100">
+						<Flex padding={5}>
 							<Text
 								onClick={() => {
 									setPostType(0);
+								}}
+								fontSize={14}
+								fontWeight={"bold"}
+								_hover={{
+									cursor: "pointer",
+									textDecoration: "underline",
 								}}
 							>
 								Image
 							</Text>
 						</Flex>
-						<Flex padding={5} borderColor="blackAlpha.100">
+						<Flex padding={5}>
 							<Text
+								fontSize={14}
+								fontWeight={"bold"}
 								onClick={() => {
 									setPostType(1);
+								}}
+								_hover={{
+									cursor: "pointer",
+									textDecoration: "underline",
 								}}
 							>
 								Link
 							</Text>
 						</Flex>
 					</Flex>
-					<Input
-						placeholder="Title"
-						value={title}
-						onChange={(e) => {
-							setTitle(e.target.value);
-						}}
-					/>
+					{InputWithTitle(
+						"Title",
+						0,
+						title,
+						title,
+						setTitle,
+						validatePostTitle,
+						{}
+					)}
+
 					{postType == 0 ? (
 						<Flex
 							flexDirection="column"
 							justifyContent="center"
 							alignItems="center"
+							padding={5}
 						>
 							{imageFile == null ? (
 								<Flex>
@@ -289,9 +358,16 @@ function Page() {
 										}}
 									>
 										<Flex flexDirection="column">
-											<PrimaryButton
-												title={"Choose Image"}
-											/>
+											<Text
+												fontSize={14}
+												fontWeight={"bold"}
+												_hover={{
+													cursor: "pointer",
+													textDecoration: "underline",
+												}}
+											>
+												Select an Image
+											</Text>
 											{imageErr === true ? (
 												<Text
 													style={{
@@ -314,77 +390,80 @@ function Page() {
 								/>
 							) : undefined}
 							{imageFile != null ? (
-								<PrimaryButton
+								<Text
 									onClick={() => {
 										setImageFile(null);
 									}}
-									style={{
-										marginTop: 20,
+									fontSize={14}
+									fontWeight={"bold"}
+									_hover={{
+										cursor: "pointer",
+										textDecoration: "underline",
 									}}
-									title={"Remove"}
-								/>
+									marginTop={2}
+								>
+									Remove
+								</Text>
 							) : undefined}
 						</Flex>
 					) : undefined}
 					{postType == 1 ? (
-						<Input
-							placeholder="Link"
-							value={link}
-							onChange={(e) => {
-								setLink(e.target.value);
-							}}
-						/>
+						<>
+							{InputWithTitle(
+								"Link URL",
+								0,
+								link,
+								link,
+								setLink,
+								validateLinkURL,
+								{}
+							)}
+						</>
 					) : undefined}
-					<Flex width={"30%"}>
-						<PrimaryButton
-							title={"Post"}
-							isLoading={newPostLoading}
-							loadingText="Processing..."
-							onClick={postHelper}
-							style={{
-								marginTop: 20,
-								flexDirection: "row",
-							}}
+					<PrimaryButton
+						title={"Post"}
+						isLoading={newPostLoading}
+						loadingText="Processing..."
+						onClick={postHelper}
+						style={{
+							marginTop: 20,
+							flexDirection: "row",
+						}}
 
-							// disabled={!tokenApproval || !isAuthenticated}
-						/>
-						<ApprovalInterface
-							marginTop={5}
-							tokenType={0}
-							erc20Address={addresses.WETH}
-							erc20AmountBn={CREATION_AMOUNT.add(ONE_BN)}
-							onSuccess={() => {
-								toast({
-									title: "Success!",
-									status: "success",
-									isClosable: true,
-								});
-							}}
-							onFail={() => {
-								toast({
-									title: "Metamask err!",
-									status: "error",
-									isClosable: true,
-								});
-							}}
-						/>
-					</Flex>
-					<Spacer />
+						// disabled={!tokenApproval || !isAuthenticated}
+					/>
+					<ApprovalInterface
+						marginTop={5}
+						tokenType={0}
+						erc20Address={addresses.WETH}
+						erc20AmountBn={CREATION_AMOUNT.add(ONE_BN)}
+						onSuccess={() => {
+							toast({
+								title: "Success!",
+								status: "success",
+								isClosable: true,
+							});
+						}}
+						onFail={() => {
+							toast({
+								title: "Metamask err!",
+								status: "error",
+								isClosable: true,
+							});
+						}}
+					/>
 				</Flex>
-				<Spacer />
-				<Flex>
-					<Flex
-						marginTop="1"
-						marginBottom="1"
-						flexDirection="column"
-						padding={5}
-						backgroundColor="gray.100"
-					>
-						<Text>Ready to post?</Text>
-						<Text>Put in some rules</Text>
-					</Flex>
+			</Flex>
+			<Flex width="30%" padding={5} flexDirection={"column"}>
+				<Flex
+					flexDirection="column"
+					padding={2}
+					backgroundColor={COLORS.PRIMARY}
+					borderRadius={8}
+				>
+					<Text>Ready to post?</Text>
+					<Text>Put in some rules</Text>
 				</Flex>
-				<Spacer />
 			</Flex>
 		</Flex>
 	);
