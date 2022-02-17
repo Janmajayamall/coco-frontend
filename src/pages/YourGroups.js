@@ -13,6 +13,7 @@ import {
 
 import { useEthers } from "@usedapp/core/packages/core";
 import {
+	useGetSafesAndGroupsManagedByUser,
 	useQueryExploreMarkets,
 	useQueryGroupsByManagers,
 	useQueryMarketByOracles,
@@ -61,50 +62,16 @@ function Page() {
 	const [groupDetails, setGroupDetails] = useState([]);
 	const [posts, setPosts] = useState([]);
 
-	const [safes, setSafes] = useState([]);
-
-	// Queries all groups managed by safes (as manager)
-	const {
-		result: rQueryGroupsByManagers,
-		reexecuteQuery: reQueryGroupsByManagers,
-	} = useQueryGroupsByManagers(
-		safes.map((id) => id.toLowerCase()),
-		false
-	);
-	console.log(rQueryGroupsByManagers, " rQueryGroupsByManagers");
+	const { safes, groupIds } = useGetSafesAndGroupsManagedByUser(account);
 
 	// Queries all markets that need attention.
-	// Query is limimted to groups managed by safes
-	// list. (i.e. groups of which user is a manager)
+	// Query is limited to groups managed by safes
+	// owned by the user
 	const timestamp = parseInt(new Date() / 1000);
-	const groupIds = rQueryGroupsByManagers.data
-		? rQueryGroupsByManagers.data.groups.map((group) => group.id)
-		: [];
 	const {
 		result: rQueryMarketsInResolutionByGroups,
 		reexecuteQuery: reQueryMarketsInResolutionByGroups,
 	} = useQueryMarketsInResolutionByGroups(groupIds, timestamp, false);
-	console.log(
-		rQueryMarketsInResolutionByGroups,
-		" rQueryMarketsInResolutionByGroups"
-	);
-
-	// get and set safes owned by user
-	useEffect(async () => {
-		if (chainId == undefined || account == undefined) {
-			return;
-		}
-		try {
-			const res = await safeService.getSafesByOwner(account);
-			if (res.safes == undefined) {
-				return;
-			}
-			const _safes = res.safes.map((v) => v.toLowerCase());
-			setSafes(_safes);
-		} catch (e) {
-			console.log(e);
-		}
-	}, [chainId, account]);
 
 	// get groups details whenever rQueryGroupsByManagers (i.e. groupIds)
 	// changes

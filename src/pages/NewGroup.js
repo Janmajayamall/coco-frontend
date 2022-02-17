@@ -40,6 +40,7 @@ import {
 import {
 	useCreateGroupWithSafe,
 	useCreateNewOracle,
+	useGetSafesAndGroupsManagedByUser,
 	useQueryGroupsByManagers,
 } from "../hooks";
 import { useEthers } from "@usedapp/core/packages/core";
@@ -63,9 +64,10 @@ function Page() {
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
 
-	const oraclesInfoObj = useSelector(selectOracleInfoObj);
-
 	const { send, state } = useCreateGroupWithSafe();
+
+	// get safes & groups managed by the user
+	const { safes, groupIds } = useGetSafesAndGroupsManagedByUser(account);
 
 	// groups already managed by user
 	const [groupsWithDetails, setGroupsWithDetails] = useState([]);
@@ -75,19 +77,7 @@ function Page() {
 	const [step, setStep] = useState(0);
 
 	// gnosis-safe
-	const [safes, setSafes] = useState([]);
 	const [safe, selectSafe] = useState(null);
-
-	// queries groups by managers
-	// (i.e. safes of which user is an owner)
-	// from theGraph's index
-	const {
-		result: rGroupsByManagers,
-		reexecuteQuery: reexecuteGroupsByManagers,
-	} = useQueryGroupsByManagers(
-		safes.map((id) => id.toLowerCase()),
-		false
-	);
 
 	// states for group configs
 	const [feeDec, setFeeDec] = useState("0.05");
@@ -113,46 +103,15 @@ function Page() {
 	// err states
 	const [nameExists, setNameExists] = useState(false);
 
-	// get and set safes owned by user
-	useEffect(async () => {
-		if (chainId == undefined || account == undefined) {
-			return;
-		}
-		try {
-			const res = await safeService.getSafesByOwner(account);
-			if (res.safes == undefined) {
-				return;
-			}
-			const _safes = res.safes.map((v) => v.toLowerCase());
-			setSafes(_safes);
-		} catch (e) {
-			console.log(e);
-		}
-	}, [chainId, account]);
-
-	useEffect(() => {
-		if (safes.length == 0) {
-			return;
-		}
-
-		// get groups associated with safes (i.e. as manager) from graphql
-		reexecuteGroupsByManagers();
-	}, [safes]);
-
 	// whenever rGroupsByManagers changes
 	// get groups details from the backend
 	// and divide them into the following -
 	// (1) With details (under groups)
 	// (2) Without details (under pending groups)
 	useEffect(async () => {
-		if (rGroupsByManagers && rGroupsByManagers.data) {
-			const groupIds = rGroupsByManagers.data.groups.map(
-				(group) => group.id
-			);
-
+		if (groupIds.length != 0) {
 			let res = await findGroupsByIdArr(groupIds);
 			let groupsWithDetails = [];
-			console.log(res, "res groups");
 			if (res != undefined) {
 				groupsWithDetails = res.groups;
 			}
@@ -162,7 +121,7 @@ function Page() {
 			setGroupsWithDetails(groupsWithDetails);
 			setGroupsWithoutDetailsIds(groupsWithoutDetailsIds);
 		}
-	}, [rGroupsByManagers]);
+	}, [groupIds]);
 
 	// transitions step to 2 once group proxy contract is deployed
 	useEffect(() => {

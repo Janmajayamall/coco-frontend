@@ -102,6 +102,14 @@ const QueryUserPositionsByMarketIdentifier = `
 	}
 `;
 
+const QueryBadMarketIdentifiers = `
+	query{
+		markets(where:{outcome:0}){
+			marketIdentifier
+		}
+	}
+`;
+
 const QueryExploreMarkets = `
 	query ($first: Int!, $skip: Int!, $timestamp: BigInt!) {
 		markets(first: $first, skip: $skip, orderBy: totalVolume, orderDirection: desc, where:{timestamp_gt: $timestamp}){
@@ -442,6 +450,18 @@ export function useQueryGroupById(groupId, pause) {
 		variables: {
 			groupId,
 		},
+		pause,
+	});
+	return {
+		result,
+		reexecuteQuery,
+	};
+}
+
+export function useQueryBadMarketIdentifiers(pause) {
+	const [result, reexecuteQuery] = useQuery({
+		query: QueryBadMarketIdentifiers,
+		variables: {},
 		pause,
 	});
 	return {

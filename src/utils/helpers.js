@@ -633,7 +633,7 @@ export function calculateRedeemObj(market, account, userPositions) {
 
 	// user gets back their stake on the right outcome
 	total = total.add(
-		market.outcoem == 0 ? userPositions.amount0 : userPositions.amount1
+		market.outcome == 0 ? userPositions.amount0 : userPositions.amount1
 	);
 
 	if (

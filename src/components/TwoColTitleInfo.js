@@ -10,7 +10,7 @@ function TwoColTitleInfo({
 }) {
 	return (
 		<Flex {...props} alignItems={"center"}>
-			<Text fontSize="14" fontWeight={titleBold ? "bold" : "normal"}>
+			<Text fontSize={14} fontWeight={titleBold ? "bold" : "normal"}>
 				{title}
 			</Text>
 			{helpText != "" ? (
@@ -25,7 +25,7 @@ function TwoColTitleInfo({
 				/>
 			) : undefined}
 			<Spacer />
-			<Text fontSize="14">{info}</Text>
+			<Text fontSize={14}>{info}</Text>
 		</Flex>
 	);
 }

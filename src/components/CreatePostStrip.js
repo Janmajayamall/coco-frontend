@@ -28,7 +28,7 @@ function CreatePostStrip() {
 					onClick={() => {
 						navigate("/add");
 					}}
-					placeholder="Create Post"
+					placeholder="Create a Post"
 				/>
 			</Flex>
 		</Flex>

@@ -235,6 +235,8 @@ function Page() {
 				});
 				throw Error();
 			}
+
+			navigate("/home");
 		} catch (e) {
 			setNewPostLoading(false);
 		}

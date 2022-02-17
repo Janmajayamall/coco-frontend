@@ -37,6 +37,7 @@ function PostDisplay({ post, onImageClick, setRef, ...children }) {
 			backgroundColor={COLORS.PRIMARY}
 			padding={4}
 			borderRadius={5}
+			marginBottom={4}
 		>
 			<Flex marginBottom={2} flexDirection={"column"}>
 				<Flex marginBottom={1}>
@@ -101,10 +102,12 @@ function PostDisplay({ post, onImageClick, setRef, ...children }) {
 						/>
 					</Flex>
 				) : undefined}
-				<Link href={postBody.link} isExternal>
-					{postBody.link}
-					<ExternalLinkIcon mx="2px" />
-				</Link>
+				{postBody.postType == 1 ? (
+					<Link href={postBody.link} isExternal>
+						{postBody.link}
+						<ExternalLinkIcon mx="2px" />
+					</Link>
+				) : undefined}
 			</Flex>
 		</Box>
 	);

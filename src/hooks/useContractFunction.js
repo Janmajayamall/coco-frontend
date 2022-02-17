@@ -60,10 +60,11 @@ export function useRedeemWins() {
 	return { state, send };
 }
 
-export function useRedeemStake() {
+export function useRedeem(groupAddress) {
+	console.log(groupAddress, " hey I received");
 	const { state, send } = useContractFunction(
-		groupRouterContract,
-		"redeemStake"
+		groupContract(groupAddress),
+		"redeem"
 	);
 	return { state, send };
 }

@@ -159,10 +159,7 @@ function Page() {
 							// 		: null.
 
 							// }
-							style={{
-								marginBottom: 45,
-								width: "100%",
-							}}
+
 							post={post}
 							onImageClick={(marketIdentifier) => {
 								navigate(`/post/${marketIdentifier}`);

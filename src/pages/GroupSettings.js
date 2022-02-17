@@ -49,6 +49,7 @@ import {
 	useCreateNewOracle,
 	useQueryGroupById,
 	useQueryGroupsByManagers,
+	useGetSafesAndGroupsManagedByUser,
 } from "../hooks";
 import { useEthers } from "@usedapp/core/packages/core";
 import { addresses } from "../contracts";
@@ -74,6 +75,18 @@ function Page() {
 
 	const toast = useToast();
 
+	// get safes & groups managed by the user
+	const { safes, groupIds } = useGetSafesAndGroupsManagedByUser(account);
+
+	// flag indicates whether groupId
+	// is within the list of groups
+	// managed by the user
+	const isUserAnOwner =
+		groupIds.find((id) => id.toLowerCase() == groupId.toLowerCase()) !=
+		undefined
+			? true
+			: false;
+
 	// group main info
 	// groupDetails is queried from the backend.
 	// groupConfig is queried from theGraph's index.
@@ -82,27 +95,11 @@ function Page() {
 	const [groupDetails, setGroupDetails] = useState(null);
 	const [groupConfigs, setGroupConfigs] = useState(null);
 
-	// gnosis-safe
-	const [safes, setSafes] = useState([]);
-
-	// queries groups by managers
-	// (i.e. safes of which user is an owner)
-	// from theGraph's index
-	const {
-		result: rGroupsByManagers,
-		reexecuteQuery: reexecuteGroupsByManagers,
-	} = useQueryGroupsByManagers(
-		safes.map((id) => id.toLowerCase()),
-		false
-	);
-
 	// query group config from theGraph by group id
 	const {
 		result: rGroupById,
 		reexecuteQuery: reGroupById,
 	} = useQueryGroupById(groupId.toLowerCase(), false);
-
-	const [isUserAnOwner, setIsUserAnOwner] = useState(false);
 
 	// states for group configs
 	const [feeDec, setFeeDec] = useState("0.05");
@@ -117,7 +114,6 @@ function Page() {
 	} = useBNInput(validateDonReservesLimit);
 
 	// states for group details
-	const [groupAddress, setGroupAddress] = useState("");
 	const [name, setName] = useState("");
 	const [description, setDescription] = useState("");
 	const [nameExists, setNameExists] = useState(false);
@@ -149,7 +145,7 @@ function Page() {
 					rGroupById.data.group.donReservesLimit
 				),
 			};
-			console.log(_groupConfigs);
+
 			// set things up for editing
 			setFeeDec(rGroupById.data.group.fee);
 			setDonBufferHr(parseSecondsToHours(_groupConfigs.donBuffer));
@@ -161,50 +157,6 @@ function Page() {
 			setGroupConfigs(_groupConfigs);
 		}
 	}, [rGroupById]);
-
-	// get and set safes owned by user
-	useEffect(async () => {
-		if (chainId == undefined || account == undefined) {
-			return;
-		}
-		try {
-			const res = await safeService.getSafesByOwner(account);
-			if (res.safes == undefined) {
-				return;
-			}
-			const _safes = res.safes.map((v) => v.toLowerCase());
-			setSafes(_safes);
-		} catch (e) {
-			console.log(e);
-		}
-	}, [chainId, account]);
-
-	// re-executes groups by managers query
-	// whenever safes array changes
-	useEffect(() => {
-		if (safes.length == 0) {
-			return;
-		}
-
-		// get groups associated with safes (i.e. as manager) from graphql
-		reexecuteGroupsByManagers();
-	}, [safes]);
-
-	// Checks whether the groupId
-	// exists in the groups returned from
-	// groupsByManager query. Makes sure
-	// that user is an owner of the group
-	useEffect(() => {
-		if (rGroupsByManagers.data && rGroupsByManagers.data.groups) {
-			let exists = false;
-			rGroupsByManagers.data.groups.forEach((g) => {
-				if (g.id.toLowerCase() == groupId.toLowerCase()) {
-					exists = true;
-				}
-			});
-			setIsUserAnOwner(exists);
-		}
-	}, [rGroupsByManagers, safes, groupId]);
 
 	useEffect(() => {
 		setNameExists(false);

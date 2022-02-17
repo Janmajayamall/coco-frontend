@@ -14,7 +14,6 @@ function ChallengeHistoryTable({ stakes }) {
 	return (
 		<Flex
 			backgroundColor={COLORS.PRIMARY}
-			marginTop={5}
 			flexDirection="column"
 			padding={3}
 			borderRadius={8}

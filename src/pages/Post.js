@@ -9,11 +9,13 @@ import {
 	NumberInputField,
 	useToast,
 	Heading,
+	Select,
 } from "@chakra-ui/react";
 import { useEthers } from "@usedapp/core/packages/core";
 import { useEffect } from "react";
 import { useState } from "react";
 import {
+	useBuyMinOutcomeTokensWithFixedAmount,
 	useChallenge,
 	useCreateAndChallengeMarket,
 	useERC1155ApprovalForAll,
@@ -22,6 +24,8 @@ import {
 	useQueryMarketByMarketIdentifier,
 	useQueryMarketTradeAndStakeInfoByUser,
 	useQueryUserPositionsByMarketIdentifier,
+	useGetSafesAndGroupsManagedByUser,
+	useRedeem,
 } from "../hooks";
 import {
 	formatTimeInSeconds,
@@ -39,6 +43,7 @@ import {
 	formatMarketData,
 	calculateRedeemObj,
 	COLORS,
+	GRAPH_BUFFER_MS,
 } from "../utils";
 import PostDisplay from "../components/PostDisplay";
 import { useParams } from "react-router";
@@ -61,17 +66,6 @@ function Page() {
 	const isAuthenticated = account && userProfile ? true : false;
 
 	const toast = useToast();
-
-	const {
-		send: sendCreateAndChallenge,
-		state: stateCreateAndChallenge,
-	} = useCreateAndChallengeMarket();
-	const { send: sendChallenge, state: stateChallenge } = useChallenge();
-
-	const { result, reexecuteQuery } = useQueryMarketByMarketIdentifier(
-		postId,
-		false
-	);
 
 	// CA - You might need to trigger this
 	const {
@@ -96,7 +90,6 @@ function Page() {
 	const [marketState, setMarketState] = useState(0);
 
 	// challenge states
-	const [marketExists, setMarketExists] = useState(false);
 	const [groupAddress, setGroupAddress] = useState(null);
 	const [marketIdentifier, setMarketIdentifier] = useState(null);
 	const [temporaryOutcome, setTemporaryOutcome] = useState(1);
@@ -115,6 +108,19 @@ function Page() {
 		validateInput
 	);
 
+	// contract function calls
+	const {
+		send: sendCreateAndChallenge,
+		state: stateCreateAndChallenge,
+	} = useCreateAndChallengeMarket();
+	const { send: sendChallenge, state: stateChallenge } = useChallenge();
+	const { send: sendRedeem, state: stateRedeem } = useRedeem(groupAddress);
+
+	const { result, reexecuteQuery } = useQueryMarketByMarketIdentifier(
+		postId,
+		false
+	);
+
 	// check WETH balance and allowance
 	const wETHTokenBalance = useERC20TokenBalance(account, addresses.WETH);
 	const wETHTokenAllowance = useERC20TokenAllowanceWrapper(
@@ -124,29 +130,48 @@ function Page() {
 		bnValue
 	);
 
+	// get safes & groups managed by the user
+	const { safes, groupIds } = useGetSafesAndGroupsManagedByUser(account);
+
+	// flag indicates whether post's
+	// groupAddress is managed
+	// by the user
+	const isUserAnOwner =
+		groupIds.find(
+			(id) =>
+				post != undefined &&
+				id.toLowerCase() == post.groupAddress.toLowerCase()
+		) != undefined
+			? true
+			: false;
+
+	// loading state of contrct fn calls
+	const [contractFnCallLoading, setContractFnCallLoading] = useState(false);
+
 	useEffect(() => {
 		// check whether market exists on chain
 		if (result.data && result.data.market) {
 			// market exists on chain
 			const _marketData = formatMarketData(result.data.market, true);
-			setMarketExists(true);
+
 			setGroupAddress(_marketData.group.id);
 			setMarketIdentifier(_marketData.marketIdentifier);
 			setTemporaryOutcome(_marketData.outcome);
 			setCurrentAmountBn(_marketData.lastAmountStaked);
 
 			// set market state and, if applicable, time left for either challenge or resolution
-			let donBufferEndsAtN = _marketData.donBufferEndsAt;
-			let resolutionBufferEndAtN = _marketData.resolutionBufferEndAt;
 			let timestamp = new Date() / 1000;
-			if (donBufferEndsAtN - timestamp > 0) {
+
+			if (_marketData.donBufferEndsAt - timestamp > 0) {
 				// state is in buffer period
 				setMarketState(1);
-				setTimeLeftToChallenge(donBufferEndsAtN - timestamp);
-			} else if (resolutionBufferEndAtN - timestamp > 0) {
+				setTimeLeftToChallenge(_marketData.donBufferEndsAt - timestamp);
+			} else if (_marketData.resolutionBufferEndsAt - timestamp > 0) {
 				// state is in resolution period
 				setMarketState(2);
-				setTimeLeftToResolve(resolutionBufferEndAtN - timestamp);
+				setTimeLeftToResolve(
+					_marketData.resolutionBufferEndsAt - timestamp
+				);
 			} else {
 				// state expired
 				setMarketState(3);
@@ -172,7 +197,7 @@ function Page() {
 				JSON.parse(post.marketData),
 				false
 			);
-			setMarketExists(false);
+
 			setGroupAddress(_marketData.group);
 			setMarketIdentifier(_marketData.marketIdentifier);
 			setTemporaryOutcome(1);
@@ -223,9 +248,32 @@ function Page() {
 		setPost(res.posts[0]);
 	}, [postId]);
 
-	function refreshPost() {
-		window.location.reload();
-	}
+	// tracks loading state of contract fn calls
+	useEffect(() => {
+		if (
+			stateCreateAndChallenge.status == "Success" ||
+			stateChallenge.status == "Success" ||
+			stateRedeem.status == "Success"
+		) {
+			setTimeout(() => {
+				setContractFnCallLoading(false);
+				window.location.reload();
+			}, GRAPH_BUFFER_MS);
+		} else if (
+			stateCreateAndChallenge.status == "Fail" ||
+			stateChallenge.status == "Fail" ||
+			stateRedeem.status == "Fail" ||
+			stateCreateAndChallenge.status == "Exception" ||
+			stateChallenge.status == "Exception" ||
+			stateRedeem.status == "Exception"
+		) {
+			toast({
+				title: "Metamask err!",
+				status: "error",
+				isClosable: true,
+			});
+		}
+	}, [stateCreateAndChallenge, stateChallenge, stateRedeem]);
 
 	function validateInput(bnValue) {
 		// check bnValue is not zero
@@ -273,46 +321,31 @@ function Page() {
 					padding={2}
 					backgroundColor={COLORS.PRIMARY}
 					borderRadius={8}
-					marginBottom={5}
-				>
-					<Text fontWeight={"bold"}>Rules for challenge</Text>
-					<Text>
-						1. YES means post is suitable and NO means otherwise
-					</Text>
-					<Text>
-						2. You can challenge exisiting YES/NO by putting amount
-						at stake
-					</Text>
-					<Text>
-						3. Every post starts with creator staking for YES
-					</Text>
-					<Text>
-						4. In order to challenge exisitng decision you need to
-						stake double the amount staked
-					</Text>
-					<Text>5. Blah blah all the rules</Text>
-				</Flex>
-				<Flex
-					flexDirection={"column"}
-					padding={2}
-					backgroundColor={COLORS.PRIMARY}
-					borderRadius={8}
+					marginBottom={4}
 				>
 					{marketState < 2 ? (
 						<>
 							<Heading size="sm" marginBottom={2}>
 								Challenge post
 							</Heading>
-							<Text>{temporaryOutcome == 1 ? "YES" : "NO"}</Text>
-							<Text>{`Min. Amount to Challenge: ${formatBNToDecimalCurr(
-								currentAmountBn.mul(TWO_BN)
-							)}`}</Text>
+							<TwoColTitleInfo
+								title={"Temporary outcome:"}
+								info={temporaryOutcome == 1 ? "YES" : "NO"}
+							/>
+							<TwoColTitleInfo
+								title={"Min. Amount to Challenge:"}
+								info={`${formatBNToDecimalCurr(
+									currentAmountBn.mul(TWO_BN)
+								)}`}
+							/>
 							{timeLeftToChallenge != undefined ? (
-								<Text>{`Time left to challenge ${formatTimeInSeconds(
-									timeLeftToChallenge
-								)}`}</Text>
+								<TwoColTitleInfo
+									title={"Time left to challenge:"}
+									info={`${formatTimeInSeconds(
+										timeLeftToChallenge
+									)}`}
+								/>
 							) : undefined}
-
 							<NumberInput
 								onChange={(val) => {
 									setInput(val);
@@ -337,7 +370,7 @@ function Page() {
 							) : undefined}
 							<PrimaryButton
 								loadingText="Processing..."
-								// isLoading={stakeLoading}
+								isLoading={contractFnCallLoading}
 								disabled={
 									!isAuthenticated || !wETHTokenAllowance
 								}
@@ -384,10 +417,9 @@ function Page() {
 											bnValue
 										);
 									}
+
+									setContractFnCallLoading(true);
 								}}
-								// title={`Outcome is ${outcomeDisplayName(
-								// 	favoredOutcome
-								// )}, I challenge`}
 								title="Challenge"
 								style={{
 									marginTop: 5,
@@ -396,9 +428,17 @@ function Page() {
 						</>
 					) : undefined}
 					{marketState == 2 ? (
-						<Heading size="sm" marginBottom={2}>
-							Post is under review
-						</Heading>
+						<>
+							<Heading size="sm" marginBottom={2}>
+								Post is under review
+							</Heading>
+							<TwoColTitleInfo
+								title={"Time left for review:"}
+								info={`${formatTimeInSeconds(
+									timeLeftToResolve
+								)}`}
+							/>
+						</>
 					) : undefined}
 					{marketState == 3 ? (
 						<>
@@ -455,16 +495,19 @@ function Page() {
 
 							<PrimaryButton
 								loadingText="Processing..."
-								disabled={
-									!isAuthenticated || !wETHTokenAllowance
-								}
+								disabled={!isAuthenticated}
+								isLoading={contractFnCallLoading}
 								onClick={() => {
-									if (
-										!isAuthenticated ||
-										!wETHTokenAllowance
-									) {
+									if (!isAuthenticated) {
 										return;
 									}
+
+									if (marketIdentifier == undefined) {
+										return;
+									}
+
+									sendRedeem(marketIdentifier, account);
+									setContractFnCallLoading(true);
 								}}
 								title="Redeeem"
 								style={{
@@ -473,27 +516,93 @@ function Page() {
 							/>
 						</>
 					) : undefined}
+					{marketState < 2 ? (
+						<ApprovalInterface
+							marginTop={5}
+							tokenType={0}
+							erc20Address={addresses.WETH}
+							erc20AmountBn={bnValue}
+							onSuccess={() => {
+								toast({
+									title: "Success!",
+									status: "success",
+									isClosable: true,
+								});
+							}}
+							onFail={() => {
+								toast({
+									title: "Metamask err!",
+									status: "error",
+									isClosable: true,
+								});
+							}}
+						/>
+					) : undefined}
 				</Flex>
-				<ApprovalInterface
-					marginTop={5}
-					tokenType={0}
-					erc20Address={addresses.WETH}
-					erc20AmountBn={bnValue}
-					onSuccess={() => {
-						toast({
-							title: "Success!",
-							status: "success",
-							isClosable: true,
-						});
-					}}
-					onFail={() => {
-						toast({
-							title: "Metamask err!",
-							status: "error",
-							isClosable: true,
-						});
-					}}
-				/>
+				{isUserAnOwner == true && marketState == 2 ? (
+					<Flex
+						flexDirection={"column"}
+						padding={2}
+						backgroundColor={COLORS.PRIMARY}
+						borderRadius={8}
+						marginBottom={4}
+					>
+						<Heading size="sm" marginBottom={1}>
+							Declare Outcome
+						</Heading>
+						<Text fontSize={12} marginBottom={1}>
+							You are seeing this because you are one of the
+							moderators of the group
+						</Text>
+
+						<Select
+							// onChange={(e) => {
+							// 	setSelectErr(false);
+							// 	setSelectGroup(e.target.value);
+							// }}
+							placeholder="Choose outcome"
+						>
+							<option value={1}>YES</option>
+							<option value={0}>NO</option>
+						</Select>
+						<PrimaryButton
+							loadingText="Processing..."
+							isLoading={contractFnCallLoading}
+							disabled={
+								isUserAnOwner == false || marketState != 2
+							}
+							onClick={() => {}}
+							title="Declare"
+							style={{
+								marginTop: 5,
+							}}
+						/>
+					</Flex>
+				) : undefined}
+
+				<Flex
+					flexDirection={"column"}
+					padding={2}
+					backgroundColor={COLORS.PRIMARY}
+					borderRadius={8}
+				>
+					<Text fontWeight={"bold"}>Rules for challenge</Text>
+					<Text>
+						1. YES means post is suitable and NO means otherwise
+					</Text>
+					<Text>
+						2. You can challenge exisiting YES/NO by putting amount
+						at stake
+					</Text>
+					<Text>
+						3. Every post starts with creator staking for YES
+					</Text>
+					<Text>
+						4. In order to challenge exisitng decision you need to
+						stake double the amount staked
+					</Text>
+					<Text>5. Blah blah all the rules</Text>
+				</Flex>
 			</Flex>
 		</Flex>
 	);

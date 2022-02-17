@@ -63,6 +63,12 @@ function MainMenu() {
 						/>
 						<Item
 							onClick={() => {
+								navigate("/challenged");
+							}}
+							title={"Challenged Posts"}
+						/>
+						<Item
+							onClick={() => {
 								navigate("/activity");
 							}}
 							title={"Your activity"}

@@ -31,6 +31,8 @@ import {
 	findPosts,
 	getExploreFeed,
 	getHomeFeed,
+	findPostsByMarketIdentifierArr,
+	COLORS,
 } from "../utils";
 import {
 	selectOracleInfoObj,
@@ -66,40 +68,32 @@ function Page() {
 	const badMarketIdentifiers = useSelector(selectBadMarketIdentifiers);
 
 	const location = useLocation();
-	const urlParams = useParams();
-	const groupId =
-		urlParams.groupId != undefined && isValidAddress(urlParams.groupId)
-			? urlParams.groupId
-			: undefined;
-
-	const feedType = (() => {
-		if (location.pathname == "/explore" || location.pathname == "/") {
-			return 0;
-		}
-		if (location.pathname == "/home") {
-			return 1;
-		}
-	})();
-
-	const groupsFollowed = useSelector(selectGroupsFollowed);
 
 	const [posts, setPosts] = useState([]);
 	const [pagination, setPagination] = useState({ first: 0, skip: 0 });
 
 	// get all posts depending on feedType
 	useEffect(async () => {
-		let res;
-		if (feedType == 0) {
-			res = await getExploreFeed();
-		} else if (feedType == 1) {
-			res = await getHomeFeed();
+		if (
+			badMarketIdentifiers == undefined ||
+			Object.keys(badMarketIdentifiers).length == 0
+		) {
+			return;
 		}
+		console.log(
+			Object.keys(badMarketIdentifiers),
+			"Object.keys(badMarketIdentifiers)"
+		);
+		const res = await findPostsByMarketIdentifierArr(
+			Object.keys(badMarketIdentifiers)
+		);
+		console.log(res, " Object res is shit");
 		if (res == undefined) {
 			// TODO throw error
 			return;
 		}
 		setPosts(res.posts);
-	}, [feedType]);
+	}, [badMarketIdentifiers]);
 
 	// infinite scroll
 	// const { observe } = useInView({
@@ -123,7 +117,6 @@ function Page() {
 				padding={5}
 				minHeight="100vh"
 			>
-				<CreatePostStrip />
 				{posts.map((post, index) => {
 					// if post does not have
 					// corresponding group info
@@ -132,9 +125,6 @@ function Page() {
 						return;
 					}
 
-					if (badMarketIdentifiers[post.marketIdentifier] == true) {
-						return;
-					}
 					return (
 						<PostDisplay
 							key={index}
@@ -155,25 +145,34 @@ function Page() {
 				})}
 			</Flex>
 			<Flex flexDirection="column" width={"30%"} paddingTop={5}>
-				<PopularGroups />
-				<WETHSwapper />
+				<Flex
+					flexDirection={"column"}
+					padding={2}
+					backgroundColor={COLORS.PRIMARY}
+					borderRadius={8}
+					marginBottom={4}
+				>
+					<Text fontWeight={"bold"}>Why are these posts here?</Text>
+					<Text>
+						These posts have been challenged that they are not
+						suitable for the group they were posted to
+					</Text>
+				</Flex>
+				<Flex
+					flexDirection={"column"}
+					padding={2}
+					backgroundColor={COLORS.PRIMARY}
+					borderRadius={8}
+					marginBottom={4}
+				>
+					<Text fontWeight={"bold"}>Can I challenge back?</Text>
+					<Text>
+						Yes you can, if the challenge period hasn't expired.
+					</Text>
+				</Flex>
 			</Flex>
 		</Flex>
 	);
 }
 
 export default Page;
-
-{
-	/* <Flex margin={3}>
-	<PrimaryButton
-		onClick={() => {
-			if (userProfile && account) {
-				return;
-			}
-			dispatch(sUpdateLoginModalIsOpen(true));
-		}}
-		title={"Sign in"}
-	/>
-</Flex>; */
-}
