@@ -102,13 +102,14 @@ export async function newPost(
 	}
 }
 
-export async function findPosts(filter) {
+export async function findPosts(filter, sort) {
 	try {
 		const { data } = await baseInstance.request({
 			url: "/post/find",
 			method: "POST",
 			data: {
 				filter,
+				sort,
 			},
 		});
 
@@ -165,10 +166,15 @@ export async function findPostsByMarketIdentifierArr(identifiers) {
 			method: "POST",
 			data: {
 				filter,
+				sort: {
+					createdAt: -1,
+				},
 			},
 		});
 		return data.response;
-	} catch (e) {}
+	} catch (e) {
+		console.log(e, " hjlqwertyui");
+	}
 }
 
 export async function updateGroup(groupAddress, details) {

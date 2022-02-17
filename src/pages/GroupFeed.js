@@ -16,18 +16,15 @@ import { useQueryExploreMarkets, useQueryMarketByOracles } from "../hooks";
 import useInView from "react-cool-inview";
 import { useEffect, useState } from "react";
 import {
-	filterOracleIdsFromMarketsGraph,
-	filterMarketIdentifiersFromMarketsGraph,
-	populateMarketWithMetadata,
-	followModerator,
-	findModeratorsDetails,
 	numStrFormatter,
-	stateSetupOraclesInfo,
-	stateSetupMarketsMetadata,
-	unfollowModerator,
+	followGroup,
+	unfollowGroup,
 	generateProfileInitials,
 	isValidAddress,
 	FEED_BATCH_COUNT,
+	findPosts,
+	findGroupsDetails,
+	COLORS,
 } from "../utils";
 import {
 	selectOracleInfoObj,
@@ -48,6 +45,8 @@ import { HomeIcon } from "../components/HomeIcon";
 import { ArrowBackIcon } from "@chakra-ui/icons";
 import SuggestionSidebar from "../components/SuggestionSidebar";
 import PrimaryButton from "../components/PrimaryButton";
+import GroupDetails from "../components/GroupDetails";
+import CreatePostStrip from "../components/CreatePostStrip";
 
 function Page() {
 	const navigate = useNavigate();
@@ -58,39 +57,23 @@ function Page() {
 
 	const location = useLocation();
 	const urlParams = useParams();
+
 	// TODO if group id is undefined then show error
 	const groupId =
 		urlParams.groupId != undefined && isValidAddress(urlParams.groupId)
-			? urlParams.groupId
+			? urlParams.groupId.toLowerCase()
 			: undefined;
+	console.log(groupId, "k");
 
-	const groupsFollowed = useSelector(selectGroupsFollowed);
+	const [groupDetails, setGroupDetails] = useState(null);
+	const [posts, setPosts] = useState([]);
 
-	const [pagination, setPagination] = useState({ first: 0, skip: 0 });
-	const [queryOracles, setQueryOracles] = useState([]);
-	const [markets, setMarkets] = useState([]);
-	const [filteredMarkets, setFilteredMarkets] = useState([]);
-	const [groupDetails, setGroupDetails] = useState({});
-	const [loadingMarkets, setLoadingMarkets] = useState(true);
-
-	const timestamp24HrsBefore = Math.floor(Date.now() / 1000) - 168 * 3600; // seven days
-	const { result: result0, reexecuteQuery: rQ0 } = useQueryExploreMarkets(
-		pagination.first,
-		pagination.skip,
-		timestamp24HrsBefore,
-		true
-	);
-	const { result: result1, reexecuteQuery: rQ1 } = useQueryMarketByOracles(
-		pagination.first,
-		pagination.skip,
-		queryOracles,
-		true
-	);
-
+	// set group details
 	useEffect(async () => {
-		setGroupDetails({});
+		setGroupDetails(null);
 		if (groupId) {
-			let res = await findModeratorsDetails([groupId]);
+			let res = await findGroupsDetails([groupId]);
+			console.log(res, "kl");
 			if (res && res.groupsDetails && res.groupsDetails.length > 0) {
 				let groupDetails = res.groupsDetails[0];
 				setGroupDetails(groupDetails);
@@ -98,123 +81,114 @@ function Page() {
 		}
 	}, [groupId]);
 
+	// set group posts
+	useEffect(async () => {
+		if (groupId == undefined) {
+			return;
+		}
+
+		const res = await findPosts(
+			{
+				groupAddress: groupId,
+			},
+			{
+				createdAt: -1,
+			}
+		);
+		console.log(res, "jklllll");
+		if (res == undefined) {
+			// TODO throw error
+			return;
+		}
+		setPosts(res.posts);
+	}, [groupId]);
+
 	// infinite scroll
-	const { observe } = useInView({
-		rootMargin: "30px",
-		// When the last item comes to the viewport
-		onEnter: ({ unobserve }) => {
-			unobserve();
-			setLoadingMarkets(true);
-			setPagination({
-				first: FEED_BATCH_COUNT,
-				skip: markets.length,
-			});
-		},
-	});
+	// const { observe } = useInView({
+	// 	rootMargin: "30px",
+	// 	// When the last item comes to the viewport
+	// 	onEnter: ({ unobserve }) => {
+	// 		unobserve();
+	// 		setLoadingMarkets(true);
+	// 		setPagination({
+	// 			first: FEED_BATCH_COUNT,
+	// 			skip: markets.length,
+	// 		});
+	// 	},
+	// });
 
 	return (
-		<Flex
-			style={{
-				paddingRight: 20,
-				paddingLeft: 20,
-			}}
-		>
-			<Spacer />
-
+		<Flex width={"100%"}>
 			<Flex
 				flexDirection="column"
-				width={"50%"}
+				width={"70%"}
+				padding={5}
 				minHeight="100vh"
-				paddingRight={21}
-				paddingLeft={21}
-				borderRightWidth={1}
-				borderLeftWidth={1}
-				borderColor={"#E0E0E0"}
 			>
-				<Flex flexDirection="column" marginBottom={5}>
-					<Flex marginBottom={5} marginTop={5} alignItems="center">
-						<ArrowBackIcon
-							onClick={() => {
-								navigate("/explore");
+				<GroupDetails groupDetails={groupDetails} followButton={true} />
+				<CreatePostStrip />
+				{posts.length == 0 ? (
+					<Flex
+						padding={2}
+						backgroundColor={COLORS.PRIMARY}
+						borderRadius={8}
+						marginBottom={4}
+						flexDirection={"column"}
+					>
+						<Text>
+							Nothing to Show... Try posting something? ;)
+						</Text>
+					</Flex>
+				) : undefined}
+				{posts.map((post, index) => {
+					// if post does not have
+					// corresponding group info
+					// then return
+					if (post.group.length == 0) {
+						return;
+					}
+
+					return (
+						<PostDisplay
+							key={index}
+							// setRef={
+							// 	filteredMarkets.length % FEED_BATCH_COUNT === 0
+							// 		? index === filteredMarkets.length - 1
+							// 			? observe
+							// 			: null
+							// 		: null.
+
+							// }
+							style={{
+								marginBottom: 45,
+								width: "100%",
 							}}
-							marginRight={5}
-							w={5}
-							h={5}
-							color="#0B0B0B"
-							_hover={{
-								cursor: "pointer",
-								textDecoration: "underline",
+							post={post}
+							onImageClick={(marketIdentifier) => {
+								navigate(`/post/${marketIdentifier}`);
 							}}
 						/>
-						<Heading size="sm">
-							{groupDetails.name ? groupDetails.name : ""}
-						</Heading>
-					</Flex>
-					<Flex marginBottom={5}>
-						<Avatar
-							size="md"
-							name={generateProfileInitials(groupDetails.name)}
-							marginRight={5}
-						/>
-						<Box marginRight={5}>
-							<Text fontSize="md">
-								{numStrFormatter(
-									groupDetails.followCount
-										? groupDetails.followCount
-										: 0
-								)}
-							</Text>
-							<Text fontSize="sm">members</Text>
-						</Box>
-						<Box marginRight={5}>
-							<Text fontSize="md">
-								{numStrFormatter(
-									groupDetails.postCount
-										? groupDetails.postCount
-										: 0
-								)}
-							</Text>
-							<Text fontSize="sm">contributions</Text>
-						</Box>
-					</Flex>
-					<Flex marginBottom={5}>
-						<Text fontSize="sm">{groupDetails.description}</Text>
-					</Flex>
-					<Flex>
-						<Button
-							backgroundColor="#0B0B0B"
-							color="#FDFDFD"
-							size="sm"
-							variant="solid"
-							onClick={async () => {
-								if (groupsFollowed[groupId] != undefined) {
-									// leave group
-									const res = await unfollowModerator(
-										groupId
-									);
-									if (res == undefined) {
-										return;
-									}
-									dispatch(sDeleteGroupFollow(groupId));
-								} else {
-									// join group
-									const res = await followModerator(groupId);
-									if (res == undefined) {
-										return;
-									}
-									dispatch(sAddGroupFollow(groupId));
-								}
-							}}
-						>
-							{groupsFollowed[groupId] != undefined
-								? "Leave Group"
-								: "Join Group"}
-						</Button>
-					</Flex>
+					);
+				})}
+			</Flex>
+			<Flex flexDirection="column" width={"30%"} paddingTop={5}>
+				<Flex
+					flexDirection="column"
+					padding={2}
+					backgroundColor={COLORS.PRIMARY}
+					borderRadius={8}
+				>
+					<Heading size={"sm"}>Group rules are simple!</Heading>
+					<Text>
+						1. Challenge any post that you find not suitable for the
+						feed
+					</Text>
+					<Text>
+						2. Only post things you think are suitable for the feed
+						:)
+					</Text>
 				</Flex>
 			</Flex>
-			<SuggestionSidebar />
-			<Spacer />
 		</Flex>
 	);
 }

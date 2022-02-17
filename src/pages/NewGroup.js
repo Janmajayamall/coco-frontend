@@ -35,6 +35,7 @@ import {
 	findGroupsByIdArr,
 	sliceAddress,
 	safeService,
+	COLORS,
 } from "../utils";
 import {
 	useCreateGroupWithSafe,
@@ -112,7 +113,7 @@ function Page() {
 	// err states
 	const [nameExists, setNameExists] = useState(false);
 
-	// sget and set safes owned by user
+	// get and set safes owned by user
 	useEffect(async () => {
 		if (chainId == undefined || account == undefined) {
 			return;
@@ -301,25 +302,26 @@ function Page() {
 		}
 
 		// TODO navigate to group page
+		navigate(`/group/${groupAddress}`);
 	}
 
 	return (
-		<Flex minHeight="100vh">
-			<Spacer />
-			<Flex
-				width="50%"
-				flexDirection="column"
-				paddingRight={20}
-				paddingLeft={20}
-				paddingTop={10}
-			>
-				<Flex>
+		<Flex width={"100%"}>
+			<Flex width={"70%"} padding={5} flexDirection={"column"}>
+				<Flex
+					padding={2}
+					backgroundColor={COLORS.PRIMARY}
+					borderRadius={8}
+					justifyContent="flex-start"
+					alignItems={"center"}
+					marginBottom={4}
+				>
 					{step != 0 ? (
 						<ArrowBackIcon
 							onClick={() => {
 								setStep(step - 1);
 							}}
-							marginRight={5}
+							marginRight={2}
 							w={5}
 							h={5}
 							color="#0B0B0B"
@@ -329,206 +331,222 @@ function Page() {
 							}}
 						/>
 					) : undefined}
-					<Heading size="lg">Create Group</Heading>
+					<Heading size="md">Create Group</Heading>
 				</Flex>
-				{step == 0 ? (
-					<>
-						<Heading size="md">Your safes</Heading>
-						<Select
-							onChange={(e) => {
-								selectSafe(e.target.value);
-							}}
-							placeholder="Choose Safe"
-							value={safe}
-						>
-							{safes.map((safe) => {
-								return (
-									<>
-										<option value={safe}>
-											{`${safe}`}
-										</option>
-									</>
-								);
-							})}
-						</Select>
-						<Link href={"https://gnosis-safe.io/"} isExternal>
-							{"Don't have one? Create one before proceeding!"}
-							<ExternalLinkIcon mx="2px" />
-						</Link>
-						<PrimaryButton
-							style={{
-								marginTop: 20,
-							}}
-							loadingText="Processing..."
-							// isLoading={createLoading}
-							onClick={() => {
-								if (safe == undefined || safe == "") {
-									return;
-								}
-								setStep(1);
-							}}
-							title="Next"
-						/>
-					</>
-				) : undefined}
-				{step == 1 ? (
-					<>
-						<Heading size="lg">Group configurations</Heading>
-						{InputWithTitle(
-							"Fee",
-							1,
-							feeDec,
-							feeDec,
-							setFeeDec,
-							validateFee,
-							{
-								defaultValue: 0.05,
-								precision: 3,
-							}
-						)}
-						{InputWithTitle(
-							"Challenge Buffer period",
-							1,
-							donBufferHr,
-							donBufferHr,
-							setDonBufferHr,
-							validateDonBufferHours,
-							{
-								defaultValue: 1,
-								precision: 0,
-							},
-							undefined,
-							"Hrs"
-						)}
-						{InputWithTitle(
-							"Resolution period",
-							1,
-							resolutionBufferHr,
-							resolutionBufferHr,
-							setResolutionBufferHr,
-							validateResolutionBufferHours,
-							{
-								defaultValue: 1,
-								precision: 0,
-							},
-							undefined,
-							"Hrs"
-						)}
-						{InputWithTitle(
-							"Max. Challange Limit",
-							1,
-							donReservesLimit,
-							donReservesLimitBN,
-							setDonReservesLimit,
-							validateDonReservesLimit,
-							{
-								defaultValue: 1000,
-								precision: 0,
-							},
-							undefined,
-							CURR_SYMBOL
-						)}
-						<PrimaryButton
-							style={{
-								marginTop: 20,
-							}}
-							loadingText="Processing..."
-							// isLoading={createLoading}
-							onClick={() => {
-								createGroupProxyHelper();
-							}}
-							title="Next"
-						/>
-					</>
-				) : undefined}
-				{step == 2 ? (
-					<>
-						<Heading size="lg">Group details</Heading>
-						{InputWithTitle(
-							"Name",
-							0,
-							name,
-							name,
-							setName,
-							validateGroupName,
-							{}
-						)}
-						{nameExists === true ? (
-							<Text
-								style={{
-									fontSize: 12,
-									color: "#EB5757",
+				<Flex
+					padding={2}
+					backgroundColor={COLORS.PRIMARY}
+					borderRadius={8}
+					flexDirection={"column"}
+				>
+					{step == 0 ? (
+						<>
+							<Heading marginBottom={2} size="sm">
+								Your safes
+							</Heading>
+							<Select
+								onChange={(e) => {
+									selectSafe(e.target.value);
 								}}
+								placeholder="Choose Safe"
+								value={safe}
+								marginBottom={1}
 							>
-								Name already taken! Please try another one.
-							</Text>
-						) : undefined}
-						{InputWithTitle(
-							"Description",
-							0,
-							description,
-							description,
-							setDescription,
-							validateGroupDescription,
-							{}
-						)}
-						<PrimaryButton
-							style={{
-								marginTop: 20,
-							}}
-							loadingText="Processing..."
-							isLoading={createLoading}
-							onClick={updateGroupDetailsHelper}
-							title="Submit"
-						/>{" "}
-					</>
-				) : undefined}
+								{safes.map((safe) => {
+									return (
+										<>
+											<option value={safe}>
+												{`${safe}`}
+											</option>
+										</>
+									);
+								})}
+							</Select>
+							<Link
+								fontSize={15}
+								href={"https://gnosis-safe.io/"}
+								isExternal
+							>
+								{
+									"Don't have one? Create one before proceeding!"
+								}
+								<ExternalLinkIcon mx="2px" />
+							</Link>
+							<PrimaryButton
+								style={{
+									marginTop: 20,
+								}}
+								loadingText="Processing..."
+								// isLoading={createLoading}
+								onClick={() => {
+									if (safe == undefined || safe == "") {
+										return;
+									}
+									setStep(1);
+								}}
+								title="Next"
+							/>
+						</>
+					) : undefined}
+					{step == 1 ? (
+						<>
+							<Heading marginBottom={2} size="sm">
+								Group configurations
+							</Heading>
+							{InputWithTitle(
+								"Fee",
+								1,
+								feeDec,
+								feeDec,
+								setFeeDec,
+								validateFee,
+								{
+									defaultValue: 0.05,
+									precision: 3,
+								}
+							)}
+							{InputWithTitle(
+								"Challenge Buffer period",
+								1,
+								donBufferHr,
+								donBufferHr,
+								setDonBufferHr,
+								validateDonBufferHours,
+								{
+									defaultValue: 1,
+									precision: 0,
+								},
+								undefined,
+								"Hrs"
+							)}
+							{InputWithTitle(
+								"Resolution period",
+								1,
+								resolutionBufferHr,
+								resolutionBufferHr,
+								setResolutionBufferHr,
+								validateResolutionBufferHours,
+								{
+									defaultValue: 1,
+									precision: 0,
+								},
+								undefined,
+								"Hrs"
+							)}
+							{InputWithTitle(
+								"Max. Challenge Limit",
+								1,
+								donReservesLimit,
+								donReservesLimitBN,
+								setDonReservesLimit,
+								validateDonReservesLimit,
+								{
+									defaultValue: 1000,
+									precision: 0,
+								},
+								undefined,
+								CURR_SYMBOL
+							)}
+							<PrimaryButton
+								style={{
+									marginTop: 20,
+								}}
+								loadingText="Processing..."
+								// isLoading={createLoading}
+								onClick={() => {
+									createGroupProxyHelper();
+								}}
+								title="Next"
+							/>
+						</>
+					) : undefined}
+					{step == 2 ? (
+						<>
+							<Heading marginBottom={2} size="sm">
+								Group details
+							</Heading>
+							{InputWithTitle(
+								"Name",
+								0,
+								name,
+								name,
+								setName,
+								validateGroupName,
+								{}
+							)}
+							{nameExists === true ? (
+								<Text
+									style={{
+										fontSize: 12,
+										color: "#EB5757",
+									}}
+								>
+									Name already taken! Please try another one.
+								</Text>
+							) : undefined}
+							{InputWithTitle(
+								"Description",
+								0,
+								description,
+								description,
+								setDescription,
+								validateGroupDescription,
+								{}
+							)}
+							<PrimaryButton
+								style={{
+									marginTop: 20,
+								}}
+								loadingText="Processing..."
+								isLoading={createLoading}
+								onClick={updateGroupDetailsHelper}
+								title="Submit"
+							/>{" "}
+						</>
+					) : undefined}
+				</Flex>
 			</Flex>
-			<Spacer />
-			<Flex
-				// borderRightWidth={1}
-				borderLeftWidth={1}
-				borderColor="#BDBDBD"
-				width="25%"
-				flexDirection="column"
-				paddingTop={10}
-				paddingLeft={5}
-			>
-				<Heading size="md" marginBottom={5}>
-					Your Groups
-				</Heading>
-				{/* {oraclesLoading === true ? <Loader /> : undefined} */}
-				{/* {oraclesLoading === false && oracleIds.length === 0 ? (
-					<Flex>
-						<Text fontSize={14} fontWeight="bold">
-							You manage 0 groups
-						</Text>
-					</Flex> 
-				) : undefined} */}
-				{groupsWithDetails.map((group, index) => {
-					return (
-						<GroupDisplayName
-							key={index}
-							group={group}
-							followStatusVisible={false}
-						/>
-					);
-				})}
-				<Heading size="md" marginTop={10}>
-					Pending Groups
-				</Heading>
-				{/* {groupsWithoutDetailsIds.map((id, index) => {
-					return <Text fontSize={}>{id}</Text>;
-				})} */}
-				<Flex backgroundColor="gray.100" borderRadius={5} padding={1}>
+			<Flex width={"30%"} paddingTop={5} flexDirection={"column"}>
+				<Flex
+					flexDirection="column"
+					padding={2}
+					backgroundColor={COLORS.PRIMARY}
+					borderRadius={8}
+					marginBottom={4}
+				>
+					<Heading size="sm" marginBottom={2}>
+						Your Groups
+					</Heading>
+					{groupsWithDetails.map((group, index) => {
+						return (
+							<GroupDisplayName
+								key={index}
+								group={group}
+								followStatusVisible={false}
+							/>
+						);
+					})}
+				</Flex>
+				<Flex
+					flexDirection="column"
+					padding={2}
+					backgroundColor={COLORS.PRIMARY}
+					borderRadius={8}
+					marginBottom={4}
+				>
+					<Heading size="sm" marginBottom={2}>
+						Pending Groups
+					</Heading>
 					{groupsWithoutDetailsIds.map((id, index) => {
 						return (
 							<Text
-								fontSize={15}
-								fontWeight={"bold"}
+								fontSize={14}
 								_hover={{
 									cursor: "pointer",
 									textDecoration: "underline",
+								}}
+								onClick={() => {
+									navigate(`/settings/${id}`);
 								}}
 							>
 								{sliceAddress(id)}

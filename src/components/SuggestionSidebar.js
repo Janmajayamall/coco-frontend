@@ -38,6 +38,7 @@ import {
 	ZERO_BN,
 	CURR_SYMBOL,
 	useBNInput,
+	findPopularGroups,
 } from "../utils";
 import {
 	selectGroupsFollowed,
@@ -94,17 +95,21 @@ function SuggestionSidebar() {
 	}, [state]);
 
 	useEffect(async () => {
-		if (initialized == true) {
-			return;
-		}
 		// const ignoreList = Object.keys(groupsFollowed);
 		// let res = await findAllModerators();
-
 		// if (res == undefined) {
 		// 	return;
 		// }
 		// setPopularGroups(res.moderators);
 		// setInitialized(true);
+	}, []);
+
+	useEffect(async () => {
+		const res = await findPopularGroups([]);
+		if (res == undefined) {
+			return;
+		}
+		setPopularGroups(res.groups);
 	}, []);
 
 	function validateEthInput() {
@@ -140,11 +145,10 @@ function SuggestionSidebar() {
 			paddingTop={5}
 			flexDirection="column"
 		>
-			<Heading size="md" marginBottom={5}>
-				Explore Groups
+			<Heading size="sm" marginBottom={2}>
+				Popular Groups
 			</Heading>
 			<Flex flexDirection={"column"} paddingBottom={5}>
-				{initialized == false ? <Loader /> : undefined}
 				{popularGroups.map((group, index) => {
 					return (
 						<GroupDisplayName

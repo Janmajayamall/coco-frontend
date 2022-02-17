@@ -49,18 +49,15 @@ function MainMenu() {
 			<MenuList backgroundColor="#0B0B0B">
 				{isAuthenticated ? (
 					<>
-						{oraclesResult.data &&
-						oraclesResult.data.oracles.length !== 0 ? (
-							<Item
-								onClick={() => {
-									navigate("/groups");
-								}}
-								title={"Your groups"}
-							/>
-						) : undefined}
 						<Item
 							onClick={() => {
-								navigate("/addModerator");
+								navigate("/groups");
+							}}
+							title={"Your groups"}
+						/>
+						<Item
+							onClick={() => {
+								navigate("/addGroup");
 							}}
 							title={"Create New Group"}
 						/>

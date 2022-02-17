@@ -17,6 +17,28 @@ const QueryGroupsByManagers = `
 	}
 `;
 
+const QueryMarketsInResolutionByGroups = `
+	query ($groups:[Bytes!]!, $timestamp: Int!){
+		markets(where:{group_in:$groups, resolutionBufferEndsAt_gte:$timestamp}, orderBy:resolutionBufferEndsAt, orderDirection:asc){
+			id
+			marketIdentifier
+			reserve0
+			reserve1
+			donBufferEndsAt
+			donBuffer
+			resolutionBufferEndsAt
+			resolutionBuffer
+			staker0
+			staker1
+			lastAmountStaked
+			tokenC
+			fee
+			outcome
+			donEscalationCount
+		}
+	}
+`;
+
 const QueryGroupById = `
 	query ($groupId: ID!) {
 		group(id: $groupId){
@@ -390,6 +412,21 @@ export function useQueryGroupsByManagers(managers, pause) {
 		query: QueryGroupsByManagers,
 		variables: {
 			managers,
+		},
+		pause,
+	});
+	return {
+		result,
+		reexecuteQuery,
+	};
+}
+
+export function useQueryMarketsInResolutionByGroups(groups, timestamp, pause) {
+	const [result, reexecuteQuery] = useQuery({
+		query: QueryMarketsInResolutionByGroups,
+		variables: {
+			groups,
+			timestamp,
 		},
 		pause,
 	});

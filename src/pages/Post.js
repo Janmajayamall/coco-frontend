@@ -8,6 +8,7 @@ import {
 	NumberInput,
 	NumberInputField,
 	useToast,
+	Heading,
 } from "@chakra-ui/react";
 import { useEthers } from "@usedapp/core/packages/core";
 import { useEffect } from "react";
@@ -47,12 +48,13 @@ import ChallengeHistoryTable from "../components/ChallengeHistoryTable";
 import { BigNumber } from "ethers";
 import { addresses } from "../contracts";
 import ApprovalInterface from "../components/ApprovalInterface";
+import TwoColTitleInfo from "../components/TwoColTitleInfo";
 
 function Page() {
 	const urlParams = useParams();
-	// const postId = urlParams.postId;
-	const postId =
-		"0xd8f23d7fd4c7fd7e97ddfb9a846f7ad112f37b7478ca26685dcefc2f9acf01e4";
+	const postId = urlParams.postId ? urlParams.postId : undefined;
+	// const postId =
+	// 	"0xd8f23d7fd4c7fd7e97ddfb9a846f7ad112f37b7478ca26685dcefc2f9acf01e4";
 
 	const { account, chainId } = useEthers();
 	const userProfile = useSelector(selectUserProfile);
@@ -211,7 +213,9 @@ function Page() {
 	// get post details using postId;
 	// note: postId == marketIdentifier
 	useEffect(async () => {
+		console.log(postId, " yoyoyo");
 		let res = await findPostsByMarketIdentifierArr([postId]);
+		console.log(res, " received posts");
 		if (res == undefined || res.posts.length == 0) {
 			// TODO set error
 			return;
@@ -258,18 +262,17 @@ function Page() {
 
 	return (
 		<Flex width={"100%"}>
-			<Flex width="70%" flexDirection={"column"} marginRight={5}>
+			<Flex width="70%" flexDirection={"column"} padding={5}>
 				{/* {loadingMarket == true ? <Loader /> : undefined} */}
 				<PostDisplay post={post} />
 				<ChallengeHistoryTable stakes={stakes} />
 			</Flex>
-			<Flex width="30%" flexDirection={"column"}>
+			<Flex width="30%" flexDirection={"column"} paddingTop={5}>
 				<Flex
 					flexDirection={"column"}
 					padding={2}
 					backgroundColor={COLORS.PRIMARY}
 					borderRadius={8}
-					marginTop={5}
 					marginBottom={5}
 				>
 					<Text fontWeight={"bold"}>Rules for challenge</Text>
@@ -297,7 +300,9 @@ function Page() {
 				>
 					{marketState < 2 ? (
 						<>
-							<Text>Challenge the post</Text>
+							<Heading size="sm" marginBottom={2}>
+								Challenge post
+							</Heading>
 							<Text>{temporaryOutcome == 1 ? "YES" : "NO"}</Text>
 							<Text>{`Min. Amount to Challenge: ${formatBNToDecimalCurr(
 								currentAmountBn.mul(TWO_BN)
@@ -391,41 +396,63 @@ function Page() {
 						</>
 					) : undefined}
 					{marketState == 2 ? (
-						<Text>
-							Post final outcome is under review by moderators
-						</Text>
+						<Heading size="sm" marginBottom={2}>
+							Post is under review
+						</Heading>
 					) : undefined}
 					{marketState == 3 ? (
 						<>
-							<Text>Post was challennged</Text>
-							<Text>{`Final outcome: ${
-								temporaryOutcome == 0 ? "NO" : "YES"
-							}`}</Text>
-							<Text>Your challenges</Text>
-							<Text>{`In favour of YES: ${formatBNToDecimalCurr(
-								userPositions != undefined
-									? userPositions.amount1
-									: ZERO_BN
-							)}`}</Text>
-							<Text>{`In favour of NO: ${formatBNToDecimalCurr(
-								userPositions != undefined
-									? userPositions.amount0
-									: ZERO_BN
-							)}`}</Text>
-							<Text>{`You win ${formatBNToDecimalCurr(
-								calculateRedeemObj(
-									marketData,
-									account,
-									userPositions
-								).wins
-							)}`}</Text>
-							<Text>{`You get back ${formatBNToDecimalCurr(
-								calculateRedeemObj(
-									marketData,
-									account,
-									userPositions
-								).total
-							)}`}</Text>
+							<Heading size="sm" marginBottom={2}>
+								Post Resolved
+							</Heading>
+							<TwoColTitleInfo
+								title={"Final outcome:"}
+								info={`${temporaryOutcome == 0 ? "NO" : "YES"}`}
+								marginBottom={1}
+							/>
+
+							<Text fontSize={14} fontWeight="bold">
+								Your challenges
+							</Text>
+							<TwoColTitleInfo
+								title={"In favour of YES:"}
+								info={`${formatBNToDecimalCurr(
+									userPositions != undefined
+										? userPositions.amount1
+										: ZERO_BN
+								)}`}
+							/>
+							<TwoColTitleInfo
+								title={"In favour of NO:"}
+								info={`${formatBNToDecimalCurr(
+									userPositions != undefined
+										? userPositions.amount0
+										: ZERO_BN
+								)}`}
+								marginBottom={1}
+							/>
+							<TwoColTitleInfo
+								title={"You win:"}
+								info={`${formatBNToDecimalCurr(
+									calculateRedeemObj(
+										marketData,
+										account,
+										userPositions
+									).wins
+								)}`}
+							/>
+							<TwoColTitleInfo
+								title={"You get back in total:"}
+								info={`${formatBNToDecimalCurr(
+									calculateRedeemObj(
+										marketData,
+										account,
+										userPositions
+									).total
+								)}`}
+								marginBottom={1}
+							/>
+
 							<PrimaryButton
 								loadingText="Processing..."
 								disabled={

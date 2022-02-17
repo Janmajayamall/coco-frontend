@@ -26,6 +26,10 @@ function PostDisplay({ post, onImageClick, setRef, ...children }) {
 		return <div />;
 	}
 
+	function actionOnPostClick() {
+		navigate(`/post/${post.marketIdentifier}`);
+	}
+
 	return (
 		<Box
 			ref={setRef}
@@ -34,19 +38,18 @@ function PostDisplay({ post, onImageClick, setRef, ...children }) {
 			padding={4}
 			borderRadius={5}
 		>
-			<Flex flexDirection={"column"}>
-				<Flex paddingBottom={1}>
+			<Flex marginBottom={2} flexDirection={"column"}>
+				<Flex marginBottom={1}>
 					<Flex alignItems="center">
 						<Avatar
 							size="sm"
 							name={generateProfileInitials(group.name)}
 						/>
 						<Text
-							// onClick={() => {
-							// 	navigate(`/group/${market.oracle.id}`);
-							// }}
-							fontSize="16"
-							fontWeight="bold"
+							onClick={() => {
+								navigate(`/group/${group.groupAddress}`);
+							}}
+							fontSize="15"
 							marginLeft="2"
 							color={"#4F4F4F"}
 							_hover={{
@@ -56,58 +59,29 @@ function PostDisplay({ post, onImageClick, setRef, ...children }) {
 						>
 							{group.name}
 						</Text>
-						{/* {market.following === false ? (
-							<>
-								<Text
-									fontSize="20"
-									fontWeight="bold"
-									marginLeft="3"
-								>
-									·
-								</Text>
-								<Text
-									onClick={async () => {
-										if (market.following === true) {
-											return;
-										}
-										const res = await followGroup(
-											market.oracle.id
-										);
-
-										if (res == undefined) {
-											return;
-										}
-										dispatch(
-											sAddGroupFollow(market.oracle.id)
-										);
-									}}
-									fontSize="16"
-									fontWeight="bold"
-									marginLeft="3"
-								>
-									Join
-								</Text>
-							</>
-						) : undefined} */}
 					</Flex>
 					<Spacer />
 				</Flex>
 
-				<Flex paddingLeft={2}>
-					<Text fontSize={14} color="#4F4F4F">{`By ${sliceAddress(
+				<Flex>
+					<Text fontSize={14} fontWeight={"bold"}>{`By ${sliceAddress(
 						post.creatorColdAddress
 					)}`}</Text>
 				</Flex>
 			</Flex>
 			<Flex flexDirection={"column"}>
-				<Text fontSize={30}>{postBody.title}</Text>
+				<Text
+					onClick={actionOnPostClick}
+					_hover={{
+						cursor: "pointer",
+					}}
+					fontSize={25}
+				>
+					{postBody.title}
+				</Text>
 				{postBody.postType == 0 ? (
 					<Flex
-						// onClick={() => {
-						// 	if (onImageClick != undefined) {
-						// 		onImageClick(market.marketIdentifier);
-						// 	}
-						// }}
+						onClick={actionOnPostClick}
 						minHeight={minHeightTrick}
 						maxHeight={500}
 						// width={"100%"}

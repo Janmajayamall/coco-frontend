@@ -48,6 +48,7 @@ function InputWithTitle(
 					width: "100%",
 					marginTop: 5,
 				}}
+				fontSize={15}
 			>
 				{title}
 			</Text>
@@ -64,10 +65,10 @@ function InputWithTitle(
 							setValue(e.target.value);
 						}}
 						value={value}
-						fontSize={14}
+						fontSize={15}
 					/>
 					{symbol != undefined ? (
-						<Text fontSize={14}>{`${symbol}`}</Text>
+						<Text fontSize={15}>{`${symbol}`}</Text>
 					) : undefined}
 				</HStack>
 			) : undefined}
@@ -83,12 +84,12 @@ function InputWithTitle(
 							setValue(val);
 						}}
 						value={value}
-						fontSize={14}
+						fontSize={15}
 					>
 						<NumberInputField />
 					</NumberInput>
 					{symbol != undefined ? (
-						<Text fontSize={14}>{`${symbol}`}</Text>
+						<Text fontSize={15}>{`${symbol}`}</Text>
 					) : undefined}
 				</HStack>
 			) : undefined}

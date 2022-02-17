@@ -60,17 +60,13 @@ import Loader from "../components/Loader";
 import GroupDisplayName from "../components/GroupDisplayPanel";
 import InputWithTitle from "../components/InputWithTitle";
 import PrimaryButton from "../components/PrimaryButton";
-import { ArrowBackIcon } from "@chakra-ui/icons";
-import {
-	getOwnedSafes,
-	proposeTransaction,
-} from "@gnosis.pm/safe-react-gateway-sdk";
-import { ethers } from "ethers";
-import { UnicodeNormalizationForm } from "ethers/lib/utils";
+import GroupDetails from "../components/GroupDetails";
+
 function Page() {
 	const urlParams = useParams();
-	// const groupId = urlParams.groupId;
-	const groupId = "0xad67843a0cc312a5b0e295e9192a4f575bc104b3";
+	const groupId = urlParams.groupId
+		? urlParams.groupId.toLowerCase()
+		: undefined;
 
 	const { chainId, account } = useEthers();
 	const userProfile = useSelector(selectUserProfile);
@@ -325,6 +321,11 @@ function Page() {
 			<Flex width="70%" flexDirection="row" padding={5}>
 				<Flex width={"49%"} flexDirection="column">
 					{groupDetails != null ? (
+						<GroupDetails
+							groupDetails={groupDetails}
+							followButton={false}
+						/>
+					) : (
 						<Flex
 							padding={2}
 							backgroundColor={COLORS.PRIMARY}
@@ -332,43 +333,11 @@ function Page() {
 							marginBottom={4}
 							flexDirection={"column"}
 						>
-							<Flex marginBottom={1}>
-								<Avatar
-									size="md"
-									name={generateProfileInitials(
-										groupDetails.name
-									)}
-									marginRight={5}
-								/>
-								<Box marginRight={5}>
-									<Text fontSize="md">
-										{numStrFormatter(
-											groupDetails.followCount
-												? groupDetails.followCount
-												: 0
-										)}
-									</Text>
-									<Text fontSize="sm">members</Text>
-								</Box>
-								<Box marginRight={5}>
-									<Text fontSize="md">
-										{numStrFormatter(
-											groupDetails.postCount
-												? groupDetails.postCount
-												: 0
-										)}
-									</Text>
-									<Text fontSize="sm">contributions</Text>
-								</Box>
-							</Flex>
-							<Flex>
-								<Text fontSize="md">
-									{groupDetails.description}
-								</Text>
-							</Flex>
+							<Text>
+								Group details do not exist! Please update them
+								:)
+							</Text>
 						</Flex>
-					) : (
-						<Loader />
 					)}
 					<Flex
 						padding={2}
@@ -379,7 +348,7 @@ function Page() {
 						width={"100%"}
 					>
 						<Text fontSize={20} fontWeight={"bold"}>
-							Edit details
+							Edit Group Details
 						</Text>
 						{InputWithTitle(
 							"Name",
@@ -539,7 +508,7 @@ function Page() {
 				</Flex>
 			</Flex>
 
-			<Flex width="30%" padding={5} flexDirection={"column"}>
+			<Flex width="30%" paddingTop={5} flexDirection={"column"}>
 				<Flex
 					flexDirection={"column"}
 					padding={2}

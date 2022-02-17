@@ -7,8 +7,6 @@ import {
 } from "../utils";
 
 function ChallengeHistoryTable({ stakes }) {
-	[].sort();
-	console.log(stakes, " mkmk");
 	stakes = stakes.sort(
 		(a, b) => -1 * (a.donEscalationIndex - b.donEscalationIndex)
 	);

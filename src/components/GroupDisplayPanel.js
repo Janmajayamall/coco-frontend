@@ -22,9 +22,8 @@ function GroupDisplayName({ group, followStatusVisible, settingsVisible }) {
 	const dispatch = useDispatch();
 
 	return (
-		<Flex marginTop={2} marginBottom={2} alignItems="center">
+		<Flex marginTop={1} alignItems="center">
 			<Avatar size="sm" name={generateProfileInitials(group.name)} />
-
 			<Text
 				onClick={() => {
 					navigate(`/group/${group.groupAddress}`);
@@ -39,14 +38,14 @@ function GroupDisplayName({ group, followStatusVisible, settingsVisible }) {
 			</Text>
 			<Spacer />
 			{followStatusVisible === true ? (
-				groupsFollowed[group.oracleAddress] !== true ? (
+				groupsFollowed[group.groupAddress] !== true ? (
 					<Button
 						onClick={async () => {
-							const res = await followGroup(group.oracleAddress);
+							const res = await followGroup(group.groupAddress);
 							if (res == undefined) {
 								return;
 							}
-							dispatch(sAddGroupFollow(group.oracleAddress));
+							dispatch(sAddGroupFollow(group.groupAddress));
 						}}
 						width={12}
 					>
@@ -55,13 +54,11 @@ function GroupDisplayName({ group, followStatusVisible, settingsVisible }) {
 				) : (
 					<Button
 						onClick={async () => {
-							const res = await unfollowGroup(
-								group.oracleAddress
-							);
+							const res = await unfollowGroup(group.groupAddress);
 							if (res == undefined) {
 								return;
 							}
-							dispatch(sDeleteGroupFollow(group.oracleAddress));
+							dispatch(sDeleteGroupFollow(group.groupAddress));
 						}}
 						width={12}
 					>
@@ -72,7 +69,7 @@ function GroupDisplayName({ group, followStatusVisible, settingsVisible }) {
 			{settingsVisible === true ? (
 				<IconButton
 					onClick={() => {
-						navigate(`/settings/${group.oracleAddress}`);
+						navigate(`/settings/${group.groupAddress}`);
 					}}
 					backgroundColor="#0B0B0B"
 					size={"sm"}

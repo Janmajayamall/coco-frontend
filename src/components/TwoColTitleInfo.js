@@ -1,29 +1,4 @@
-import {
-	Button,
-	Box,
-	Text,
-	Flex,
-	Tabs,
-	TabList,
-	TabPanel,
-	TabPanels,
-	Tab,
-	NumberInput,
-	NumberInputField,
-	Table,
-	TableCaption,
-	Thead,
-	Tr,
-	Th,
-	Tbody,
-	Td,
-	Tfoot,
-	Spacer,
-	SliderTrack,
-	SliderFilledTrack,
-	SliderThumb,
-	Slider,
-} from "@chakra-ui/react";
+import { Text, Flex, Spacer } from "@chakra-ui/react";
 import InfoTip from "./InfoTip";
 
 function TwoColTitleInfo({
@@ -35,7 +10,7 @@ function TwoColTitleInfo({
 }) {
 	return (
 		<Flex {...props} alignItems={"center"}>
-			<Text fontSize="12" fontWeight={titleBold ? "bold" : "normal"}>
+			<Text fontSize="14" fontWeight={titleBold ? "bold" : "normal"}>
 				{title}
 			</Text>
 			{helpText != "" ? (
@@ -50,7 +25,7 @@ function TwoColTitleInfo({
 				/>
 			) : undefined}
 			<Spacer />
-			<Text fontSize="12">{info}</Text>
+			<Text fontSize="14">{info}</Text>
 		</Flex>
 	);
 }

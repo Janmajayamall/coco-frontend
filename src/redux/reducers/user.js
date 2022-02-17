@@ -20,11 +20,12 @@ const slice = createSlice({
 			if (action.payload && Array.isArray(action.payload)) {
 				let groupsFollowed = new Object();
 				action.payload.forEach((obj) => {
-					if (obj.moderatorAddress) {
-						groupsFollowed[obj.moderatorAddress] = true;
+					if (obj.groupAddress) {
+						groupsFollowed[obj.groupAddress] = true;
 					}
 				});
 				state.groupsFollowed = groupsFollowed;
+				console.log(groupsFollowed, " groupsFollowed");
 			}
 		},
 		sAddGroupFollow(state, action) {

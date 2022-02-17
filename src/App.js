@@ -11,7 +11,9 @@ import Activity from "./pages/Activity";
 import Feed from "./pages/Feed";
 import Post from "./pages/Post";
 import Pages from "./pages/Pages";
-import PageSettings from "./pages/GroupSettings";
+import GroupFeed from "./pages/GroupFeed";
+import GroupSettings from "./pages/GroupSettings";
+import YourGroups from "./pages/YourGroups";
 import {
 	Button,
 	Box,
@@ -50,21 +52,7 @@ import HeaderWarning from "./components/HeaderWarning";
 
 import Web3 from "web3";
 import { useEffect, useState } from "react";
-import {
-	newPost,
-	updateModerator,
-	toCheckSumAddress,
-	getUser,
-	findAllFollows,
-	filterOracleIdsFromMarketsGraph,
-	filterMarketIdentifiersFromMarketsGraph,
-	findPostsByMarketIdentifierArr,
-	populateMarketWithMetadata,
-	findPopularModerators,
-	followModerator,
-	getRinkebyLatestBlockNumber,
-	COLORS,
-} from "./utils";
+import { getUser, findAllFollows, COLORS } from "./utils";
 import {
 	sUpdateProfile,
 	sUpdateOraclesInfoObj,
@@ -73,8 +61,7 @@ import {
 	sUpdateMarketsMetadata,
 	sUpdateGroupsFollowed,
 	selectGroupsFollowed,
-	sUpdateRinkebyLatestBlockNumber,
-	selectRinkebyLatestBlockNumber,
+	selectUserProfile,
 } from "./redux/reducers";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, Route, Routes, useNavigate } from "react-router";
@@ -84,13 +71,13 @@ import CocoFull from "./Coco-full.svg";
 import { FireIcon } from "./components/FireIcon";
 import { HomeIcon } from "./components/HomeIcon";
 
-const web3 = new Web3();
-
 function App() {
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
 	const location = useLocation();
 	const { account } = useEthers();
+	const userProfile = useSelector(selectUserProfile);
+	const isAuthenticated = account && userProfile ? true : false;
 
 	useEffect(async () => {
 		let res = await getUser();
@@ -174,29 +161,37 @@ function App() {
 								}
 							/>
 
-							<IconButton
-								onClick={() => {
-									if (location.pathname == "/home") {
-										return;
+							{isAuthenticated == true ? (
+								<IconButton
+									onClick={() => {
+										if (location.pathname == "/home") {
+											return;
+										}
+										navigate("/home");
+									}}
+									borderRadius={10}
+									style={
+										location.pathname == "/home"
+											? {
+													border: "2px",
+													borderStyle: "solid",
+													borderColor: "blue.400",
+													backgroundColor: "blue.400",
+											  }
+											: {
+													backgroundColor: "#FDFDFD",
+											  }
 									}
-									navigate("/home");
-								}}
-								borderRadius={10}
-								style={
-									location.pathname == "/home"
-										? {
-												border: "2px",
-												borderStyle: "solid",
-												borderColor: "blue.400",
-												backgroundColor: "blue.400",
-										  }
-										: {
-												backgroundColor: "#FDFDFD",
-										  }
-								}
-								margin="1"
-								icon={<HomeIcon fill={"#0B0B0B"} w={8} h={8} />}
-							/>
+									margin="1"
+									icon={
+										<HomeIcon
+											fill={"#0B0B0B"}
+											w={8}
+											h={8}
+										/>
+									}
+								/>
+							) : undefined}
 						</Flex>
 						<Spacer />
 						<ConnectButton />
@@ -211,16 +206,15 @@ function App() {
 					<Routes>
 						<Route path="/add" element={<NewPost />} />
 						<Route path="/addGroup" element={<NewGroup />} />
-						{/* <Route path="/oracle/:address" element={<OracleConfig />} /> */}
 						<Route path="/explore" element={<Feed />} />
 						<Route path="/home" element={<Feed />} />
-						<Route path="/group/:groupId" element={<Feed />} />
+						<Route path="/group/:groupId" element={<GroupFeed />} />
 						<Route path="/" element={<Feed />} />
 						<Route path="/post/:postId" element={<Post />} />
-						<Route path="/groups" element={<Pages />} />
+						<Route path="/groups" element={<YourGroups />} />
 						<Route
-							path="/settings/:pageId"
-							element={<PageSettings />}
+							path="/settings/:groupId"
+							element={<GroupSettings />}
 						/>
 						<Route path="/activity" element={<Activity />} />
 					</Routes>

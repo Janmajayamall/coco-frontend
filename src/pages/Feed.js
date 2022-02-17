@@ -51,6 +51,9 @@ import { HomeIcon } from "../components/HomeIcon";
 import { ArrowBackIcon } from "@chakra-ui/icons";
 import SuggestionSidebar from "../components/SuggestionSidebar";
 import PrimaryButton from "../components/PrimaryButton";
+import CreatePostStrip from "../components/CreatePostStrip";
+import PopularGroups from "../components/PopularGroups";
+import WETHSwapper from "../components/WETHSwapper";
 
 function Page() {
 	const navigate = useNavigate();
@@ -114,11 +117,10 @@ function Page() {
 			<Flex
 				flexDirection="column"
 				width={"70%"}
+				padding={5}
 				minHeight="100vh"
-				paddingRight={21}
-				paddingLeft={21}
-				borderColor={"#E0E0E0"}
 			>
+				<CreatePostStrip />
 				{posts.map((post, index) => {
 					// if post does not have
 					// corresponding group info
@@ -150,7 +152,10 @@ function Page() {
 					);
 				})}
 			</Flex>
-			<SuggestionSidebar />
+			<Flex flexDirection="column" width={"30%"} paddingTop={5}>
+				<PopularGroups />
+				<WETHSwapper />
+			</Flex>
 		</Flex>
 	);
 }
