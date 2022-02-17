@@ -1,6 +1,6 @@
 import SafeServiceClient from "@gnosis.pm/safe-service-client";
 import { ethers } from "ethers";
-import Safe, { SafeFactory } from "@gnosis.pm/safe-core-sdk";
+import Safe, { ContractNetworksConfig } from "@gnosis.pm/safe-core-sdk";
 import EthersAdapter from "@gnosis.pm/safe-ethers-lib";
 import Web3Adapter from "@gnosis.pm/safe-web3-lib";
 import Web3 from "web3";
@@ -35,11 +35,8 @@ export async function createSafeTx(
 	safeAddress,
 	account
 ) {
-	const web3Provider = new ethers.providers.JsonRpcProvider(
-		"https://arb-rinkeby.g.alchemy.com/v2/Mk6VvurgNanO_UUi008rNJcZfbjn8R9O"
-	);
-	const provider = new ethers.providers.Web3Provider(web3Provider);
-	const safeOwner = provider.getSigner(account);
+	const web3Provider = new ethers.providers.Web3Provider(window.ethereum);
+	const safeOwner = web3Provider.getSigner(0);
 
 	const ethAdapter = new EthersAdapter({
 		ethers,
@@ -48,11 +45,13 @@ export async function createSafeTx(
 	const safeSdk = await Safe.create({
 		ethAdapter: ethAdapter,
 		safeAddress: safeAddress,
+		contractNetworks: {},
 	});
 	const tx = await safeSdk.createTransaction({
 		to: toAddress,
 		data: calldata,
 		value: value,
 	});
+	console.log(tx, " tyu");
 	return tx;
 }

@@ -176,6 +176,7 @@ function Page() {
 								key={index}
 								group={group}
 								followStatusVisible={false}
+								settingsVisible={true}
 							/>
 						);
 					})}

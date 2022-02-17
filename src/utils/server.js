@@ -4,10 +4,15 @@ import { generateRequestSignatures } from "./auth";
 import { getMarketIdentifierOfPost } from ".";
 
 const baseInstance = axios.create({
-	baseURL:
-		process.env.REACT_APP_VERCEL_ENV === "production"
-			? "https://backend.cocoverse.club/"
-			: "http://65.108.59.231:8080",
+	baseURL: (() => {
+		if (process.env.REACT_APP_VERCEL_ENV === "production") {
+			return "https://backend.cocoverse.club/";
+		} else if (process.env.REACT_APP_VERCEL_ENV === "preview") {
+			return "http://65.108.59.231:8080";
+		} else {
+			return "http://65.108.59.231:8080";
+		}
+	})(),
 	timeout: 10000,
 	headers: { "Content-Type": "application/json" },
 });
