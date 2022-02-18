@@ -656,3 +656,17 @@ export function calculateRedeemObj(market, account, userPositions) {
 		wins,
 	};
 }
+
+export function determineMarketState(market) {
+	let timestamp = new Date() / 1000;
+	if (market.donBufferEndsAt - timestamp > 0) {
+		// state is in buffer period
+		return 1;
+	} else if (market.resolutionBufferEndsAt - timestamp > 0) {
+		// state is in resolution period
+		return 2;
+	} else {
+		// state expired
+		return 3;
+	}
+}

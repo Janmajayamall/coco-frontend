@@ -63,8 +63,6 @@ function Page() {
 		CREATION_AMOUNT.add(ONE_BN)
 	);
 
-	console.log(wETHTokenAllowance, " token allowance");
-
 	const [title, setTitle] = useState("");
 	const [link, setLink] = useState("");
 	const [postType, setPostType] = useState(0);
@@ -208,17 +206,6 @@ function Page() {
 				method: "eth_signTypedData_v3",
 				params: [accounts[0], dataToSign],
 			});
-			console.log(dataToSign);
-			console.log(marketSignature);
-			// console.log(marketSignature, " Post helper data to sign ");
-			// console.log(
-			// 	selectGroup,
-			// 	marketIdentifier,
-			// 	JSON.stringify(bodyObject),
-			// 	marketSignature,
-			// 	JSON.stringify(marketData),
-			// 	chainId
-			// );
 
 			let res = await newPost(
 				selectGroup,

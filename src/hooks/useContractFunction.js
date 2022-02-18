@@ -61,7 +61,6 @@ export function useRedeemWins() {
 }
 
 export function useRedeem(groupAddress) {
-	console.log(groupAddress, " hey I received");
 	const { state, send } = useContractFunction(
 		groupContract(groupAddress),
 		"redeem"

@@ -44,8 +44,15 @@ export function useGetSafesAndGroupsManagedByUser(account) {
 		reexecuteQuery: reexecuteGroupsByManagers,
 	} = useQueryGroupsByManagers(
 		safes.map((id) => id.toLowerCase()),
-		false
+		true
 	);
+	const [groupIds, setGroupsIds] = useState([]);
+
+	useEffect(() => {
+		if (safes.length > 0) {
+			reexecuteGroupsByManagers();
+		}
+	}, [safes]);
 
 	useEffect(async () => {
 		try {
@@ -60,10 +67,16 @@ export function useGetSafesAndGroupsManagedByUser(account) {
 		} catch (e) {}
 	}, [account]);
 
+	useEffect(() => {
+		if (rGroupsByManagers.data) {
+			setGroupsIds(
+				rGroupsByManagers.data.groups.map((group) => group.id)
+			);
+		}
+	}, [rGroupsByManagers]);
+
 	return {
 		safes,
-		groupIds: rGroupsByManagers.data
-			? rGroupsByManagers.data.groups.map((group) => group.id)
-			: [],
+		groupIds,
 	};
 }

@@ -103,6 +103,8 @@ function Page() {
 	// err states
 	const [nameExists, setNameExists] = useState(false);
 
+	const [nj, setnj] = useState(true);
+
 	// whenever rGroupsByManagers changes
 	// get groups details from the backend
 	// and divide them into the following -
@@ -125,17 +127,14 @@ function Page() {
 
 	// transitions step to 2 once group proxy contract is deployed
 	useEffect(() => {
-		console.log(state, " createGroupWithSafe");
 		if (state.status == "Success") {
 			// get group address from tx receipt
 			let groupAddress;
 			state.receipt.events.forEach((event) => {
-				console.log(event);
 				if (
 					event.address.toLowerCase() ==
 					addresses.GroupProxyFactory.toLowerCase()
 				) {
-					console.log("Yay grabbed it");
 					groupAddress = event.args[0].toLowerCase();
 				}
 			});
@@ -198,14 +197,6 @@ function Page() {
 			[true, feeBN, donBufferSecs, resolutionBufferSecs]
 		);
 
-		console.log(
-			feeBN,
-			donBufferSecs,
-			resolutionBufferSecs,
-			donReservesLimitBN,
-			groupGlobalConfig
-		);
-
 		send(
 			safe,
 			addresses.GroupSingleton,
@@ -254,7 +245,7 @@ function Page() {
 			name,
 			description,
 		});
-		console.log(res);
+
 		if (res == undefined) {
 			// TODO throw error
 			return;

@@ -103,7 +103,7 @@ export async function newPost(
 
 		return data.response;
 	} catch (e) {
-		console.log(e, " new post error");
+		console.log(e);
 	}
 }
 
@@ -178,7 +178,7 @@ export async function findPostsByMarketIdentifierArr(identifiers) {
 		});
 		return data.response;
 	} catch (e) {
-		console.log(e, " hjlqwertyui");
+		console.log(e);
 	}
 }
 
@@ -262,7 +262,6 @@ export async function findGroupsByIdArr(ids) {
 			$in: ids,
 		},
 	};
-
 	try {
 		const { data } = await baseInstance.request({
 			url: "/group/find",
@@ -314,7 +313,7 @@ export async function findGroupsDetails(groupIds) {
 
 		return data.response;
 	} catch (e) {
-		console.log(e, " ghjk");
+		console.log(e);
 	}
 }
 

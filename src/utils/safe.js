@@ -4,7 +4,7 @@ import Safe from "@gnosis.pm/safe-core-sdk";
 import EthersAdapter from "@gnosis.pm/safe-ethers-lib";
 import axios from "axios";
 
-const transactionServiceUrl = "http://18.185.94.213/txs/";
+const transactionServiceUrl = "http://18.185.94.213/txs";
 export const safeService = new SafeServiceClient(transactionServiceUrl);
 
 export function createUpdateGlobalConfigTx(
@@ -72,7 +72,7 @@ export async function createSafeTx(
 
 	// make API req to transaction service for proposing the tx
 	const res = await axios({
-		url: `${transactionServiceUrl}api/v1/safes/${safeAddress}/multisig-transactions`,
+		url: `${transactionServiceUrl}/api/v1/safes/${safeAddress}/multisig-transactions`,
 		method: "POST",
 		data: {
 			...tx.data,

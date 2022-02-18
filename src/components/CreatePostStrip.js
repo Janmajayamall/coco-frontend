@@ -1,15 +1,4 @@
-import {
-	Heading,
-	Flex,
-	Text,
-	Box,
-	useToast,
-	Spacer,
-	Link,
-	Select,
-	Avatar,
-	Input,
-} from "@chakra-ui/react";
+import { Flex, Input } from "@chakra-ui/react";
 import { useNavigate } from "react-router";
 import { COLORS, generateProfileInitials, numStrFormatter } from "../utils";
 

@@ -102,6 +102,32 @@ const QueryUserPositionsByMarketIdentifier = `
 	}
 `;
 
+const QueryUserMarketsAndPositions = `
+	query($user: Bytes!) {
+		user(id: $user){
+			markets{
+				market{
+					marketIdentifier
+				}
+			}
+			positions{
+				market{
+					marketIdentifier
+					outcome
+					resolutionBufferEndsAt
+					donBufferEndsAt
+					staker0
+					staker1
+					reserve0
+					reserve1
+				}
+				amount0
+				amount1
+			}
+		}
+	}
+`;
+
 const QueryBadMarketIdentifiers = `
 	query{
 		markets(where:{outcome:0}){
@@ -435,6 +461,20 @@ export function useQueryMarketsInResolutionByGroups(groups, timestamp, pause) {
 		variables: {
 			groups,
 			timestamp,
+		},
+		pause,
+	});
+	return {
+		result,
+		reexecuteQuery,
+	};
+}
+
+export function useQueryUserMarketsAndPositions(user, pause) {
+	const [result, reexecuteQuery] = useQuery({
+		query: QueryUserMarketsAndPositions,
+		variables: {
+			user,
 		},
 		pause,
 	});

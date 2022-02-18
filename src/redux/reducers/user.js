@@ -25,7 +25,6 @@ const slice = createSlice({
 					}
 				});
 				state.groupsFollowed = groupsFollowed;
-				console.log(groupsFollowed, " groupsFollowed");
 			}
 		},
 		sAddGroupFollow(state, action) {

@@ -238,9 +238,7 @@ function Page() {
 	// get post details using postId;
 	// note: postId == marketIdentifier
 	useEffect(async () => {
-		console.log(postId, " yoyoyo");
 		let res = await findPostsByMarketIdentifierArr([postId]);
-		console.log(res, " received posts");
 		if (res == undefined || res.posts.length == 0) {
 			// TODO set error
 			return;
@@ -298,7 +296,7 @@ function Page() {
 		if (!bnValue.lte(wETHTokenBalance)) {
 			return {
 				valid: false,
-				expStr: "Insuffcient Balance",
+				expStr: "Insufficient Balance",
 			};
 		}
 

@@ -63,7 +63,6 @@ function Page() {
 		urlParams.groupId != undefined && isValidAddress(urlParams.groupId)
 			? urlParams.groupId.toLowerCase()
 			: undefined;
-	console.log(groupId, "k");
 
 	const [groupDetails, setGroupDetails] = useState(null);
 	const [posts, setPosts] = useState([]);
@@ -73,7 +72,6 @@ function Page() {
 		setGroupDetails(null);
 		if (groupId) {
 			let res = await findGroupsDetails([groupId]);
-			console.log(res, "kl");
 			if (res && res.groupsDetails && res.groupsDetails.length > 0) {
 				let groupDetails = res.groupsDetails[0];
 				setGroupDetails(groupDetails);
@@ -95,7 +93,7 @@ function Page() {
 				createdAt: -1,
 			}
 		);
-		console.log(res, "jklllll");
+
 		if (res == undefined) {
 			// TODO throw error
 			return;

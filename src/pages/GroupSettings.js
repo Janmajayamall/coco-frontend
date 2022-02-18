@@ -126,7 +126,6 @@ function Page() {
 			return;
 		}
 		const _groupDetails = res.groupsDetails[0];
-		console.log(_groupDetails);
 
 		// set things up for editing
 		setName(_groupDetails.name);
@@ -208,18 +207,9 @@ function Page() {
 			account
 		);
 
-		console.log(createdTx, " GHJK")
-
-		// propose the tx
+		// propose the tx // TODO Propose tx is taken care of in create safe tx
 
 		return;
-		// console.log(
-		// 	feeBN,
-		// 	donBufferSecs,
-		// 	resolutionBufferSecs,
-		// 	donReservesLimitBN,
-		// 	groupGlobalConfig
-		// );
 	}
 
 	async function updateGroupDetailsHelper() {

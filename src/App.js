@@ -118,7 +118,6 @@ function App() {
 	// get all groups
 	useEffect(async () => {
 		const res = await findAllGroups();
-		console.log(res, " Got all groups");
 		if (res == undefined) {
 			return;
 		}

@@ -43,8 +43,6 @@ function LoginModal() {
 		let accountNonce = Math.ceil(Number(res.accountNonce) + 1);
 		const { privateKey, address } = createHotAccount();
 
-		console.log(privateKey, address);
-
 		const signature = await window.ethereum.request({
 			method: "personal_sign",
 			params: [
@@ -55,7 +53,7 @@ function LoginModal() {
 
 		// login user
 		res = await loginUser(signature, address, accountNonce);
-		console.log(res, " login response");
+
 		if (!res) {
 			return;
 		}

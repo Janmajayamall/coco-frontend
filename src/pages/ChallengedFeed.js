@@ -80,14 +80,11 @@ function Page() {
 		) {
 			return;
 		}
-		console.log(
-			Object.keys(badMarketIdentifiers),
-			"Object.keys(badMarketIdentifiers)"
-		);
+
 		const res = await findPostsByMarketIdentifierArr(
 			Object.keys(badMarketIdentifiers)
 		);
-		console.log(res, " Object res is shit");
+
 		if (res == undefined) {
 			// TODO throw error
 			return;

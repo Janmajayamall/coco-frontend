@@ -26,9 +26,9 @@ import {
 	useQueryMarketByOracles,
 	useQueryMarketsByUserInteraction,
 	useQueryTokenBalancesByUser,
+	useQueryUserMarketsAndPositions,
 } from "../hooks";
 
-import Web3 from "web3";
 import { useEffect, useState } from "react";
 import {
 	filterOracleIdsFromMarketsGraph,
@@ -47,6 +47,11 @@ import {
 	filterMarketsByStage,
 	filterMarketsByClaim,
 	filterMarketsByCreator,
+	COLORS,
+	determineMarketState,
+	calculateRedeemObj,
+	ZERO_BN,
+	findPosts,
 } from "../utils";
 import {
 	sUpdateProfile,
@@ -79,165 +84,194 @@ function Page() {
 
 	const { account } = useEthers();
 
-	const oraclesInfoObj = useSelector(selectOracleInfoObj);
-	const marketsMetadata = useSelector(selectMarketsMetadata);
-	const groupsFollowed = useSelector(selectGroupsFollowed);
-	const rinkebyLatestBlockNumber = useSelector(
-		selectRinkebyLatestBlockNumber
+	const {
+		result: rUserMarketsAndPositions,
+		reexecuteQuery: reUserMarketsAndPositions,
+	} = useQueryUserMarketsAndPositions(
+		account ? account.toLowerCase() : "",
+		false
 	);
 
-	const { result: userMarketsResult } = useQueryMarketsByUserInteraction(
-		account ? account.toLowerCase() : ""
-	);
-	const { result: tokenBalancesResult } = useQueryTokenBalancesByUser(
-		account ? account.toLowerCase() : ""
-	);
+	const [interactedPosts, setInteractedPosts] = useState([]);
+	const [pendingRedeemPosts, setPendingRedeemPosts] = useState([]);
+	const [userPosts, setUserPosts] = useState([]);
 
-	const [markets, setMarkets] = useState([]);
-	const [filteredMarkets, setFilteredMarkets] = useState([]);
-	const [filter, setFilter] = useState(0);
-	const [tokenBalancesObj, setTokenBalancesObj] = useState({});
+	const [filteredPosts, setFilteredPosts] = useState([]);
+	const [filter, setFilter] = useState(1);
 
-	const [loading, setLoading] = useState(true);
-
+	// get posts of markets with which
+	// user interacted whenever
+	// rUserMarketsAndPositions changes
 	useEffect(async () => {
 		if (
-			userMarketsResult.data == undefined ||
-			userMarketsResult.data.user == undefined
+			rUserMarketsAndPositions.data &&
+			rUserMarketsAndPositions.data.user
 		) {
-			return;
+			const iMarketIdentifiers = rUserMarketsAndPositions.data.user.markets.map(
+				(m) => m.market.marketIdentifier
+			);
+
+			// query posts using market identifiers
+			const res = await findPostsByMarketIdentifierArr(
+				iMarketIdentifiers
+			);
+			if (res == undefined) {
+				return;
+			}
+			setInteractedPosts(res.posts);
 		}
+	}, [rUserMarketsAndPositions]);
 
-		const _markets = userMarketsResult.data.user.markets.map(
-			(obj) => obj.market
-		);
-		await stateSetupOraclesInfo(
-			filterOracleIdsFromMarketsGraph(_markets),
-			dispatch
-		);
-		await stateSetupMarketsMetadata(
-			filterMarketIdentifiersFromMarketsGraph(_markets),
-			dispatch
-		);
-	}, [userMarketsResult]);
-
-	useEffect(() => {
+	// get posts of markets in which
+	// user has pending redeem whenever
+	// rUserMarketsAndPositions changes
+	useEffect(async () => {
 		if (
-			userMarketsResult.data == undefined ||
-			userMarketsResult.data.user == undefined
+			rUserMarketsAndPositions.data &&
+			rUserMarketsAndPositions.data.user
 		) {
-			return;
+			const rMarketIdentifiers = rUserMarketsAndPositions.data.user.positions.map(
+				(pos) => {
+					const marketState = determineMarketState({
+						donBufferEndsAt: pos.market.donBufferEndsAt,
+						resolutionBufferEndsAt:
+							pos.market.resolutionBufferEndsAt,
+					});
+					if (marketState == 3) {
+						// market has expired, so its possible that user has something to redeem
+						const redeemObj = calculateRedeemObj(
+							{
+								...pos.market,
+								outcome: Number(pos.market.outcome),
+								reserve1: parseDecimalToBN(pos.market.reserve1),
+								reserve0: parseDecimalToBN(pos.market.reserve0),
+							},
+							account,
+							{
+								amount0: parseDecimalToBN(pos.amount0),
+								amount1: parseDecimalToBN(pos.amount1),
+							}
+						);
+						if (redeemObj.total.gt(ZERO_BN)) {
+							return pos.market.marketIdentifier;
+						}
+					}
+				}
+			);
+
+			// retrieve posts using rMarketIdentifiers
+			const res = await findPostsByMarketIdentifierArr(
+				rMarketIdentifiers
+			);
+			if (res == undefined) {
+				return;
+			}
+			setPendingRedeemPosts(res.posts);
 		}
+	}, [rUserMarketsAndPositions]);
 
-		setLoading(true);
-
-		const _populatedMarkets = userMarketsResult.data.user.markets.map(
-			(obj) =>
-				populateMarketWithMetadata(
-					obj.market,
-					oraclesInfoObj,
-					marketsMetadata,
-					groupsFollowed,
-					rinkebyLatestBlockNumber
-				)
-		);
-		setMarkets(_populatedMarkets);
-		setLoading(false);
-	}, [oraclesInfoObj, marketsMetadata, groupsFollowed, userMarketsResult]);
+	// retrieve posts created by the user
+	useEffect(async () => {
+		if (account != undefined) {
+			const res = await findPosts(
+				{
+					creatorColdAddress: account.toLowerCase(),
+				},
+				{
+					createdAt: -1,
+				}
+			);
+			if (res == undefined) {
+				return;
+			}
+			setUserPosts(res.posts);
+		}
+	}, [account]);
 
 	useEffect(() => {
-		if (tokenBalancesResult.data == undefined) {
-			return;
-		}
-
-		let dict = {};
-		tokenBalancesResult.data.tokenBalances.forEach((obj) => {
-			dict[obj.tokenId] = {
-				...obj,
-				balance: parseDecimalToBN(obj.balance),
-			};
-		});
-
-		setTokenBalancesObj(dict);
-	}, [tokenBalancesResult]);
-
-	useEffect(() => {
-		if (filter == "" || filter == undefined) {
-			setFilteredMarkets(markets);
-			return;
-		}
-
-		let _markets = [];
-		if (filter == 0) {
-			_markets = markets;
-		}
 		if (filter == 1) {
-			_markets = filterMarketsByStage(markets, 1);
+			setFilteredPosts(userPosts);
+		} else if (filter == 2) {
+			setFilteredPosts(interactedPosts);
+		} else if (filter == 3) {
+			setFilteredPosts(pendingRedeemPosts);
 		}
-		if (filter == 2) {
-			_markets = filterMarketsByStage(markets, 2);
-		}
-		if (filter == 3) {
-			_markets = filterMarketsByStage(markets, 3);
-		}
-		if (filter == 4) {
-			_markets = filterMarketsByStage(markets, 4);
-		}
-		if (filter == 5) {
-			_markets = filterMarketsByClaim(markets, tokenBalancesObj);
-		}
-		if (filter == 6) {
-			_markets = filterMarketsByCreator(markets, account);
-		}
-		setFilteredMarkets(_markets);
-	}, [filter, markets, tokenBalancesObj]);
+	}, [filter, interactedPosts, userPosts, pendingRedeemPosts]);
 
 	return (
-		<Flex>
-			<Spacer />
-			<Flex width={"50%"} flexDirection={"column"}>
-				<Flex flexDirection={"column"} marginTop={5} marginBottom={5}>
-					<Text marginBottom={1} fontSize={"16"} fontWeight="bold">
-						Filter Posts
-					</Text>
+		<Flex width={"100%"}>
+			<Flex
+				flexDirection="column"
+				width={"70%"}
+				padding={5}
+				minHeight="100vh"
+			>
+				{filteredPosts.length == 0 ? (
+					<Flex
+						padding={2}
+						backgroundColor={COLORS.PRIMARY}
+						borderRadius={8}
+						marginBottom={4}
+						flexDirection={"column"}
+					>
+						<Text>Nothing to show.</Text>
+					</Flex>
+				) : undefined}
+				{filteredPosts.map((post, index) => {
+					// if post does not have
+					// corresponding group info
+					// then return
+					if (post.group.length == 0) {
+						return;
+					}
+
+					return (
+						<PostDisplay
+							key={index}
+							// setRef={
+							// 	filteredMarkets.length % FEED_BATCH_COUNT === 0
+							// 		? index === filteredMarkets.length - 1
+							// 			? observe
+							// 			: null
+							// 		: null.
+
+							// }
+							post={post}
+							onImageClick={(marketIdentifier) => {
+								navigate(`/post/${marketIdentifier}`);
+							}}
+						/>
+					);
+				})}
+			</Flex>
+			<Flex flexDirection="column" width={"30%"} paddingTop={5}>
+				<Flex
+					flexDirection="column"
+					padding={2}
+					backgroundColor={COLORS.PRIMARY}
+					borderRadius={8}
+					marginBottom={4}
+				>
+					<Heading size="sm" marginBottom={2}>
+						Filter your activity by
+					</Heading>
 					<Select
 						onChange={(e) => {
 							setFilter(e.target.value);
 						}}
+						value={filter}
 						fontSize={14}
 						placeholder="No Filter"
 						borderWidth={1}
 						borderStyle="solid"
 						borderColor="#0B0B0B"
 					>
-						<option value={1}>Live</option>
-						<option value={2}>Challenge</option>
-						<option value={3}>Resolution</option>
-						<option value={4}>Final</option>
-						<option value={5}>Pending Redeem</option>
-						<option value={6}>Created by you</option>
+						<option value={1}>Your Posts</option>
+						<option value={2}>You Challenged</option>
+						<option value={3}>Pending Redeem</option>
 					</Select>
 				</Flex>
-				{loading === true ? <Loader /> : undefined}
-				{loading === false && filteredMarkets.length === 0 ? (
-					<NoPostsTag marginTop={10} />
-				) : undefined}
-				{filteredMarkets.map((market, index) => {
-					return (
-						<PostDisplay
-							key={index}
-							style={{
-								marginBottom: 20,
-							}}
-							market={market}
-							onImageClick={() => {
-								navigate(`/post/${market.marketIdentifier}`);
-							}}
-						/>
-					);
-				})}
 			</Flex>
-			<Spacer />
 		</Flex>
 	);
 }

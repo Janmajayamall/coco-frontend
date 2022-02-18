@@ -76,7 +76,7 @@ function Page() {
 	// get groups details whenever rQueryGroupsByManagers (i.e. groupIds)
 	// changes
 	useEffect(async () => {
-		if (groupIds.length > 0) {
+		if (groupIds.length != 0) {
 			let res = await findGroupsByIdArr(groupIds);
 			if (res == undefined) {
 				return;
@@ -101,7 +101,7 @@ function Page() {
 					createdAt: -1,
 				}
 			);
-			console.log(res, " got the posts");
+
 			if (res == undefined) {
 				return;
 			}

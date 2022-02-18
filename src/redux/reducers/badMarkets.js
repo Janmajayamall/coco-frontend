@@ -11,7 +11,6 @@ const slice = createSlice({
 	initialState,
 	reducers: {
 		sUpdateBadMarketIdentifiers(state, action) {
-			console.log(action.payload.markets, "xsrdctfvygjbuhnijomkp");
 			if (action.payload.markets) {
 				let marketIdentifiers = {};
 				action.payload.markets.forEach((market) => {
