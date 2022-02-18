@@ -31,6 +31,7 @@ import {
 	findPosts,
 	getExploreFeed,
 	getHomeFeed,
+	COLORS,
 } from "../utils";
 import {
 	selectOracleInfoObj,
@@ -124,6 +125,22 @@ function Page() {
 				minHeight="100vh"
 			>
 				<CreatePostStrip />
+				{posts.length == 0 ||
+				posts.filter(
+					(p) => badMarketIdentifiers[p.marketIdentifier] == undefined
+				).length == 0 ? (
+					<Flex
+						padding={2}
+						backgroundColor={COLORS.PRIMARY}
+						borderRadius={8}
+						marginBottom={4}
+						flexDirection={"column"}
+					>
+						<Text>
+							Nothing to Show... Try posting something? ;)
+						</Text>
+					</Flex>
+				) : undefined}
 				{posts.map((post, index) => {
 					// if post does not have
 					// corresponding group info

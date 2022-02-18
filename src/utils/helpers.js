@@ -131,9 +131,12 @@ export function useBNInput(validationFn) {
 	useEffect(() => {
 		try {
 			let bn = parseDecimalToBN(
-				`${input == "" || input == "." ? "0" : input}`
+				`${
+					input == undefined || input == "" || input == "."
+						? "0"
+						: input
+				}`
 			);
-
 			setBnValue(bn);
 			if (validationFn != undefined) {
 				let { valid, expStr } = validationFn(bn);

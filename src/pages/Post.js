@@ -273,6 +273,13 @@ function Page() {
 		}
 	}, [stateCreateAndChallenge, stateChallenge, stateRedeem]);
 
+	// whenever wEthBalance changes, refresh the input
+	useEffect(() => {
+		if (wETHTokenBalance != undefined) {
+			setInput(input);
+		}
+	}, [wETHTokenBalance]);
+
 	function validateInput(bnValue) {
 		// check bnValue is not zero
 		if (bnValue.isZero()) {
@@ -293,7 +300,7 @@ function Page() {
 		}
 
 		// check bnValue is lte tokenBalance
-		if (!bnValue.lte(wETHTokenBalance)) {
+		if (wETHTokenBalance == undefined || !bnValue.lte(wETHTokenBalance)) {
 			return {
 				valid: false,
 				expStr: "Insufficient Balance",

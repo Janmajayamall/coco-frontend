@@ -36,6 +36,7 @@ import {
 	selectFeedDisplayConfigs,
 	selectUserProfile,
 	sUpdateLoginModalIsOpen,
+	selectBadMarketIdentifiers,
 } from "../redux/reducers";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate, useParams } from "react-router";
@@ -58,11 +59,12 @@ function Page() {
 	const location = useLocation();
 	const urlParams = useParams();
 
-	// TODO if group id is undefined then show error
 	const groupId =
 		urlParams.groupId != undefined && isValidAddress(urlParams.groupId)
 			? urlParams.groupId.toLowerCase()
 			: undefined;
+
+	const badMarketIdentifiers = useSelector(selectBadMarketIdentifiers);
 
 	const [groupDetails, setGroupDetails] = useState(null);
 	const [posts, setPosts] = useState([]);
@@ -125,7 +127,10 @@ function Page() {
 			>
 				<GroupDetails groupDetails={groupDetails} followButton={true} />
 				<CreatePostStrip />
-				{posts.length == 0 ? (
+				{posts.length == 0 ||
+				posts.filter(
+					(p) => badMarketIdentifiers[p.marketIdentifier] == undefined
+				).length == 0 ? (
 					<Flex
 						padding={2}
 						backgroundColor={COLORS.PRIMARY}
@@ -143,6 +148,10 @@ function Page() {
 					// corresponding group info
 					// then return
 					if (post.group.length == 0) {
+						return;
+					}
+
+					if (badMarketIdentifiers[post.marketIdentifier] == true) {
 						return;
 					}
 
