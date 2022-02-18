@@ -208,6 +208,8 @@ function Page() {
 			account
 		);
 
+		console.log(createdTx, " GHJK")
+
 		// propose the tx
 
 		return;

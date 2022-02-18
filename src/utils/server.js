@@ -3,7 +3,7 @@ import axios from "axios";
 import { generateRequestSignatures } from "./auth";
 import { getMarketIdentifierOfPost } from ".";
 
-const baseInstance = axios.create({
+export const baseInstance = axios.create({
 	baseURL: (() => {
 		if (process.env.REACT_APP_VERCEL_ENV === "production") {
 			return "https://backend.cocoverse.club/";
