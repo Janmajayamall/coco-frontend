@@ -125,7 +125,9 @@ function Page() {
 						marginBottom={4}
 						flexDirection={"column"}
 					>
-						<Text>Hurray :)! No posts for you to review.</Text>
+						<Text fontSize={15}>
+							Hurray :)! No posts for you to review.
+						</Text>
 					</Flex>
 				) : undefined}
 				{posts.map((post, index) => {

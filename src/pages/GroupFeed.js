@@ -48,6 +48,7 @@ import SuggestionSidebar from "../components/SuggestionSidebar";
 import PrimaryButton from "../components/PrimaryButton";
 import GroupDetails from "../components/GroupDetails";
 import CreatePostStrip from "../components/CreatePostStrip";
+import HelpBox from "../components/HelpBox";
 
 function Page() {
 	const navigate = useNavigate();
@@ -176,22 +177,13 @@ function Page() {
 				})}
 			</Flex>
 			<Flex flexDirection="column" width={"30%"} paddingTop={5}>
-				<Flex
-					flexDirection="column"
-					padding={2}
-					backgroundColor={COLORS.PRIMARY}
-					borderRadius={8}
-				>
-					<Heading size={"sm"}>Group rules are simple!</Heading>
-					<Text>
-						1. Challenge any post that you find not suitable for the
-						feed
-					</Text>
-					<Text>
-						2. Only post things you think are suitable for the feed
-						:)
-					</Text>
-				</Flex>
+				<HelpBox
+					heading={"Group Rules"}
+					pointsArr={[
+						"1. Your posts should be relevant to the group :)",
+						"2. Challenge to win if you think some post isn't right for the group feed",
+					]}
+				/>
 			</Flex>
 		</Flex>
 	);

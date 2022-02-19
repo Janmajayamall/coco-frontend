@@ -56,6 +56,7 @@ import PrimaryButton from "../components/PrimaryButton";
 import CreatePostStrip from "../components/CreatePostStrip";
 import PopularGroups from "../components/PopularGroups";
 import WETHSwapper from "../components/WETHSwapper";
+import HelpBox from "../components/HelpBox";
 
 function Page() {
 	const navigate = useNavigate();
@@ -136,7 +137,7 @@ function Page() {
 						marginBottom={4}
 						flexDirection={"column"}
 					>
-						<Text>
+						<Text fontSize={15}>
 							Nothing to Show... Try posting something? ;)
 						</Text>
 					</Flex>
@@ -174,6 +175,15 @@ function Page() {
 			<Flex flexDirection="column" width={"30%"} paddingTop={5}>
 				<PopularGroups />
 				<WETHSwapper />
+				<HelpBox
+					heading={"How does this work?"}
+					pointsArr={[
+						"1. Join groups and post interesting things in them.",
+						"2. Didn't find one of interest? Create one by going to menu on top right.",
+						"3. For every post you put some amount (0.05 WETH) to assure everyone that your post is relevant to the group. So, in case it isn't then anyone can challenge you!",
+						"4. You can also challenge posts that you think are not related to the grourp, and win some amount.",
+					]}
+				/>
 			</Flex>
 		</Flex>
 	);

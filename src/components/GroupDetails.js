@@ -11,6 +11,7 @@ import {
 	Button,
 } from "@chakra-ui/react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router";
 import {
 	selectGroupsFollowed,
 	sAddGroupFollow,
@@ -26,6 +27,7 @@ import {
 import PrimaryButton from "./PrimaryButton";
 
 function GroupDetails({ groupDetails, followButton }) {
+	const navigate = useNavigate();
 	const groupsFollowed = useSelector(selectGroupsFollowed);
 	const dispatch = useDispatch();
 
@@ -74,40 +76,59 @@ function GroupDetails({ groupDetails, followButton }) {
 			<Flex marginBottom={2}>
 				<Text fontSize={15}>{groupDetails.description}</Text>
 			</Flex>
+
 			{followButton == true ? (
-				groupsFollowed[groupDetails.groupAddress] !== true ? (
-					<PrimaryButton
-						onClick={async () => {
-							const res = await followGroup(
-								groupDetails.groupAddress
-							);
-							if (res == undefined) {
-								return;
-							}
-							dispatch(
-								sAddGroupFollow(groupDetails.groupAddress)
-							);
+				<Flex alignItems={"center"}>
+					{groupsFollowed[groupDetails.groupAddress] !== true ? (
+						<PrimaryButton
+							onClick={async () => {
+								const res = await followGroup(
+									groupDetails.groupAddress
+								);
+								if (res == undefined) {
+									return;
+								}
+								dispatch(
+									sAddGroupFollow(groupDetails.groupAddress)
+								);
+							}}
+							title="Join"
+							width={"15%"}
+						/>
+					) : (
+						<PrimaryButton
+							onClick={async () => {
+								const res = await unfollowGroup(
+									groupDetails.groupAddress
+								);
+								if (res == undefined) {
+									return;
+								}
+								dispatch(
+									sDeleteGroupFollow(
+										groupDetails.groupAddress
+									)
+								);
+							}}
+							title="Leave"
+							width={"15%"}
+						/>
+					)}
+					<Text
+						marginLeft={5}
+						fontSize={15}
+						fontWeight="bold"
+						_hover={{
+							cursor: "pointer",
+							textDecoration: "underline",
 						}}
-						title="Join"
-						width={"15%"}
-					/>
-				) : (
-					<PrimaryButton
-						onClick={async () => {
-							const res = await unfollowGroup(
-								groupDetails.groupAddress
-							);
-							if (res == undefined) {
-								return;
-							}
-							dispatch(
-								sDeleteGroupFollow(groupDetails.groupAddress)
-							);
+						onClick={() => {
+							navigate(`/settings/${groupDetails.groupAddress}`);
 						}}
-						title="Leave"
-						width={"15%"}
-					/>
-				)
+					>
+						More details
+					</Text>
+				</Flex>
 			) : undefined}
 		</Flex>
 	);

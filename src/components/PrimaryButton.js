@@ -17,7 +17,9 @@ function PrimaryButton({ title, ...children }) {
 			}}
 			borderRadius="md"
 		>
-			<Text color="#FDFDFD">{title}</Text>
+			<Text fontSize={15} color="#FDFDFD">
+				{title}
+			</Text>
 		</Button>
 	);
 }

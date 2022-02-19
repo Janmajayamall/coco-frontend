@@ -17,7 +17,8 @@ function InputWithTitle(
 	validationFn,
 	inputOptions = {},
 	userBalance = ZERO_BN,
-	symbol = undefined
+	symbol = undefined,
+	disabled = false
 ) {
 	const { valid, expText } = validationHelper();
 
@@ -55,6 +56,7 @@ function InputWithTitle(
 			{inputType === 0 ? (
 				<HStack>
 					<Input
+						disabled={disabled}
 						{...inputOptions}
 						style={{
 							width: "100%",
@@ -75,6 +77,7 @@ function InputWithTitle(
 			{inputType === 1 || inputType === 2 ? (
 				<HStack>
 					<NumberInput
+						disabled={disabled}
 						{...inputOptions}
 						style={{
 							width: "100%",

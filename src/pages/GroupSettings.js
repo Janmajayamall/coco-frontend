@@ -63,6 +63,7 @@ import GroupDisplayName from "../components/GroupDisplayPanel";
 import InputWithTitle from "../components/InputWithTitle";
 import PrimaryButton from "../components/PrimaryButton";
 import GroupDetails from "../components/GroupDetails";
+import HelpBox from "../components/HelpBox";
 
 function Page() {
 	const urlParams = useParams();
@@ -320,7 +321,9 @@ function Page() {
 						width={"100%"}
 					>
 						<Text fontSize={20} fontWeight={"bold"}>
-							Edit Group Details
+							{`${
+								isUserAnOwner == true ? "Edit " : ""
+							}Group Details`}
 						</Text>
 						{InputWithTitle(
 							"Name",
@@ -329,7 +332,10 @@ function Page() {
 							name,
 							setName,
 							validateGroupName,
-							{}
+							{},
+							undefined,
+							"",
+							!isUserAnOwner
 						)}
 						{nameExists === true ? (
 							<Text
@@ -348,17 +354,22 @@ function Page() {
 							description,
 							setDescription,
 							validateGroupDescription,
-							{}
+							{},
+							undefined,
+							"",
+							!isUserAnOwner
 						)}
-						<PrimaryButton
-							style={{
-								marginTop: 20,
-							}}
-							loadingText="Processing..."
-							isLoading={false}
-							onClick={updateGroupDetailsHelper}
-							title="Submit"
-						/>{" "}
+						{isUserAnOwner == true ? (
+							<PrimaryButton
+								style={{
+									marginTop: 20,
+								}}
+								loadingText="Processing..."
+								isLoading={false}
+								onClick={updateGroupDetailsHelper}
+								title="Submit"
+							/>
+						) : undefined}
 					</Flex>
 				</Flex>
 				<Spacer />
@@ -372,7 +383,9 @@ function Page() {
 						marginBottom={4}
 					>
 						<Text fontSize={20} fontWeight={"bold"}>
-							Edit configurations
+							{`${
+								isUserAnOwner == true ? "Edit " : ""
+							}Group configurations`}
 						</Text>
 						{InputWithTitle(
 							"Fee",
@@ -384,7 +397,10 @@ function Page() {
 							{
 								defaultValue: 0.05,
 								precision: 3,
-							}
+							},
+							undefined,
+							"",
+							!isUserAnOwner
 						)}
 						{InputWithTitle(
 							"Challenge Buffer period",
@@ -398,7 +414,8 @@ function Page() {
 								precision: 0,
 							},
 							undefined,
-							"Hrs"
+							"Hrs",
+							!isUserAnOwner
 						)}
 						{InputWithTitle(
 							"Resolution period",
@@ -412,19 +429,22 @@ function Page() {
 								precision: 0,
 							},
 							undefined,
-							"Hrs"
+							"Hrs",
+							!isUserAnOwner
 						)}
-						<PrimaryButton
-							style={{
-								marginTop: 20,
-							}}
-							loadingText="Processing..."
-							// isLoading={createLoading}
-							onClick={() => {
-								editGroupConfigHelper();
-							}}
-							title="Next"
-						/>
+						{isUserAnOwner == true ? (
+							<PrimaryButton
+								style={{
+									marginTop: 20,
+								}}
+								loadingText="Processing..."
+								// isLoading={createLoading}
+								onClick={() => {
+									editGroupConfigHelper();
+								}}
+								title="Submit"
+							/>
+						) : undefined}
 					</Flex>
 					<Flex
 						padding={2}
@@ -434,7 +454,9 @@ function Page() {
 						padding={2}
 					>
 						<Text fontSize={20} fontWeight={"bold"}>
-							Edit Max. Challenge limit
+							{`${
+								isUserAnOwner == true ? "Edit " : ""
+							}Max. Challenge limit`}
 						</Text>
 
 						{InputWithTitle(
@@ -449,42 +471,46 @@ function Page() {
 								precision: 0,
 							},
 							undefined,
-							CURR_SYMBOL
+							CURR_SYMBOL,
+							!isUserAnOwner
 						)}
-						<PrimaryButton
-							style={{
-								marginTop: 20,
-							}}
-							loadingText="Processing..."
-							// isLoading={createLoading}
-							onClick={() => {
-								editMaxChallengeLimitHelper();
-							}}
-							title="Next"
-						/>
+						{isUserAnOwner == true ? (
+							<PrimaryButton
+								style={{
+									marginTop: 20,
+								}}
+								loadingText="Processing..."
+								// isLoading={createLoading}
+								onClick={() => {
+									editMaxChallengeLimitHelper();
+								}}
+								title="Submit"
+							/>
+						) : undefined}
 					</Flex>
 				</Flex>
 			</Flex>
 
 			<Flex width="30%" paddingTop={5} flexDirection={"column"}>
-				<Flex
-					flexDirection={"column"}
-					padding={2}
-					backgroundColor={COLORS.PRIMARY}
-					borderRadius={8}
-					marginBottom={5}
-				>
-					<Text fontWeight={"bold"}>How to edit?</Text>
-					<Text>
-						1. Any moderator can edit "details" which is basically
-						stored on backend
-					</Text>
-					<Text>
-						2. To make any changes to Configurations or Max.
-						challenge limit - first propose a safe tx from here and
-						then approve it from the safe.
-					</Text>
-				</Flex>
+				<HelpBox
+					heading={"What's?"}
+					pointsArr={[
+						"1. Fee - Fee charged by moderators as product of amount put for losing outcome when they declare final outcome.",
+						"2. Challenge Buffer period - Time period before to challenge temporary outcome.",
+						"3. Resolution period - Time period for momderators to declare final outcome, if needed.",
+						"4. Max. Challenge limit  - Max. total amount put up in challenge rounds of a post, after which no more challenges are allowed and moderators will declare the final outcome.",
+					]}
+				/>
+				{isUserAnOwner == true ? (
+					<HelpBox
+						heading={"How to edit?"}
+						pointsArr={[
+							"1. Group details - Any moderator can edit group details right away.",
+							"2. Group Configurations - Any moderator can only propose a transaction to update configurations to gnosis-safe.",
+							"3. Max. Challenge Limit - Like (2) Any moderator can only propose transaction to gnosis-safe for the update.",
+						]}
+					/>
+				) : undefined}
 			</Flex>
 		</Flex>
 	);
