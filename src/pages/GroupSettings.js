@@ -43,6 +43,7 @@ import {
 	generateProfileInitials,
 	numStrFormatter,
 	COLORS,
+	createUpdateDonReservesLimitTx,
 } from "../utils";
 import {
 	useCreateGroupWithSafe,
@@ -161,6 +162,37 @@ function Page() {
 		setNameExists(false);
 	}, [name]);
 
+	async function editMaxChallengeLimitHelper() {
+		if (!isAuthenticated || isUserAnOwner == false) {
+			toast({
+				title: "Invalid request!",
+				status: "error",
+				isClosable: true,
+			});
+			return;
+		}
+
+		if (!validateDonReservesLimit(donReservesLimitBN).valid) {
+			toast({
+				title: "Invalid Input!",
+				status: "error",
+				isClosable: true,
+			});
+			return;
+		}
+
+		const calldata = createUpdateDonReservesLimitTx(donReservesLimitBN);
+
+		// create safe transaction
+		await createSafeTx(
+			groupConfigs.id,
+			calldata,
+			0,
+			groupConfigs.manager,
+			account
+		);
+	}
+
 	async function editGroupConfigHelper() {
 		if (!isAuthenticated || isUserAnOwner == false) {
 			toast({
@@ -199,17 +231,13 @@ function Page() {
 		);
 
 		// create safe transaction
-		const createdTx = await createSafeTx(
+		await createSafeTx(
 			groupConfigs.id,
 			updateGlobalConfigCalldata,
 			0,
 			groupConfigs.manager,
 			account
 		);
-
-		// propose the tx // TODO Propose tx is taken care of in create safe tx
-
-		return;
 	}
 
 	async function updateGroupDetailsHelper() {
@@ -386,20 +414,6 @@ function Page() {
 							undefined,
 							"Hrs"
 						)}
-						{InputWithTitle(
-							"Max. Challange Limit",
-							1,
-							donReservesLimit,
-							donReservesLimitBN,
-							setDonReservesLimit,
-							validateDonReservesLimit,
-							{
-								defaultValue: 1000,
-								precision: 0,
-							},
-							undefined,
-							CURR_SYMBOL
-						)}
 						<PrimaryButton
 							style={{
 								marginTop: 20,
@@ -444,7 +458,7 @@ function Page() {
 							loadingText="Processing..."
 							// isLoading={createLoading}
 							onClick={() => {
-								editGroupConfigHelper();
+								editMaxChallengeLimitHelper();
 							}}
 							title="Next"
 						/>

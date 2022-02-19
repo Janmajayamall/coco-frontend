@@ -44,6 +44,8 @@ import {
 	calculateRedeemObj,
 	COLORS,
 	GRAPH_BUFFER_MS,
+	createSetOutcomeTx,
+	createSafeTx,
 } from "../utils";
 import PostDisplay from "../components/PostDisplay";
 import { useParams } from "react-router";
@@ -100,6 +102,10 @@ function Page() {
 	// state for redeem
 	// user's stakes
 	const [userPositions, setUserPositions] = useState(null);
+
+	// State for set outcome propose tx,
+	// if user is one of the moderators
+	const [chosenOutcome, setChosenOutcome] = useState(null);
 
 	// stake history
 	const [stakes, setStakes] = useState([]);
@@ -311,6 +317,57 @@ function Page() {
 			valid: true,
 			expStr: "",
 		};
+	}
+
+	async function setOutcomeHelper() {
+		// throw if user isn't authenticated
+		if (!isAuthenticated || isUserAnOwner == false) {
+			toast({
+				title: "Invalid request!",
+				status: "error",
+				isClosable: true,
+			});
+			return;
+		}
+
+		// throw if outcome to delare is not chosen
+		if (
+			chosenOutcome == undefined ||
+			chosenOutcome < 0 ||
+			chosenOutcome > 1
+		) {
+			toast({
+				title: "Please chose an outcome!",
+				status: "error",
+				isClosable: true,
+			});
+			return;
+		}
+
+		// throw if any of necessary values are missing
+		if (
+			marketData.onChain == false ||
+			marketData.group.id == undefined ||
+			marketData.group.manager == undefined ||
+			account == undefined
+		) {
+			toast({
+				title: "Invalid Inputs!",
+				status: "error",
+				isClosable: true,
+			});
+			return;
+		}
+
+		const calldata = createSetOutcomeTx(chosenOutcome, marketData.id);
+
+		await createSafeTx(
+			marketData.group.id,
+			calldata,
+			0,
+			marketData.group.manager,
+			account
+		);
 	}
 
 	return (
@@ -561,10 +618,10 @@ function Page() {
 						</Text>
 
 						<Select
-							// onChange={(e) => {
-							// 	setSelectErr(false);
-							// 	setSelectGroup(e.target.value);
-							// }}
+							onChange={(e) => {
+								setChosenOutcome(e.target.value);
+							}}
+							value={chosenOutcome}
 							placeholder="Choose outcome"
 						>
 							<option value={1}>YES</option>
@@ -576,7 +633,7 @@ function Page() {
 							disabled={
 								isUserAnOwner == false || marketState != 2
 							}
-							onClick={() => {}}
+							onClick={setOutcomeHelper}
 							title="Declare"
 							style={{
 								marginTop: 5,

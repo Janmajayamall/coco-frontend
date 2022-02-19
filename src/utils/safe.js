@@ -4,8 +4,16 @@ import Safe from "@gnosis.pm/safe-core-sdk";
 import EthersAdapter from "@gnosis.pm/safe-ethers-lib";
 import axios from "axios";
 
-const transactionServiceUrl = "http://18.185.94.213/txs";
+const transactionServiceUrl = "http://18.185.94.213:8000/txs";
 export const safeService = new SafeServiceClient(transactionServiceUrl);
+
+export function createSetOutcomeTx(outcome, marketIdentifier) {
+	const intf = new ethers.utils.Interface([
+		"function setOutcome(uint8 outcome, bytes32 marketIdentifier)",
+	]);
+
+	return intf.encodeFunctionData("setOutcome", [outcome, marketIdentifier]);
+}
 
 export function createUpdateGlobalConfigTx(
 	isActive,
@@ -25,6 +33,16 @@ export function createUpdateGlobalConfigTx(
 	]);
 }
 
+export function createUpdateDonReservesLimitTx(donReservesLimit) {
+	const intf = new ethers.utils.Interface([
+		"function updateDonReservesLimit(uint256 newLimit)",
+	]);
+
+	return intf.encodeFunctionData("updateDonReservesLimit", [
+		donReservesLimit,
+	]);
+}
+
 export async function createSafeTx(
 	toAddress,
 	calldata,
@@ -36,6 +54,11 @@ export async function createSafeTx(
 	safeAddress = ethers.utils.getAddress(safeAddress.toLowerCase());
 	account = ethers.utils.getAddress(account.toLowerCase());
 	toAddress = ethers.utils.getAddress(toAddress.toLowerCase());
+	console.log(safeAddress, account, toAddress, "Youtube.com");
+
+	// const pendingTxs = await safeService.getPendingTransactions(safeAddress);
+	// console.log(pendingTxs, " oendingtxs");
+	// return;
 
 	const web3Provider = new ethers.providers.Web3Provider(window.ethereum);
 	const safeOwner = web3Provider.getSigner(0);
@@ -60,26 +83,20 @@ export async function createSafeTx(
 		data: calldata,
 		value: value,
 	});
-
+	// 0xcbb5fb68507efd662f469f2f7417506057a95a62e67c534a6fd2f3caab2193cc;
 	// owner1 signs the tx
 	await safeSdk.signTransaction(tx);
 
 	// ge tx hash for proposing it
 	const txHash = await safeSdk.getTransactionHash(tx);
-
+	console.log(txHash, " this is txhash");
 	// get owner1's signature from tx
 	const signature = tx.signatures.get(account.toLowerCase()).data;
 
-	// make API req to transaction service for proposing the tx
-	const res = await axios({
-		url: `${transactionServiceUrl}/api/v1/safes/${safeAddress}/multisig-transactions`,
-		method: "POST",
-		data: {
-			...tx.data,
-			contractTransactionHash: txHash,
-			sender: account,
-			signature,
-		},
-		headers: { "Content-Type": "application/json" },
+	const res = await safeService.proposeTransaction({
+		safeAddress,
+		senderAddress: account,
+		safeTransaction: tx,
+		safeTxHash: txHash,
 	});
 }

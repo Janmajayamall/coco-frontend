@@ -62,6 +62,7 @@ const QueryMarketByMarketIdentifier = `
 			id
 			group {
 				id
+				manager
 			}
 			marketIdentifier
 			reserve0
