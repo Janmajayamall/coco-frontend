@@ -44,6 +44,7 @@ import InputWithTitle from "../components/InputWithTitle";
 import PrimaryButton from "../components/PrimaryButton";
 import ApprovalInterface from "../components/ApprovalInterface";
 import { addresses } from "../contracts";
+import HelpBox from "../components/HelpBox";
 
 function Page() {
 	const { account, chainId } = useEthers();
@@ -443,16 +444,16 @@ function Page() {
 					/>
 				</Flex>
 			</Flex>
-			<Flex width="30%" padding={5} flexDirection={"column"}>
-				<Flex
-					flexDirection="column"
-					padding={2}
-					backgroundColor={COLORS.PRIMARY}
-					borderRadius={8}
-				>
-					<Text>Ready to post?</Text>
-					<Text>Put in some rules</Text>
-				</Flex>
+			<Flex width="30%" paddingTop={5} flexDirection={"column"}>
+				<HelpBox
+					heading={"Posting to COCO"}
+					pointsArr={[
+						"1. Your post should be suitable to group your are posting to.",
+						"2. To post you need to put up 0.05 WETH for YES, so that others can challenge your post.",
+						"3. Don't worry 0.05 WETH will only be deducted if someone challenges your post, otherwise nothing happens.",
+						"4. If someone challenges and you think your post is suitable for group, then challenge them back to win their amount.",
+					]}
+				/>
 			</Flex>
 		</Flex>
 	);

@@ -495,19 +495,20 @@ function Page() {
 				<HelpBox
 					heading={"What's?"}
 					pointsArr={[
-						"1. Fee - Fee charged by moderators as product of amount put for losing outcome when they declare final outcome.",
-						"2. Challenge Buffer period - Time period before to challenge temporary outcome.",
-						"3. Resolution period - Time period for momderators to declare final outcome, if needed.",
-						"4. Max. Challenge limit  - Max. total amount put up in challenge rounds of a post, after which no more challenges are allowed and moderators will declare the final outcome.",
+						"1. Fee - Fee charged by moderators as a product of amount put up for the losing outcome. Only applicable when they declare final outcome.",
+						"2. Challenge Buffer period - Time period to challenge temporary outcome.",
+						"3. Resolution period - Time period for moderators to declare final outcome, if needed.",
+						"4. Max. Challenge limit  - Max. limit total amount put up in challenge rounds a post can reach. After which no more challenges are allowed and moderators will declare the final outcome.",
 					]}
 				/>
 				{isUserAnOwner == true ? (
 					<HelpBox
 						heading={"How to edit?"}
 						pointsArr={[
-							"1. Group details - Any moderator can edit group details right away.",
-							"2. Group Configurations - Any moderator can only propose a transaction to update configurations to gnosis-safe.",
-							"3. Max. Challenge Limit - Like (2) Any moderator can only propose transaction to gnosis-safe for the update.",
+							"1. Group details - Any one moderator can edit group details right away.",
+							"2. Group Configurations - A moderator can propose a transaction to update configurations to gnosis-safe.",
+							"3. Max. Challenge Limit - Like (2) a moderator can propose update transaction to gnosis-safe.",
+							"4. For (2) & (3) transactions should be executed through gnosis-safe user interface.",
 						]}
 					/>
 				) : undefined}

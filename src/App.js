@@ -3,7 +3,6 @@ import ConnectButton from "./components/ConnectButton";
 import LoginButton from "./components/LoginButton";
 import PostDisplay from "./components/PostDisplay";
 import NewPost from "./pages/NewPost";
-import NewModerator from "./pages/_NewGroup";
 import NewGroup from "./pages/NewGroup";
 // import OracleConfig from "./pages/OracleConfig";
 import Activity from "./pages/Activity";

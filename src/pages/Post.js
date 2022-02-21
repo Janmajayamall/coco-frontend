@@ -646,15 +646,15 @@ function Page() {
 				<HelpBox
 					heading={"Challenge Rules"}
 					pointsArr={[
-						"1. You can challenge that post is (YES) / isn't (NO) suitable for group's feed.",
+						"1. You can challenge that post is (i.e. YES) / isn't (i.e. NO) suitable for group's feed.",
 						"2. Temporary outcome is current view on the post. If you disagree, you can challenge it.",
-						"3. To challenge you have to put up 2x (Min. Amount) the amount put up for last challenge.",
+						"3. To challenge you have to put up 2x the amount (i.e Min. Amount to Challenge) put up for last challenge.",
 						"4. Every post starts with creator putting up some amount for YES, so others can challenge them.",
-						`6. If temporary outcome isn't challenged before challenge period (Time left to challenge) expires, it is set as the final outcome`,
-						"7. Every successful challenge renews challenge period",
-						"8. The last challenger (i.e. last one to challenge in favour of final outcome) gets their amount back + win entire amount challenged against them",
-						"9. If you challenged in favour of final outcome you get back your amount back",
-						"10. If total amount put up for challenge reaches certain volume (decided by moderators), challenging stops & moderators declare the final outcome",
+						`6. If temporary outcome isn't challenged before challenge period expires (i.e. Time left to challenge), it is set as the final outcome.`,
+						"7. Every successful challenge renews challenge period.",
+						"8. The last challenger (i.e. last one to challenge in favour of final outcome) gets their amount back + win entire amount challenged against them.",
+						"9. If you challenged in favour of final outcome you get your amount back.",
+						"10. If total amount put up for challenge reaches certain volume (i.e. Max. Challenge limit), challenging stops & moderators declare the final outcome.",
 					]}
 				/>
 			</Flex>

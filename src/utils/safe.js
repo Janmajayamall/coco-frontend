@@ -54,7 +54,6 @@ export async function createSafeTx(
 	safeAddress = ethers.utils.getAddress(safeAddress.toLowerCase());
 	account = ethers.utils.getAddress(account.toLowerCase());
 	toAddress = ethers.utils.getAddress(toAddress.toLowerCase());
-	console.log(safeAddress, account, toAddress, "Youtube.com");
 
 	// const pendingTxs = await safeService.getPendingTransactions(safeAddress);
 	// console.log(pendingTxs, " oendingtxs");
@@ -89,9 +88,6 @@ export async function createSafeTx(
 
 	// ge tx hash for proposing it
 	const txHash = await safeSdk.getTransactionHash(tx);
-	console.log(txHash, " this is txhash");
-	// get owner1's signature from tx
-	const signature = tx.signatures.get(account.toLowerCase()).data;
 
 	const res = await safeService.proposeTransaction({
 		safeAddress,

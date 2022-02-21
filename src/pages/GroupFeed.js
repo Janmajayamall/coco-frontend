@@ -181,7 +181,7 @@ function Page() {
 					heading={"Group Rules"}
 					pointsArr={[
 						"1. Your posts should be relevant to the group :)",
-						"2. Challenge to win if you think some post isn't right for the group feed",
+						"2. Challenge to win if you think some post isn't suitable for the group feed",
 					]}
 				/>
 			</Flex>
