@@ -2,9 +2,17 @@ import SafeServiceClient from "@gnosis.pm/safe-service-client";
 import { ethers } from "ethers";
 import Safe from "@gnosis.pm/safe-core-sdk";
 import EthersAdapter from "@gnosis.pm/safe-ethers-lib";
-import axios from "axios";
 
-const transactionServiceUrl = "http://18.185.94.213:8000/txs";
+const transactionServiceUrl = (() => {
+	if (process.env.REACT_APP_VERCEL_ENV === "production") {
+		return "https://cocosafe.efprivacyscaling.org/txs";
+	} else if (process.env.REACT_APP_VERCEL_ENV === "preview") {
+		return "https://cocosafe.efprivacyscaling.org/txs";
+	} else {
+		return "https://cocosafe.efprivacyscaling.org/txs";
+	}
+})();
+
 export const safeService = new SafeServiceClient(transactionServiceUrl);
 
 export function createSetOutcomeTx(outcome, marketIdentifier) {

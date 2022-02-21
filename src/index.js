@@ -14,10 +14,15 @@ import { mode } from "@chakra-ui/theme-tools";
 
 // setting up theGraph's endpoint
 const client = createClient({
-	url:
-		process.env.REACT_APP_VERCEL_ENV === "production"
-			? "https://api.thegraph.com/subgraphs/name/janmajayamall/meme-curator-subgraphs"
-			: "https://api.thegraph.com/subgraphs/name/janmajayamall/pm-content-test",
+	url: (() => {
+		if (process.env.REACT_APP_VERCEL_ENV === "production") {
+			return "https://api.thegraph.com/subgraphs/name/janmajayamall/meme-curator-subgraphs";
+		} else if (process.env.REACT_APP_VERCEL_ENV === "preview") {
+			return "https://api.thegraph.com/subgraphs/name/janmajayamall/cocostaging";
+		} else {
+			return "https://api.thegraph.com/subgraphs/name/janmajayamall/pm-content-test";
+		}
+	})(),
 });
 
 // chakra ui theme

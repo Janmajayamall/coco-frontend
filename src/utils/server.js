@@ -8,7 +8,7 @@ export const baseInstance = axios.create({
 		if (process.env.REACT_APP_VERCEL_ENV === "production") {
 			return "https://backend.cocoverse.club/";
 		} else if (process.env.REACT_APP_VERCEL_ENV === "preview") {
-			return "http://65.108.59.231:8080";
+			return "https://cocostaging.efprivacyscaling.org";
 		} else {
 			return "http://65.108.59.231:8080";
 		}

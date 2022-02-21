@@ -277,6 +277,7 @@ function Page() {
 				status: "error",
 				isClosable: true,
 			});
+			setContractFnCallLoading(false);
 		}
 	}, [stateCreateAndChallenge, stateChallenge, stateRedeem]);
 
