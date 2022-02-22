@@ -10,7 +10,9 @@ import {
 	useToast,
 	Heading,
 	Select,
+	Link,
 } from "@chakra-ui/react";
+
 import { useEthers } from "@usedapp/core/packages/core";
 import { useEffect } from "react";
 import { useState } from "react";
@@ -57,6 +59,7 @@ import { addresses } from "../contracts";
 import ApprovalInterface from "../components/ApprovalInterface";
 import TwoColTitleInfo from "../components/TwoColTitleInfo";
 import HelpBox from "../components/HelpBox";
+import { ExternalLinkIcon } from "@chakra-ui/icons";
 
 function Page() {
 	const urlParams = useParams();
@@ -618,7 +621,23 @@ function Page() {
 							You are seeing this because you are one of the
 							moderators of the group
 						</Text>
+						<Text fontSize={12} marginBottom={1}>
+							By clicking on Declare you propose a transaction to
+							group's gnosis-safe.
+						</Text>
 
+						<Link
+							marginBottom={1}
+							fontSize={12}
+							href={
+								"https://cocosafeapp.efprivacyscaling.org/app/"
+							}
+							fontWeight={"semibold"}
+							isExternal
+						>
+							{"Visit safe"}
+							<ExternalLinkIcon mx="2px" />
+						</Link>
 						<Select
 							onChange={(e) => {
 								setChosenOutcome(e.target.value);

@@ -316,7 +316,9 @@ function Page() {
 							</Select>
 							<Link
 								fontSize={15}
-								href={"https://gnosis-safe.io/"}
+								href={
+									"https://cocosafeapp.efprivacyscaling.org/app/"
+								}
 								isExternal
 							>
 								{
