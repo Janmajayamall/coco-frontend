@@ -458,37 +458,8 @@ function Page() {
 						</>
 					) : undefined}
 				</Flex>
-				{step == 0 ? (
-					<HelpBox
-						heading={"Why is gnosis-safe required?"}
-						pointsArr={[
-							"Groups are expected to be governed by DAOs (or even a small group of people) rather than an individual. Thus to make governing decisions & coordination easier, a group is created under a gnosis-safe which is controlled by the governing DAO/group.",
-						]}
-					/>
-				) : undefined}
-				{step == 1 ? (
-					<HelpBox
-						heading={"What's?"}
-						pointsArr={[
-							"1. Fee - Fee charged by moderators as a product of amount put up for the losing outcome. Only applicable when they declare final outcome.",
-							"2. Challenge Buffer period - Time period to challenge temporary outcome.",
-							"3. Resolution period - Time period for moderators to declare final outcome, if needed.",
-							"4. Max. Challenge limit  - Max. limit total amount put up in challenge rounds a post can reach. After which no more challenges are allowed and moderators will declare the final outcome.",
-						]}
-					/>
-				) : undefined}
 			</Flex>
 			<Flex width={"30%"} paddingTop={5} flexDirection={"column"}>
-				<HelpBox
-					heading={"What's a group?"}
-					pointsArr={[
-						"1. Groups are communities around a topics of interest.",
-						"2. It's open to anyone and is loosely governed by a DAO.",
-						"3. Group feeds are self moderated thru crypto-economic incentive of challenging posts that are irrelevant.",
-						"4. Governing DAO is needed to make sure the group stays aligned with its goal and set necessary configurations.",
-					]}
-				/>
-
 				<Flex
 					flexDirection="column"
 					padding={2}
@@ -536,6 +507,34 @@ function Page() {
 						);
 					})}
 				</Flex>
+				{step == 0 ? (
+					<HelpBox
+						heading={"Why is gnosis-safe required?"}
+						pointsArr={[
+							"Groups are expected to be governed by DAOs (or even a small group of people) rather than an individual. Thus to make governing decisions & coordination easier, a group is created under a gnosis-safe which is controlled by the governing DAO/group.",
+						]}
+					/>
+				) : undefined}
+				{step == 1 ? (
+					<HelpBox
+						heading={"What's?"}
+						pointsArr={[
+							"1. Fee - Fee charged by moderators as a product of amount put up for the losing outcome. Only applicable when they declare final outcome.",
+							"2. Challenge Buffer period - Time period to challenge temporary outcome.",
+							"3. Resolution period - Time period for moderators to declare final outcome, if needed.",
+							"4. Max. Challenge limit  - Max. limit total amount put up in challenge rounds a post can reach. After which no more challenges are allowed and moderators will declare the final outcome.",
+						]}
+					/>
+				) : undefined}
+				<HelpBox
+					heading={"What's a group?"}
+					pointsArr={[
+						"1. Groups are communities around a topics of interest.",
+						"2. It's open to anyone and is loosely governed by a DAO.",
+						"3. Group feeds are self moderated thru crypto-economic incentive of challenging posts that are irrelevant.",
+						"4. Governing DAO is needed to make sure the group stays aligned with its goal and set necessary configurations.",
+					]}
+				/>
 			</Flex>
 		</Flex>
 	);

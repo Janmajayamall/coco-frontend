@@ -189,7 +189,7 @@ function Page() {
 	}, [account]);
 
 	useEffect(() => {
-		if (filter == 1) {
+		if (filter == 1 || filter == 0) {
 			setFilteredPosts(userPosts);
 		} else if (filter == 2) {
 			setFilteredPosts(interactedPosts);
@@ -257,7 +257,11 @@ function Page() {
 					</Heading>
 					<Select
 						onChange={(e) => {
-							setFilter(e.target.value);
+							let v = e.target.value;
+							if (v == "" || v == undefined) {
+								v = 1;
+							}
+							setFilter(v);
 						}}
 						value={filter}
 						fontSize={14}

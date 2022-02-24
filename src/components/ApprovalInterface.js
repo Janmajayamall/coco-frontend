@@ -90,25 +90,17 @@ function ApprovalInterface({
 
 	return (
 		<Flex
+			flexDirection={"column"}
+			padding={2}
 			backgroundColor={COLORS.PRIMARY}
 			borderRadius={8}
-			flexDirection={"column"}
-			{...props}
+			marginBottom={4}
 		>
-			<Box
-				padding={2}
-				// borderColor="blue.400"
-				borderWidth={1}
-				borderStyle="solid"
-				backgroundColor="#0B0B0B"
-				borderRadius={10}
-			>
-				<Text color={"#FDFDFD"} fontWeight="bold" fontSize={12}>
-					{tokenType === 0
-						? `To spend your ${CURR_SYMBOL} tokens, you will first have to give approval to the app. This is only needed once.`
-						: `To spend your YES/NO shares, you will first have to give approval to the app. This is only needed once per group`}
-				</Text>
-			</Box>
+			<Text fontWeight="bold" fontSize={12}>
+				{tokenType === 0
+					? `To spend your ${CURR_SYMBOL} tokens, you will first have to give approval to the app. This is only needed once.`
+					: `To spend your YES/NO shares, you will first have to give approval to the app. This is only needed once per group`}
+			</Text>
 			<PrimaryButton
 				style={{ marginTop: 5 }}
 				disabled={isDisabled()}

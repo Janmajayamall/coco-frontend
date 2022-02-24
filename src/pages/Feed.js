@@ -51,7 +51,6 @@ import ConfigSidebar from "../components/ConfigSiderbar";
 import { FireIcon } from "../components/FireIcon";
 import { HomeIcon } from "../components/HomeIcon";
 import { ArrowBackIcon } from "@chakra-ui/icons";
-import SuggestionSidebar from "../components/SuggestionSidebar";
 import PrimaryButton from "../components/PrimaryButton";
 import CreatePostStrip from "../components/CreatePostStrip";
 import PopularGroups from "../components/PopularGroups";
@@ -117,6 +116,21 @@ function Page() {
 	// 	},
 	// });
 
+	function HelperOption({ text, onClick }) {
+		return (
+			<Flex
+				_hover={{ cursor: "pointer", textDecoration: "underline" }}
+				paddingTop={2}
+				paddingBottom={2}
+				fontWeight={"semibold"}
+			>
+				<Text onClick={onClick} fontSize={15}>
+					{text}
+				</Text>
+			</Flex>
+		);
+	}
+
 	return (
 		<Flex width={"100%"}>
 			<Flex
@@ -179,11 +193,34 @@ function Page() {
 					heading={"How does this work?"}
 					pointsArr={[
 						"1. Join groups and post interesting things in them.",
-						"2. Didn't find one of interest? Create one by going to menu on top right.",
+						"2. Didn't find a group of interest? Create one by going to menu on top right.",
 						"3. For every post you put some amount (0.05 WETH) to assure everyone that your post is relevant to the group. So, in case it isn't then anyone can challenge you!",
 						"4. You can also challenge posts that you think are not related to the grourp, and win some amount.",
 					]}
 				/>
+				<Flex
+					flexDirection="column"
+					padding={2}
+					backgroundColor={COLORS.PRIMARY}
+					borderRadius={8}
+					marginBottom={4}
+				>
+					<HelperOption
+						text="Send Feedback"
+						onClick={() => {
+							window.open(
+								"https://airtable.com/shrsVVVLBuawaCDvE",
+								"_blank"
+							);
+						}}
+					/>
+					<HelperOption
+						text="Join COCO on TG"
+						onClick={() => {
+							window.open("https://t.me/cocoverse", "_blank");
+						}}
+					/>
+				</Flex>
 			</Flex>
 		</Flex>
 	);

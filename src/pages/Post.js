@@ -562,10 +562,24 @@ function Page() {
 
 							<PrimaryButton
 								loadingText="Processing..."
-								disabled={!isAuthenticated}
+								disabled={
+									!isAuthenticated ||
+									calculateRedeemObj(
+										marketData,
+										account,
+										userPositions
+									).total.eq(ZERO_BN)
+								}
 								isLoading={contractFnCallLoading}
 								onClick={() => {
-									if (!isAuthenticated) {
+									if (
+										!isAuthenticated ||
+										calculateRedeemObj(
+											marketData,
+											account,
+											userPositions
+										).total.eq(ZERO_BN)
+									) {
 										return;
 									}
 
@@ -583,29 +597,28 @@ function Page() {
 							/>
 						</>
 					) : undefined}
-					{marketState < 2 ? (
-						<ApprovalInterface
-							marginTop={5}
-							tokenType={0}
-							erc20Address={addresses.WETH}
-							erc20AmountBn={bnValue}
-							onSuccess={() => {
-								toast({
-									title: "Success!",
-									status: "success",
-									isClosable: true,
-								});
-							}}
-							onFail={() => {
-								toast({
-									title: "Metamask err!",
-									status: "error",
-									isClosable: true,
-								});
-							}}
-						/>
-					) : undefined}
 				</Flex>
+				{marketState < 2 ? (
+					<ApprovalInterface
+						tokenType={0}
+						erc20Address={addresses.WETH}
+						erc20AmountBn={bnValue}
+						onSuccess={() => {
+							toast({
+								title: "Success!",
+								status: "success",
+								isClosable: true,
+							});
+						}}
+						onFail={() => {
+							toast({
+								title: "Metamask err!",
+								status: "error",
+								isClosable: true,
+							});
+						}}
+					/>
+				) : undefined}
 				{isUserAnOwner == true && marketState == 2 ? (
 					<Flex
 						flexDirection={"column"}

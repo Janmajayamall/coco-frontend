@@ -52,7 +52,6 @@ import ConfigSidebar from "../components/ConfigSiderbar";
 import { FireIcon } from "../components/FireIcon";
 import { HomeIcon } from "../components/HomeIcon";
 import { ArrowBackIcon } from "@chakra-ui/icons";
-import SuggestionSidebar from "../components/SuggestionSidebar";
 import PrimaryButton from "../components/PrimaryButton";
 import CreatePostStrip from "../components/CreatePostStrip";
 import PopularGroups from "../components/PopularGroups";

@@ -6,7 +6,6 @@ import NewPost from "./pages/NewPost";
 import NewGroup from "./pages/NewGroup";
 // import OracleConfig from "./pages/OracleConfig";
 import Activity from "./pages/Activity";
-
 import Feed from "./pages/Feed";
 import Post from "./pages/Post";
 import Pages from "./pages/Pages";
@@ -160,29 +159,6 @@ function App() {
 						/>
 
 						<Spacer />
-						<Select
-							onChange={(e) => {
-								if (e.target.value == "") {
-									navigate(`/explore`);
-								} else {
-									navigate(`/group/${e.target.value}`);
-								}
-							}}
-							placeholder="Search Group"
-							// value={safe}
-							width={"20%"}
-						>
-							{groups.map((group) => {
-								return (
-									<>
-										<option value={group.groupAddress}>
-											{`${group.name}`}
-										</option>
-									</>
-								);
-							})}
-						</Select>
-						<Spacer />
 						<Flex justifyContent="center" margin={5}>
 							<IconButton
 								onClick={() => {
@@ -218,7 +194,9 @@ function App() {
 								}
 							/>
 
-							{isAuthenticated == true ? (
+							{/* Home feed isn't needed rn, since there aren't many
+							posts */}
+							{isAuthenticated == true && false ? (
 								<IconButton
 									onClick={() => {
 										if (location.pathname == "/home") {
@@ -250,6 +228,29 @@ function App() {
 								/>
 							) : undefined}
 						</Flex>
+						<Spacer />
+						<Select
+							onChange={(e) => {
+								if (e.target.value == "") {
+									navigate(`/explore`);
+								} else {
+									navigate(`/group/${e.target.value}`);
+								}
+							}}
+							placeholder="Search Group"
+							// value={safe}
+							width={"20%"}
+						>
+							{groups.map((group) => {
+								return (
+									<>
+										<option value={group.groupAddress}>
+											{`${group.name}`}
+										</option>
+									</>
+								);
+							})}
+						</Select>
 						<Spacer />
 						<ConnectButton />
 						<MainMenu />
