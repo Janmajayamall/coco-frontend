@@ -6,7 +6,7 @@ import { getMarketIdentifierOfPost } from ".";
 export const baseInstance = axios.create({
 	baseURL: (() => {
 		if (process.env.REACT_APP_VERCEL_ENV === "production") {
-			return "https://backend.cocoverse.club/";
+			return "https://cocoproduction.efprivacyscaling.org";
 		} else if (process.env.REACT_APP_VERCEL_ENV === "preview") {
 			return "https://cocostaging.efprivacyscaling.org";
 		} else {

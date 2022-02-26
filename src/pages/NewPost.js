@@ -448,10 +448,10 @@ function Page() {
 				<HelpBox
 					heading={"Posting to COCO"}
 					pointsArr={[
-						"1. Your post should be suitable to group your are posting to.",
-						"2. To post you need to put up 0.05 WETH for YES, so that others can challenge your post.",
+						"1. Your post should be suitable for the group your are posting to.",
+						"2. To post you need to put in 0.05 WETH for YES, so that others can challenge your post if required.",
 						"3. Don't worry 0.05 WETH will only be deducted if someone challenges your post, otherwise nothing happens.",
-						"4. If someone challenges and you think your post is suitable for group, then challenge them back to win their amount.",
+						"4. If someone challenges and you think your post is still suitable for group, then challenge them back to win their amount.",
 					]}
 				/>
 			</Flex>

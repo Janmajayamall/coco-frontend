@@ -495,10 +495,10 @@ function Page() {
 				<HelpBox
 					heading={"What's?"}
 					pointsArr={[
-						"1. Fee - Fee charged by moderators as a product of amount put up for the losing outcome. Only applicable when they declare final outcome.",
+						"1. Fee - Fee charged by moderators as a product of total amount put in for the losing outcome. Only applicable when they declare final outcome.",
 						"2. Challenge Buffer period - Time period to challenge temporary outcome.",
 						"3. Resolution period - Time period for moderators to declare final outcome, if needed.",
-						"4. Max. Challenge limit  - Max. limit total amount put up in challenge rounds a post can reach. After which no more challenges are allowed and moderators will declare the final outcome.",
+						"4. Max. Challenge limit  - Max. limit on total amount that can be put in during challenge rounds of a post. After which no more challenges are allowed and moderators will declare the final outcome.",
 					]}
 				/>
 				{isUserAnOwner == true ? (

@@ -194,8 +194,8 @@ function Page() {
 					pointsArr={[
 						"1. Join groups and post interesting things in them.",
 						"2. Didn't find a group of interest? Create one by going to menu on top right.",
-						"3. For every post you put some amount (0.05 WETH) to assure everyone that your post is relevant to the group. So, in case it isn't then anyone can challenge you!",
-						"4. You can also challenge posts that you think are not related to the grourp, and win some amount.",
+						"3. For every post you put in some amount (0.05 WETH) to give assurance that your post is relevant to the group. So, in case it isn't, anyone can challenge you!",
+						"4. You should challenge posts that you think are not related to the group, and, if you are right, win reward.",
 					]}
 				/>
 				<Flex
